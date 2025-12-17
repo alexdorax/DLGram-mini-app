@@ -1,1 +1,1 @@
-# DLGram-mini-app
+# DLGram

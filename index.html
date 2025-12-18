@@ -945,9 +945,14 @@
                     const persianAmount = toPersianNumbers((payment.amount / 10).toLocaleString('en-US'));
                     const persianDate = toPersianNumbers(payment.paid_at);
 
-                    // بررسی انقضا
-                    const isExpired = payment.expires_at && isPaymentExpired(payment.expires_at);
+                    // بررسی انقضا - فقط برای اشتراک‌های استفاده شده
+                    const isExpired = payment.used && payment.expires_at && isPaymentExpired(payment.expires_at);
                     const cardId = `card-${payment.payment_id}`;
+
+                    // Debug log
+                    if (payment.expires_at) {
+                        console.log(`Payment ${payment.payment_id}: expires_at=${payment.expires_at}, isExpired=${isExpired}`);
+                    }
 
                     html += `
                         <div class="payment-card" id="${cardId}" style="position: relative;">
@@ -1078,12 +1083,18 @@
                 // تبدیل فرمت فارسی به میلادی
                 // فرمت: "1403/09/28 - 15:30"
                 const parts = expiresAtString.split(' - ');
-                if (parts.length !== 2) return false;
+                if (parts.length !== 2) {
+                    console.log('Invalid format - missing time separator');
+                    return false;
+                }
 
                 const dateParts = parts[0].split('/');
                 const timeParts = parts[1].split(':');
 
-                if (dateParts.length !== 3 || timeParts.length !== 2) return false;
+                if (dateParts.length !== 3 || timeParts.length !== 2) {
+                    console.log('Invalid date/time parts');
+                    return false;
+                }
 
                 // تبدیل اعداد فارسی به انگلیسی
                 const toEnglishNumber = (str) => {
@@ -1100,30 +1111,60 @@
                 const hour = parseInt(toEnglishNumber(timeParts[0]));
                 const minute = parseInt(toEnglishNumber(timeParts[1]));
 
-                // تبدیل دقیق شمسی به میلادی
+                console.log(`Jalali date: ${jYear}/${jMonth}/${jDay} ${hour}:${minute}`);
+
+                // تبدیل شمسی به میلادی - الگوریتم استاندارد
                 function jalaliToGregorian(jy, jm, jd) {
-                    const gy = jy + 1595;
-                    let days = 365 * jy + Math.floor((jy + 3) / 4) - Math.floor((jy + 99) / 100) + Math.floor((jy + 399) / 400) - 80;
+                    const sal_a = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+                    let gy = (jy <= 979) ? 621 : 1600;
+                    jy -= (jy <= 979) ? 0 : 979;
 
-                    for (let i = 0; i < jm - 1; i++) {
-                        days += [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29][i];
+                    let days = (365 * jy) + (Math.floor(jy / 33) * 8) + Math.floor(((jy % 33) + 3) / 4) + 78 + jd;
+
+                    if (jm < 7) {
+                        days += (jm - 1) * 31;
+                    } else {
+                        days += ((jm - 7) * 30) + 186;
                     }
-                    days += jd;
 
-                    const gd_1 = new Date(gy, 2, 20);
-                    const gd_2 = new Date(gd_1.getTime() + (days * 24 * 60 * 60 * 1000));
+                    gy += 400 * Math.floor(days / 146097);
+                    days %= 146097;
 
-                    return {
-                        year: gd_2.getFullYear(),
-                        month: gd_2.getMonth(),
-                        day: gd_2.getDate()
-                    };
+                    if (days > 36524) {
+                        gy += 100 * Math.floor(--days / 36524);
+                        days %= 36524;
+                        if (days >= 365) days++;
+                    }
+
+                    gy += 4 * Math.floor(days / 1461);
+                    days %= 1461;
+
+                    if (days > 365) {
+                        gy += Math.floor((days - 1) / 365);
+                        days = (days - 1) % 365;
+                    }
+
+                    let gd = days + 1;
+                    const gm_array = [0, 31, ((gy % 4 === 0 && gy % 100 !== 0) || (gy % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                    let gm;
+
+                    for (gm = 0; gm < 13 && gd > gm_array[gm]; gm++) {
+                        gd -= gm_array[gm];
+                    }
+
+                    return { year: gy, month: gm, day: gd };
                 }
 
                 const gregorian = jalaliToGregorian(jYear, jMonth, jDay);
-                const expiryDate = new Date(gregorian.year, gregorian.month, gregorian.day, hour, minute);
+                const expiryDate = new Date(gregorian.year, gregorian.month - 1, gregorian.day, hour, minute);
                 const now = new Date();
 
+                console.log(`Gregorian: ${gregorian.year}-${gregorian.month}-${gregorian.day}`);
+                console.log(`Expiry Date: ${expiryDate}`);
+                console.log(`Now: ${now}`);
+                console.log(`Is Expired: ${now > expiryDate}`);
+
+                // چک اینکه حداقل 1 روز گذشته باشد
                 return now > expiryDate;
             } catch (e) {
                 console.error('Error checking expiry:', e);

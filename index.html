@@ -376,9 +376,9 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(225, 48, 108, 0.85), rgba(131, 58, 180, 0.85));
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: linear-gradient(135deg, rgba(225, 48, 108, 0.6), rgba(131, 58, 180, 0.6));
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             border-radius: 16px;
             display: flex;
             flex-direction: column;
@@ -386,11 +386,26 @@
             align-items: center;
             cursor: pointer;
             z-index: 10;
-            transition: opacity 0.3s;
+            opacity: 1;
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
 
         .expired-overlay.hidden {
-            display: none;
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(0.95);
+            }
         }
 
         .expired-text {
@@ -1079,18 +1094,34 @@
                     }).join('');
                 };
 
-                const year = parseInt(toEnglishNumber(dateParts[0]));
-                const month = parseInt(toEnglishNumber(dateParts[1]));
-                const day = parseInt(toEnglishNumber(dateParts[2]));
+                const jYear = parseInt(toEnglishNumber(dateParts[0]));
+                const jMonth = parseInt(toEnglishNumber(dateParts[1]));
+                const jDay = parseInt(toEnglishNumber(dateParts[2]));
                 const hour = parseInt(toEnglishNumber(timeParts[0]));
                 const minute = parseInt(toEnglishNumber(timeParts[1]));
 
-                // تبدیل شمسی به میلادی (تقریبی)
-                const gregorianYear = year - 1304 + 1925;
-                const gregorianMonth = month;
-                const gregorianDay = day;
+                // تبدیل دقیق شمسی به میلادی
+                function jalaliToGregorian(jy, jm, jd) {
+                    const gy = jy + 1595;
+                    let days = 365 * jy + Math.floor((jy + 3) / 4) - Math.floor((jy + 99) / 100) + Math.floor((jy + 399) / 400) - 80;
 
-                const expiryDate = new Date(gregorianYear, gregorianMonth - 1, gregorianDay, hour, minute);
+                    for (let i = 0; i < jm - 1; i++) {
+                        days += [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29][i];
+                    }
+                    days += jd;
+
+                    const gd_1 = new Date(gy, 2, 20);
+                    const gd_2 = new Date(gd_1.getTime() + (days * 24 * 60 * 60 * 1000));
+
+                    return {
+                        year: gd_2.getFullYear(),
+                        month: gd_2.getMonth(),
+                        day: gd_2.getDate()
+                    };
+                }
+
+                const gregorian = jalaliToGregorian(jYear, jMonth, jDay);
+                const expiryDate = new Date(gregorian.year, gregorian.month, gregorian.day, hour, minute);
                 const now = new Date();
 
                 return now > expiryDate;

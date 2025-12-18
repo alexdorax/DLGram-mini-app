@@ -32,6 +32,9 @@
             background: var(--bg);
             color: var(--text);
             padding: 16px 16px 90px;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow-x: hidden;
         }
 
         .header {
@@ -202,6 +205,15 @@
             right: 0;
             color: var(--accent);
             font-weight: bold;
+        }
+
+        .feature.discount {
+            color: var(--accent);
+            font-weight: 700;
+            background: rgba(252, 175, 69, 0.1);
+            padding: 8px 8px 8px 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(252, 175, 69, 0.3);
         }
 
         .cta {
@@ -510,7 +522,7 @@
     <div class="header">
         <h1>خرید اشتراک دی‌ال گرام</h1>
         <p>دسترسی حرفه‌ای برای دانلود سریع و نامحدود از اینستاگرام</p>
-        <div class="refund">✅ بازگشت وجه تا ۲۴ ساعت در صورت نارضایتی</div>
+        <div class="refund">✅ بازگشت وجه تا ۲۴ ساعت در صورت نارضایتی ✅</div>
     </div>
 
     <div class="tabs">
@@ -579,7 +591,7 @@
                     'پست + ریلز + استوری',
                     'سرعت بالا',
                     'پشتیبانی سریع',
-                    '۲۰٪ تخفیف'
+                    { text: '۲۰٪ تخفیف', discount: true }
                 ],
                 highlight: true,
                 badge: '🔥 محبوب کاربران'
@@ -594,7 +606,7 @@
                     'بالاترین سرعت',
                     'پشتیبانی VIP',
                     'مخصوص تولیدکنندگان محتوا',
-                    '۳۳٪ تخفیف'
+                    { text: '۳۳٪ تخفیف', discount: true }
                 ],
                 highlight: true,
                 badge: '⭐ VIP'
@@ -639,7 +651,11 @@
                         </div>
 
                         <div class="features">
-                            ${plan.features.map(f => `<div class="feature">${f}</div>`).join('')}
+                            ${plan.features.map(f => {
+                    const text = typeof f === 'object' ? f.text : f;
+                    const discountClass = typeof f === 'object' && f.discount ? 'discount' : '';
+                    return `<div class="feature ${discountClass}">${text}</div>`;
+                }).join('')}
                         </div>
 
                         <button class="cta" onclick="buyPlan('${key}')">
@@ -796,9 +812,19 @@
                                     <span>${persianAmount} تومان</span>
                                 </div>
                                 <div class="payment-row">
-                                    <span>📅 تاریخ:</span>
+                                    <span>📅 تاریخ خرید:</span>
                                     <span>${persianDate}</span>
                                 </div>
+                                ${payment.activated_at ? `
+                                <div class="payment-row">
+                                    <span>✅ تاریخ فعال‌سازی:</span>
+                                    <span>${toPersianNumbers(payment.activated_at)}</span>
+                                </div>
+                                <div class="payment-row">
+                                    <span>⏳ تاریخ انقضا:</span>
+                                    <span>${toPersianNumbers(payment.expires_at)}</span>
+                                </div>
+                                ` : ''}
                             </div>
                             <div class="payment-code" onclick="handleCodeClick('${payment.payment_id}')">
                                 🔑 ${payment.payment_id}

@@ -1060,22 +1060,46 @@
         // کپی کردن متن به کلیپبورد
         async function copyToClipboard(text) {
             try {
-                // روش اول: استفاده از Clipboard API
-                if (navigator.clipboard) {
-                    await navigator.clipboard.writeText(text);
-                    return true;
+                // روش اول: استفاده از API مینی اپ بله
+                if (WebApp.copyToClipboard) {
+                    try {
+                        await WebApp.copyToClipboard(text);
+                        return true;
+                    } catch (e) {
+                        console.log('Bale WebApp copy failed, trying fallback');
+                    }
                 }
 
-                // روش دوم: روش قدیمی
+                // روش دوم: استفاده از Clipboard API
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        return true;
+                    } catch (e) {
+                        console.log('Clipboard API failed, trying fallback');
+                    }
+                }
+
+                // روش سوم: روش قدیمی با textarea
                 const textArea = document.createElement('textarea');
                 textArea.value = text;
                 textArea.style.position = 'fixed';
                 textArea.style.left = '-999999px';
+                textArea.style.top = '0';
+                textArea.style.opacity = '0';
+                textArea.setAttribute('readonly', '');
                 document.body.appendChild(textArea);
+
+                // انتخاب متن
+                textArea.focus();
                 textArea.select();
-                document.execCommand('copy');
+                textArea.setSelectionRange(0, text.length);
+
+                // تلاش برای کپی
+                const successful = document.execCommand('copy');
                 document.body.removeChild(textArea);
-                return true;
+
+                return successful;
             } catch (err) {
                 console.error('Copy failed:', err);
                 return false;

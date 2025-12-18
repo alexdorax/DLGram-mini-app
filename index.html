@@ -577,21 +577,6 @@
             }
         });
 
-        // تشخیص باز بودن DevTools
-        const devToolsCheck = () => {
-            const threshold = 160;
-            const widthThreshold = window.outerWidth - window.innerWidth > threshold;
-            const heightThreshold = window.outerHeight - window.innerHeight > threshold;
-
-            if (widthThreshold || heightThreshold) {
-                // DevTools باز است - می‌توانید اقدام دلخواه انجام دهید
-                document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;color:#E1306C;font-size:18px;text-align:center;">⚠️<br>دسترسی غیرمجاز تشخیص داده شد</div>';
-            }
-        };
-
-        // بررسی هر 1 ثانیه
-        setInterval(devToolsCheck, 1000);
-
         // تبدیل اعداد انگلیسی به فارسی
         function toPersianNumbers(str) {
             const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
@@ -704,18 +689,18 @@
                         WebApp.HapticFeedback.impactOccurred('light');
                     }
 
-                    // swipe به راست (نمایش تب قبلی) - در RTL به معنی رفتن به سمت راست است
+                    // swipe به راست (نمایش تب بعدی)
                     if (diffX > 0) {
-                        const currentIndex = tabs.indexOf(currentTab);
-                        if (currentIndex > 0) {
-                            switchTab(tabs[currentIndex - 1]);
-                        }
-                    }
-                    // swipe به چپ (نمایش تب بعدی) - در RTL به معنی رفتن به سمت چپ است
-                    else if (diffX < 0) {
                         const currentIndex = tabs.indexOf(currentTab);
                         if (currentIndex < tabs.length - 1) {
                             switchTab(tabs[currentIndex + 1]);
+                        }
+                    }
+                    // swipe به چپ (نمایش تب قبلی)
+                    else if (diffX < 0) {
+                        const currentIndex = tabs.indexOf(currentTab);
+                        if (currentIndex > 0) {
+                            switchTab(tabs[currentIndex - 1]);
                         }
                     }
                 }

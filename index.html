@@ -85,12 +85,16 @@
             font-size: 14px;
             cursor: pointer;
             transition: all 0.3s;
+            border: 2px solid transparent;
         }
 
         .tab.active {
-            background: var(--card);
             color: var(--text);
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+            border: 2px solid transparent;
+            background:
+                linear-gradient(var(--card), var(--card)) padding-box,
+                linear-gradient(135deg, var(--primary), var(--secondary)) border-box;
         }
 
         .content {
@@ -651,6 +655,9 @@
             // به‌روزرسانی وضعیت فعلی
             currentTab = tabName;
 
+            // اسکرول به بالای صفحه
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
             // بارگذاری داده‌ها
             if (tabName === 'payments') {
                 loadPayments();
@@ -694,6 +701,7 @@
                         const currentIndex = tabs.indexOf(currentTab);
                         if (currentIndex < tabs.length - 1) {
                             switchTab(tabs[currentIndex + 1]);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
                         }
                     }
                     // swipe به چپ (نمایش تب قبلی)
@@ -701,6 +709,7 @@
                         const currentIndex = tabs.indexOf(currentTab);
                         if (currentIndex > 0) {
                             switchTab(tabs[currentIndex - 1]);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
                         }
                     }
                 }

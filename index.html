@@ -365,6 +365,49 @@
             opacity: 0.8;
         }
 
+        /* Expired Payment Overlay */
+        .payment-card {
+            position: relative;
+        }
+
+        .expired-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(225, 48, 108, 0.85), rgba(131, 58, 180, 0.85));
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: opacity 0.3s;
+        }
+
+        .expired-overlay.hidden {
+            display: none;
+        }
+
+        .expired-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .expired-subtext {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            padding: 0 20px;
+        }
+
         /* Toast Notification */
         .toast {
             position: fixed;
@@ -887,8 +930,12 @@
                     const persianAmount = toPersianNumbers((payment.amount / 10).toLocaleString('en-US'));
                     const persianDate = toPersianNumbers(payment.paid_at);
 
+                    // بررسی انقضا
+                    const isExpired = payment.expires_at && isPaymentExpired(payment.expires_at);
+                    const cardId = `card-${payment.payment_id}`;
+
                     html += `
-                        <div class="payment-card">
+                        <div class="payment-card" id="${cardId}" style="position: relative;">
                             <div class="payment-header">
                                 <div class="payment-plan">${plan.name || payment.plan}</div>
                                 <div class="payment-status ${statusClass}">${status}</div>
@@ -917,6 +964,12 @@
                                 🔑 ${payment.payment_id}
                             </div>
                             <div class="copy-hint">برای کپی کردن کد کلیک کنید</div>
+                            ${isExpired ? `
+                            <div class="expired-overlay" onclick="hideExpiredOverlay('${cardId}')">
+                                <div class="expired-text">🔒 اشتراک منقضی شده</div>
+                                <div class="expired-subtext">مدت اعتبار این اشتراک به پایان رسیده است<br>برای مشاهده جزئیات کلیک کنید</div>
+                            </div>
+                            ` : ''}
                         </div>
                     `;
                 }
@@ -1003,6 +1056,71 @@
                 }
             });
         }
+
+        // بررسی انقضای پرداخت
+        function isPaymentExpired(expiresAtString) {
+            try {
+                // تبدیل فرمت فارسی به میلادی
+                // فرمت: "1403/09/28 - 15:30"
+                const parts = expiresAtString.split(' - ');
+                if (parts.length !== 2) return false;
+
+                const dateParts = parts[0].split('/');
+                const timeParts = parts[1].split(':');
+
+                if (dateParts.length !== 3 || timeParts.length !== 2) return false;
+
+                // تبدیل اعداد فارسی به انگلیسی
+                const toEnglishNumber = (str) => {
+                    const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+                    return str.split('').map(char => {
+                        const index = persianDigits.indexOf(char);
+                        return index !== -1 ? index.toString() : char;
+                    }).join('');
+                };
+
+                const year = parseInt(toEnglishNumber(dateParts[0]));
+                const month = parseInt(toEnglishNumber(dateParts[1]));
+                const day = parseInt(toEnglishNumber(dateParts[2]));
+                const hour = parseInt(toEnglishNumber(timeParts[0]));
+                const minute = parseInt(toEnglishNumber(timeParts[1]));
+
+                // تبدیل شمسی به میلادی (تقریبی)
+                const gregorianYear = year - 1304 + 1925;
+                const gregorianMonth = month;
+                const gregorianDay = day;
+
+                const expiryDate = new Date(gregorianYear, gregorianMonth - 1, gregorianDay, hour, minute);
+                const now = new Date();
+
+                return now > expiryDate;
+            } catch (e) {
+                console.error('Error checking expiry:', e);
+                return false;
+            }
+        }
+
+        // پنهان کردن overlay انقضا
+        function hideExpiredOverlay(cardId) {
+            const card = document.getElementById(cardId);
+            if (card) {
+                const overlay = card.querySelector('.expired-overlay');
+                if (overlay) {
+                    overlay.classList.add('hidden');
+                }
+            }
+        }
+
+        // مدیریت pageshow event برای برگشت از پرداخت
+        window.addEventListener('pageshow', function (event) {
+            // اگر صفحه از cache بارگذاری شده
+            if (event.persisted) {
+                // نمایش دوباره overlayهای انقضا
+                document.querySelectorAll('.expired-overlay').forEach(overlay => {
+                    overlay.classList.remove('hidden');
+                });
+            }
+        });
 
         // بارگذاری اولیه
         loadPlans();

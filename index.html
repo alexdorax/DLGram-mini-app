@@ -335,7 +335,7 @@
         }
 
         .payment-code::after {
-            content: '📋 برای کپی کلیک کنید';
+            content: 'برای کپی کلیک کنید';
             position: absolute;
             left: -8px;
             top: 50%;
@@ -375,6 +375,14 @@
 
         .payment-code:hover::after {
             transform: translate(-105%, -50%);
+        }
+
+        .copy-hint {
+            text-align: center;
+            font-size: 11px;
+            color: var(--primary);
+            margin-top: 8px;
+            opacity: 0.8;
         }
 
         /* Toast Notification */
@@ -825,6 +833,7 @@
                             <div class="payment-code" onclick="handleCodeClick('${payment.payment_id}')">
                                 🔑 ${payment.payment_id}
                             </div>
+                            <div class="copy-hint">⚡ برای کپی کردن کد کلیک کنید</div>
                         </div>
                     `;
                 }

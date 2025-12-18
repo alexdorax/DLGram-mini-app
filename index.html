@@ -52,33 +52,27 @@
         .main-container::before {
             content: '';
             position: absolute;
-            top: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 48px;
-            height: 48px;
-            background-image: url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            opacity: 0.3;
-            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 5% 8% / 2px 2px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 15% 25% / 4px 4px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 85% 15% / 2px 2px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 92% 35% / 4px 4px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 8% 55% / 2px 2px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 88% 65% / 4px 4px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 12% 80% / 2px 2px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 90% 88% / 4px 4px no-repeat;
+            opacity: 0.03;
+            pointer-events: none;
+            border-radius: 24px;
         }
 
-        .main-container::after {
-            content: '';
-            position: absolute;
-            bottom: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 48px;
-            height: 48px;
-            background-image: url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            opacity: 0.3;
-            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+        .main-container>* {
+            position: relative;
+            z-index: 1;
         }
 
         .header {
@@ -101,22 +95,23 @@
         }
 
         .header p {
-            font-size: 14.5px;
+            font-size: 11px;
             color: rgba(255, 255, 255, 0.85);
-            line-height: 1.8;
+            line-height: 1.4;
             font-weight: 500;
         }
 
         .refund {
-            margin-top: 14px;
-            font-size: 13.5px;
+            margin-top: 10px;
+            font-size: 11px;
             color: #FFD700;
             font-weight: 700;
             background: rgba(255, 215, 0, 0.15);
-            padding: 10px 16px;
-            border-radius: 12px;
+            padding: 6px 12px;
+            border-radius: 8px;
             border: 1.5px solid rgba(255, 215, 0, 0.4);
             display: inline-block;
+            white-space: nowrap;
         }
 
         .tabs {
@@ -621,20 +616,27 @@
         .footer-link {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
+            gap: 4px;
+            padding: 6px 12px;
             background: rgba(225, 48, 108, 0.1);
             border: 1px solid var(--primary);
-            border-radius: 12px;
+            border-radius: 10px;
             color: var(--text);
             text-decoration: none;
-            font-size: 13px;
+            font-size: 11px;
             transition: all 0.3s;
+            cursor: pointer;
         }
 
         .footer-link:active {
             transform: scale(0.96);
             background: rgba(225, 48, 108, 0.2);
+        }
+
+        .footer-link img {
+            width: 14px;
+            height: 14px;
+            object-fit: contain;
         }
     </style>
 </head>
@@ -907,7 +909,11 @@
                     <div class="footer-title">تمامی حقوق محفوظ است | © 2025 DLGram</div>
                     <div class="footer-title">طراحی و توسعه توسط <strong>DLGramProBot</strong> | <strong>MrAliz</strong></div>
                     <div class="footer-links">
-                        <a href="https://ble.ir/MrAliz" class="footer-link" target="_blank">
+                        <a href="javascript:void(0)" class="footer-link" onclick="openTelegramBot()">
+                            <img src="https://cdn.imgurl.ir/uploads/v7634_Telegram_2019_Logo.svg.png" alt="Telegram">
+                            دی‌ال‌گرام
+                        </a>
+                        <a href="javascript:void(0)" class="footer-link" onclick="openSupport()">
                             📞 پشتیبانی در بله
                         </a>
                     </div>
@@ -915,6 +921,28 @@
             `;
 
             plansContent.innerHTML = html;
+        }
+
+        // باز کردن ربات تلگرام
+        function openTelegramBot() {
+            if (WebApp.openTelegramLink) {
+                WebApp.openTelegramLink('https://t.me/DLGramProBot');
+            } else if (WebApp.openLink) {
+                WebApp.openLink('https://t.me/DLGramProBot');
+            } else {
+                window.open('https://t.me/DLGramProBot', '_blank');
+            }
+        }
+
+        // باز کردن لینک پشتیبانی
+        function openSupport() {
+            if (WebApp.openTelegramLink) {
+                WebApp.openTelegramLink('https://ble.ir/MrAliz');
+            } else if (WebApp.openLink) {
+                WebApp.openLink('https://ble.ir/MrAliz');
+            } else {
+                window.open('https://ble.ir/MrAliz', '_blank');
+            }
         }
 
         // خرید پلن
@@ -1015,6 +1043,19 @@
                             <div class="empty-text">هنوز پرداختی ندارید</div>
                             <div class="empty-subtext">برای خرید اشتراک به تب بسته‌ها بروید</div>
                         </div>
+                        <div class="footer">
+                            <div class="footer-title">تمامی حقوق محفوظ است | © 2025 DLGram</div>
+                            <div class="footer-title">طراحی و توسعه توسط <strong>DLGramProBot</strong> | <strong>MrAliz</strong></div>
+                            <div class="footer-links">
+                                <a href="javascript:void(0)" class="footer-link" onclick="openTelegramBot()">
+                                    <img src="https://cdn.imgurl.ir/uploads/v7634_Telegram_2019_Logo.svg.png" alt="Telegram">
+                                    دی‌ال‌گرام
+                                </a>
+                                <a href="javascript:void(0)" class="footer-link" onclick="openSupport()">
+                                    📞 پشتیبانی در بله
+                                </a>
+                            </div>
+                        </div>
                     `;
                     return;
                 }
@@ -1076,6 +1117,23 @@
                         </div>
                     `;
                 }
+
+                // اضافه کردن footer
+                html += `
+                    <div class="footer">
+                        <div class="footer-title">تمامی حقوق محفوظ است | © 2025 DLGram</div>
+                        <div class="footer-title">طراحی و توسعه توسط <strong>DLGramProBot</strong> | <strong>MrAliz</strong></div>
+                        <div class="footer-links">
+                            <a href="javascript:void(0)" class="footer-link" onclick="openTelegramBot()">
+                                <img src="https://cdn.imgurl.ir/uploads/v7634_Telegram_2019_Logo.svg.png" alt="Telegram">
+                                دی‌ال‌گرام
+                            </a>
+                            <a href="javascript:void(0)" class="footer-link" onclick="openSupport()">
+                                📞 پشتیبانی در بله
+                            </a>
+                        </div>
+                    </div>
+                `;
 
                 paymentsContent.innerHTML = html;
 

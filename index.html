@@ -179,9 +179,18 @@
         }
 
         .plan-duration {
-            font-size: 13px;
-            color: var(--muted);
-            margin-top: 4px;
+            font-size: 16px;
+            color: var(--accent);
+            margin-top: 6px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .plan-duration::before {
+            content: '⏰';
+            font-size: 18px;
         }
 
         .plan-price {
@@ -577,7 +586,7 @@
     </div>
 
     <div class="tabs">
-        <button class="tab active" onclick="switchTab('plans')">📦 پلن‌ها</button>
+        <button class="tab active" onclick="switchTab('plans')">� بسته‌های اشتراک</button>
         <button class="tab" onclick="switchTab('payments')">📋 پرداخت‌های من</button>
     </div>
 
@@ -940,7 +949,7 @@
                         <div class="empty-state">
                             <div class="empty-icon">📋</div>
                             <div class="empty-text">هنوز پرداختی ندارید</div>
-                            <div class="empty-subtext">برای خرید اشتراک به تب پلن‌ها بروید</div>
+                            <div class="empty-subtext">برای خرید اشتراک به تب بسته‌ها بروید</div>
                         </div>
                     `;
                     return;

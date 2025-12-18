@@ -334,25 +334,6 @@
             transform: scale(0.98);
         }
 
-        .payment-code::after {
-            content: 'برای کپی کلیک کنید';
-            position: absolute;
-            left: -8px;
-            top: 50%;
-            transform: translate(-100%, -50%);
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s, transform 0.3s;
-            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-            white-space: nowrap;
-            box-shadow: 0 2px 8px rgba(225, 48, 108, 0.4);
-        }
-
         .payment-code::before {
             content: '';
             position: absolute;
@@ -368,13 +349,8 @@
             transition: opacity 0.3s;
         }
 
-        .payment-code:hover::after,
         .payment-code:hover::before {
             opacity: 1;
-        }
-
-        .payment-code:hover::after {
-            transform: translate(-105%, -50%);
         }
 
         .copy-hint {
@@ -563,6 +539,59 @@
         WebApp.ready();
         WebApp.expand();
 
+        // محافظت از کد - غیرفعال کردن inspect و developer tools
+        // غیرفعال کردن راست کلیک
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        // غیرفعال کردن کلیدهای میانبر DevTools
+        document.addEventListener('keydown', (e) => {
+            // F12
+            if (e.key === 'F12') {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+Shift+I (DevTools)
+            if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+Shift+J (Console)
+            if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+Shift+C (Inspect)
+            if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+U (View Source)
+            if (e.ctrlKey && e.key === 'u') {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+S (Save)
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // تشخیص باز بودن DevTools
+        const devToolsCheck = () => {
+            const threshold = 160;
+            const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+            const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+
+            if (widthThreshold || heightThreshold) {
+                // DevTools باز است - می‌توانید اقدام دلخواه انجام دهید
+                document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;color:#E1306C;font-size:18px;text-align:center;">⚠️<br>دسترسی غیرمجاز تشخیص داده شد</div>';
+            }
+        };
+
+        // بررسی هر 1 ثانیه
+        setInterval(devToolsCheck, 1000);
+
         // تبدیل اعداد انگلیسی به فارسی
         function toPersianNumbers(str) {
             const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
@@ -618,18 +647,78 @@
         };
 
         // تابع تغییر تب
+        // وضعیت تب فعلی
+        let currentTab = 'plans';
+        const tabs = ['plans', 'payments'];
+
         function switchTab(tabName) {
             // تغییر دکمه‌های فعال
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
+            const targetButton = tabName === 'plans'
+                ? document.querySelector('.tab:first-child')
+                : document.querySelector('.tab:last-child');
+            targetButton.classList.add('active');
 
             // تغییر محتوا
             document.querySelectorAll('.content').forEach(content => content.classList.remove('active'));
             document.getElementById(tabName + '-content').classList.add('active');
 
+            // به‌روزرسانی وضعیت فعلی
+            currentTab = tabName;
+
             // بارگذاری داده‌ها
             if (tabName === 'payments') {
                 loadPayments();
+            }
+        }
+
+        // راه‌اندازی swipe navigation
+        function initSwipeNavigation() {
+            let touchStartX = 0;
+            let touchEndX = 0;
+            let touchStartY = 0;
+            let touchEndY = 0;
+            const swipeThreshold = 50; // حداقل فاصله برای تشخیص swipe (پیکسل)
+
+            const container = document.body;
+
+            container.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+
+            container.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                touchEndY = e.changedTouches[0].screenY;
+                handleSwipe();
+            }, { passive: true });
+
+            function handleSwipe() {
+                const diffX = touchEndX - touchStartX;
+                const diffY = touchEndY - touchStartY;
+
+                // بررسی اینکه swipe افقی است نه عمودی
+                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > swipeThreshold) {
+                    // Haptic feedback
+                    if (WebApp.HapticFeedback) {
+                        WebApp.HapticFeedback.impactOccurred('light');
+                    }
+
+                    // swipe به راست (نمایش تب قبلی) - در RTL به معنی رفتن به سمت راست است
+                    if (diffX > 0) {
+                        const currentIndex = tabs.indexOf(currentTab);
+                        if (currentIndex > 0) {
+                            switchTab(tabs[currentIndex - 1]);
+                        }
+                    }
+                    // swipe به چپ (نمایش تب بعدی) - در RTL به معنی رفتن به سمت چپ است
+                    else if (diffX < 0) {
+                        const currentIndex = tabs.indexOf(currentTab);
+                        if (currentIndex < tabs.length - 1) {
+                            switchTab(tabs[currentIndex + 1]);
+                        }
+                    }
+                }
             }
         }
 
@@ -833,7 +922,7 @@
                             <div class="payment-code" onclick="handleCodeClick('${payment.payment_id}')">
                                 🔑 ${payment.payment_id}
                             </div>
-                            <div class="copy-hint">⚡ برای کپی کردن کد کلیک کنید</div>
+                            <div class="copy-hint">برای کپی کردن کد کلیک کنید</div>
                         </div>
                     `;
                 }
@@ -923,6 +1012,7 @@
 
         // بارگذاری اولیه
         loadPlans();
+        initSwipeNavigation();
     </script>
 
 </body>

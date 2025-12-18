@@ -2,73 +2,91 @@
 <html lang="fa" dir="rtl">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>خرید اشتراک</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>خرید اشتراک دی‌ال گرام</title>
 
     <!-- Bale Mini App SDK -->
     <script src="https://tapi.bale.ai/miniapp.js?3"></script>
 
     <style>
+        :root {
+            --bg: #0F0F13;
+            --card: #1A1A22;
+            --primary: #E1306C;
+            --secondary: #833AB4;
+            --accent: #FCAF45;
+            --text: #FFFFFF;
+            --muted: #B3B3C2;
+            --radius: 16px;
+        }
+
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
+            margin: 0;
+            padding: 0
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-            background-color: var(--bale-bg-color, #ffffff);
-            color: var(--bale-text-color, #000000);
-            padding: 16px;
-            padding-bottom: 80px;
-            transition: background-color 0.3s, color 0.3s;
+            font-family: IRANSansX, 'Segoe UI', Tahoma, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 16px 16px 90px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 24px;
-            padding: 20px 0;
+            margin-bottom: 28px;
         }
 
         .header h1 {
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 22px;
+            font-weight: 800;
             margin-bottom: 8px;
-            color: var(--bale-text-color, #000000);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .header p {
             font-size: 14px;
-            color: var(--bale-hint-color, #666666);
-            line-height: 1.6;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .refund {
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--accent);
+            font-weight: 600;
         }
 
         .tabs {
             display: flex;
             gap: 8px;
-            margin-bottom: 20px;
-            background: var(--bale-secondary-bg-color, #f5f5f5);
-            border-radius: 12px;
-            padding: 4px;
+            background: #181820;
+            padding: 6px;
+            border-radius: 14px;
+            margin-bottom: 24px;
         }
 
         .tab {
             flex: 1;
-            padding: 12px;
             border: none;
             background: transparent;
-            color: var(--bale-text-color, #000000);
+            color: var(--muted);
+            padding: 12px;
+            border-radius: 12px;
             font-size: 14px;
-            font-weight: 500;
-            border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s;
         }
 
         .tab.active {
-            background: var(--bale-bg-color, #ffffff);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: var(--card);
+            color: var(--text);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
         }
 
         .content {
@@ -93,12 +111,12 @@
         }
 
         .plan-card {
-            background: var(--bale-secondary-bg-color, #f5f5f5);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
+            background: var(--card);
+            border-radius: 20px;
+            padding: 22px;
+            margin-bottom: 18px;
             position: relative;
-            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
@@ -106,27 +124,24 @@
             transform: scale(0.98);
         }
 
-        .plan-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #4fc3dc, #ff6b9d);
+        .plan-card.highlight {
+            border: 2px solid transparent;
+            background:
+                linear-gradient(var(--card), var(--card)) padding-box,
+                linear-gradient(135deg, var(--primary), var(--secondary)) border-box;
+            box-shadow: 0 8px 24px rgba(225, 48, 108, 0.15);
         }
 
-        .discount-badge {
+        .badge {
             position: absolute;
-            top: 16px;
-            left: 16px;
-            background: linear-gradient(135deg, #ff6b9d, #ff8fab);
-            color: white;
-            padding: 6px 12px;
+            top: -12px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 12px;
-            font-weight: bold;
-            box-shadow: 0 2px 8px rgba(255, 107, 157, 0.4);
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(225, 48, 108, 0.4);
             animation: pulse 2s infinite;
         }
 
@@ -142,87 +157,101 @@
             }
         }
 
-        .plan-header {
+        .plan-head {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .plan-icon {
-            font-size: 32px;
-            margin-left: 12px;
-        }
-
-        .plan-title {
-            flex: 1;
+            align-items: center;
+            margin-bottom: 16px;
         }
 
         .plan-name {
             font-size: 18px;
-            font-weight: bold;
-            color: var(--bale-text-color, #000000);
+            font-weight: 800;
+            color: var(--text);
         }
 
         .plan-duration {
             font-size: 13px;
-            color: var(--bale-hint-color, #666666);
+            color: var(--muted);
             margin-top: 4px;
         }
 
         .plan-price {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--bale-button-color, #4fc3dc);
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--accent);
         }
 
-        .plan-description {
+        .features {
+            margin: 16px 0;
+            display: grid;
+            gap: 10px;
+        }
+
+        .feature {
             font-size: 13px;
-            color: var(--bale-hint-color, #666666);
-            margin-bottom: 12px;
-            line-height: 1.5;
+            color: var(--muted);
+            padding-right: 20px;
+            position: relative;
         }
 
-        .plan-features {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        .feature-badge {
-            background: var(--bale-button-color, #4fc3dc);
-            color: var(--bale-button-text-color, #ffffff);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .buy-button {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #4fc3dc, #3a9fb5);
-            color: #ffffff;
-            font-size: 16px;
+        .feature::before {
+            content: '✓';
+            position: absolute;
+            right: 0;
+            color: var(--accent);
             font-weight: bold;
+        }
+
+        .cta {
+            width: 100%;
+            border: none;
+            border-radius: 14px;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 800;
             cursor: pointer;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(79, 195, 220, 0.3);
+            box-shadow: 0 4px 16px rgba(225, 48, 108, 0.3);
         }
 
-        .buy-button:active {
+        .cta:active {
             transform: scale(0.96);
-            box-shadow: 0 2px 8px rgba(79, 195, 220, 0.2);
+            box-shadow: 0 2px 8px rgba(225, 48, 108, 0.2);
         }
 
+        .trust {
+            margin-top: 32px;
+            background: #15151C;
+            border-radius: 16px;
+            padding: 18px;
+            display: grid;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .trust div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .trust div::before {
+            content: '✓';
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Payment History Styles */
         .payment-card {
-            background: var(--bale-secondary-bg-color, #f5f5f5);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
+            background: var(--card);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .payment-header {
@@ -234,8 +263,8 @@
 
         .payment-plan {
             font-size: 16px;
-            font-weight: bold;
-            color: var(--bale-text-color, #000000);
+            font-weight: 700;
+            color: var(--text);
         }
 
         .payment-status {
@@ -246,20 +275,21 @@
         }
 
         .status-used {
-            background: #e8f5e9;
-            color: #2e7d32;
+            background: rgba(76, 175, 80, 0.2);
+            color: #81c784;
         }
 
         .status-unused {
-            background: #fff3e0;
-            color: #e65100;
+            background: rgba(252, 175, 69, 0.2);
+            color: var(--accent);
         }
 
         .payment-details {
             display: grid;
             gap: 8px;
             font-size: 13px;
-            color: var(--bale-hint-color, #666666);
+            color: var(--muted);
+            margin-bottom: 12px;
         }
 
         .payment-row {
@@ -268,12 +298,11 @@
         }
 
         .payment-code {
-            background: var(--bale-bg-color, #ffffff);
-            padding: 8px 12px;
-            border-radius: 8px;
+            background: #15151C;
+            padding: 10px 14px;
+            border-radius: 10px;
             font-family: monospace;
             font-size: 13px;
-            margin-top: 8px;
             word-break: break-all;
             cursor: pointer;
             transition: all 0.3s;
@@ -283,8 +312,8 @@
         }
 
         .payment-code:hover {
-            border-color: var(--bale-button-color, #4fc3dc);
-            background: var(--bale-secondary-bg-color, #f5f5f5);
+            border-color: var(--primary);
+            background: rgba(225, 48, 108, 0.1);
         }
 
         .payment-code:active {
@@ -297,35 +326,37 @@
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.85);
             color: white;
-            padding: 4px 8px;
-            border-radius: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
             font-size: 11px;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s;
             font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            white-space: nowrap;
         }
 
         .payment-code:hover::after {
             opacity: 1;
         }
 
+        /* Toast Notification */
         .toast {
             position: fixed;
             bottom: 80px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.90);
             color: white;
-            padding: 12px 24px;
+            padding: 14px 26px;
             border-radius: 24px;
             font-size: 14px;
             z-index: 1000;
             opacity: 0;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -336,6 +367,7 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        /* Empty States */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -344,29 +376,31 @@
         .empty-icon {
             font-size: 64px;
             margin-bottom: 16px;
-            opacity: 0.5;
+            opacity: 0.6;
         }
 
         .empty-text {
             font-size: 16px;
-            color: var(--bale-hint-color, #666666);
+            color: var(--text);
             margin-bottom: 8px;
+            font-weight: 600;
         }
 
         .empty-subtext {
             font-size: 13px;
-            color: var(--bale-hint-color, #666666);
+            color: var(--muted);
         }
 
+        /* Loading */
         .loading {
             text-align: center;
             padding: 40px;
-            color: var(--bale-hint-color, #666666);
+            color: var(--muted);
         }
 
         .spinner {
-            border: 3px solid var(--bale-secondary-bg-color, #f5f5f5);
-            border-top: 3px solid var(--bale-button-color, #4fc3dc);
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid var(--primary);
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -385,39 +419,24 @@
         }
 
         .error-message {
-            background: #ffebee;
-            color: #c62828;
-            padding: 12px 16px;
-            border-radius: 8px;
+            background: rgba(225, 48, 108, 0.15);
+            color: var(--primary);
+            padding: 14px 18px;
+            border-radius: 12px;
             margin-bottom: 16px;
             font-size: 14px;
             text-align: center;
-        }
-
-        /* Dark theme support */
-        @media (prefers-color-scheme: dark) {
-            .status-used {
-                background: rgba(46, 125, 50, 0.2);
-                color: #81c784;
-            }
-
-            .status-unused {
-                background: rgba(230, 81, 0, 0.2);
-                color: #ffb74d;
-            }
-
-            .error-message {
-                background: rgba(198, 40, 40, 0.2);
-                color: #ef5350;
-            }
+            border: 1px solid rgba(225, 48, 108, 0.3);
         }
     </style>
 </head>
 
 <body>
+
     <div class="header">
-        <h1>💎 خرید اشتراک پریمیوم</h1>
-        <p>اشتراک خود را انتخاب کنید و از امکانات ویژه لذت ببرید</p>
+        <h1>💎 خرید اشتراک</h1>
+        <p>دسترسی حرفه‌ای برای دانلود سریع و نامحدود از اینستاگرام</p>
+        <div class="refund">✅ بازگشت وجه تا ۲۴ ساعت در صورت نارضایتی</div>
     </div>
 
     <div class="tabs">
@@ -443,34 +462,7 @@
         const Bale = window.Bale;
         const WebApp = Bale.WebApp;
 
-        // تنظیم تم
-        function applyTheme() {
-            const themeParams = WebApp.themeParams;
-            const root = document.documentElement;
-
-            if (themeParams.bg_color) {
-                root.style.setProperty('--bale-bg-color', themeParams.bg_color);
-            }
-            if (themeParams.text_color) {
-                root.style.setProperty('--bale-text-color', themeParams.text_color);
-            }
-            if (themeParams.hint_color) {
-                root.style.setProperty('--bale-hint-color', themeParams.hint_color);
-            }
-            if (themeParams.button_color) {
-                root.style.setProperty('--bale-button-color', themeParams.button_color);
-            }
-            if (themeParams.button_text_color) {
-                root.style.setProperty('--bale-button-text-color', themeParams.button_text_color);
-            }
-            if (themeParams.secondary_bg_color) {
-                root.style.setProperty('--bale-secondary-bg-color', themeParams.secondary_bg_color);
-            }
-
-            document.body.style.backgroundColor = themeParams.bg_color || '#ffffff';
-        }
-
-        // API endpoint - باید با آدرس Worker شما جایگزین شود
+        // API endpoint
         const API_BASE = 'https://eshterak-ble-bot.alinouri904.workers.dev';
 
         // دریافت اطلاعات کاربر
@@ -480,33 +472,52 @@
         // تنظیمات اولیه
         WebApp.ready();
         WebApp.expand();
-        applyTheme();
 
         // پلن‌های اشتراک
         const plans = {
             bronze: {
                 name: 'برنزی',
-                icon: '🥉',
                 duration: '۳۰ روز',
-                price: '۵۰,۰۰۰',
-                description: 'اشتراک یک ماهه برای شروع',
-                features: ['دانلود HD', 'پشتیبانی ۲۴/۷']
+                price: '50,000',
+                description: 'دانلود پست و ریلز',
+                features: [
+                    'دانلود پست و ریلز',
+                    'کیفیت HD بدون واترمارک',
+                    'سرعت استاندارد',
+                    'پشتیبانی ۲۴/۷'
+                ],
+                highlight: false,
+                badge: ''
             },
             silver: {
                 name: 'نقره‌ای',
-                icon: '🥈',
                 duration: '۹۰ روز',
-                price: '۱۲۰,۰۰۰',
-                description: 'اشتراک سه ماهه با تخفیف ویژه',
-                features: ['دانلود HD', 'پشتیبانی ۲۴/۷', '۲۰٪ تخفیف']
+                price: '120,000',
+                description: 'دانلود نامحدود',
+                features: [
+                    'دانلود نامحدود',
+                    'پست + ریلز + استوری',
+                    'سرعت بالا',
+                    'پشتیبانی سریع',
+                    '۲۰٪ تخفیف'
+                ],
+                highlight: true,
+                badge: '🔥 محبوب کاربران'
             },
             gold: {
                 name: 'طلایی',
-                icon: '🥇',
                 duration: '۳۶۵ روز',
-                price: '۴۰۰,۰۰۰',
-                description: 'اشتراک یک ساله با بیشترین تخفیف',
-                features: ['دانلود HD', 'پشتیبانی VIP', '۳۳٪ تخفیف']
+                price: '400,000',
+                description: 'بالاترین سرعت',
+                features: [
+                    'دانلود نامحدود',
+                    'بالاترین سرعت',
+                    'پشتیبانی VIP',
+                    'مخصوص تولیدکنندگان محتوا',
+                    '۳۳٪ تخفیف'
+                ],
+                highlight: true,
+                badge: '⭐ VIP'
             }
         };
 
@@ -532,30 +543,39 @@
             let html = '';
 
             for (const [key, plan] of Object.entries(plans)) {
-                const discountBadge = key === 'silver' ? '<div class="discount-badge">🔥 ۲۰٪ تخفیف</div>' :
-                    key === 'gold' ? '<div class="discount-badge">⭐ بهترین قیمت</div>' : '';
+                const highlightClass = plan.highlight ? 'highlight' : '';
+                const badge = plan.badge ? `<div class="badge">${plan.badge}</div>` : '';
 
                 html += `
-                    <div class="plan-card">
-                        ${discountBadge}
-                        <div class="plan-header">
-                            <div class="plan-icon">${plan.icon}</div>
-                            <div class="plan-title">
+                    <div class="plan-card ${highlightClass}">
+                        ${badge}
+                        <div class="plan-head">
+                            <div>
                                 <div class="plan-name">${plan.name}</div>
                                 <div class="plan-duration">${plan.duration}</div>
                             </div>
                             <div class="plan-price">${plan.price} تومان</div>
                         </div>
-                        <div class="plan-description">${plan.description}</div>
-                        <div class="plan-features">
-                            ${plan.features.map(f => `<span class="feature-badge">${f}</span>`).join('')}
+
+                        <div class="features">
+                            ${plan.features.map(f => `<div class="feature">${f}</div>`).join('')}
                         </div>
-                        <button class="buy-button" onclick="buyPlan('${key}')">
-                            💳 خرید اشتراک ${plan.name}
+
+                        <button class="cta" onclick="buyPlan('${key}')">
+                            🚀 فعال‌سازی نامحدود
                         </button>
                     </div>
                 `;
             }
+
+            // اضافه کردن بخش اعتماد
+            html += `
+                <div class="trust">
+                    <div>پرداخت امن با کیف پول بله</div>
+                    <div>بازگشت وجه تا ۲۴ ساعت</div>
+                    <div>هزاران کاربر فعال</div>
+                </div>
+            `;
 
             plansContent.innerHTML = html;
         }
@@ -615,7 +635,7 @@
             plansContent.innerHTML = `
                 <div class="empty-state" style="animation: zoomIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);">
                     <div class="empty-icon" style="animation: rotate 1s ease-in-out;">🎊</div>
-                    <div class="empty-text" style="color: #4fc3dc; font-weight: bold;">پرداخت با موفقیت انجام شد!</div>
+                    <div class="empty-text" style="color: var(--primary);">پرداخت با موفقیت انجام شد!</div>
                     <div class="empty-subtext">کد پیگیری شما ذخیره شد و در تاریخچه قابل مشاهده است</div>
                 </div>
                 <style>
@@ -664,14 +684,14 @@
 
                 let html = '';
                 for (const payment of data.payments) {
-                    const plan = plans[payment.plan] || { name: payment.plan, icon: '📦' };
+                    const plan = plans[payment.plan] || { name: payment.plan };
                     const status = payment.used ? 'استفاده شده' : 'استفاده نشده';
                     const statusClass = payment.used ? 'status-used' : 'status-unused';
 
                     html += `
                         <div class="payment-card">
                             <div class="payment-header">
-                                <div class="payment-plan">${plan.icon} ${plan.name}</div>
+                                <div class="payment-plan">${plan.name || payment.plan}</div>
                                 <div class="payment-status ${statusClass}">${status}</div>
                             </div>
                             <div class="payment-details">
@@ -684,7 +704,9 @@
                                     <span>${payment.paid_at}</span>
                                 </div>
                             </div>
-                            <div class="payment-code" onclick="handleCodeClick('${payment.payment_id}')">🔑 ${payment.payment_id}</div>
+                            <div class="payment-code" onclick="handleCodeClick('${payment.payment_id}')">
+                                🔑 ${payment.payment_id}
+                            </div>
                         </div>
                     `;
                 }
@@ -775,6 +797,7 @@
         // بارگذاری اولیه
         loadPlans();
     </script>
+
 </body>
 
 </html>

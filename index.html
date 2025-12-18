@@ -24,7 +24,9 @@
         * {
             box-sizing: border-box;
             margin: 0;
-            padding: 0
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            tap-highlight-color: transparent;
         }
 
         body {
@@ -145,9 +147,9 @@
             top: -12px;
             right: 20px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 5px 12px;
+            border-radius: 18px;
+            font-size: 11px;
             font-weight: 700;
             box-shadow: 0 4px 12px rgba(225, 48, 108, 0.4);
             animation: pulse 2s infinite;
@@ -586,7 +588,7 @@
     </div>
 
     <div class="tabs">
-        <button class="tab active" onclick="switchTab('plans')">� بسته‌های اشتراک</button>
+        <button class="tab active" onclick="switchTab('plans')">📦 بسته‌های اشتراک</button>
         <button class="tab" onclick="switchTab('payments')">📋 پرداخت‌های من</button>
     </div>
 
@@ -1005,7 +1007,7 @@
                             <div class="copy-hint">برای کپی کردن کد کلیک کنید</div>
                             ${isExpired ? `
                             <div class="expired-overlay" onclick="hideExpiredOverlay('${cardId}')">
-                                <div class="expired-text">🔒 اشتراک منقضی شده 🔒</div>
+                                <div class="expired-text">⚠️ اشتراک منقضی شده ⚠️</div>
                                 <div class="expired-subtext">مدت اعتبار این اشتراک به پایان رسیده است<br>برای مشاهده جزئیات کلیک کنید</div>
                             </div>
                             ` : ''}

@@ -368,6 +368,19 @@
             animation: pulse 2s infinite;
         }
 
+        .discount-badge {
+            position: absolute;
+            top: -8px;
+            left: 20px;
+            background: linear-gradient(135deg, #4CAF50, #2196F3);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: 700;
+            box-shadow: 0 3px 8px rgba(76, 175, 80, 0.3);
+            animation: pulse 2s infinite;
+        }
+
         @keyframes pulse {
 
             0%,
@@ -1073,8 +1086,8 @@
                     const originalPrice = toPersianNumbers(plan.price);
                     priceHtml = `
                         <div>
-                            <div class="plan-price" style="font-size: 14px; text-decoration: line-through; opacity: 0.5; margin-bottom: 4px;">${originalPrice}</div>
-                            <div class="plan-price" style="color: #4CAF50;">${persianPrice} تومان</div>
+                            <div class="plan-price" style="font-size: 18px; text-decoration: line-through; opacity: 0.8; color: #999; margin-bottom: 6px;">${originalPrice} تومان</div>
+                            <div class="plan-price" style="color: #4CAF50; font-weight: bold;">${persianPrice} تومان</div>
                         </div>
                     `;
                 }
@@ -1082,7 +1095,7 @@
                 html += `
                     <div class="plan-card ${highlightClass}">
                         ${badge}
-                        ${isFirstPurchase ? '<div class="badge" style="background: linear-gradient(135deg, #4CAF50, #2196F3);">🎁 10% تخفیف</div>' : ''}
+                        ${isFirstPurchase ? '<div class="badge discount-badge" style="background: linear-gradient(135deg, #4CAF50, #2196F3); left: 20px; padding: 3px 8px; font-size: 9px;">🎁 10% تخفیف</div>' : ''}
                         <div class="plan-head">
                             <div>
                                 <div class="plan-name">${plan.name}</div>

@@ -538,7 +538,7 @@
         .trust {
             margin-top: 32px;
             background: linear-gradient(135deg, rgba(225, 48, 108, 0.05), rgba(131, 58, 180, 0.05));
-            border: 2px solid transparent;
+            border: 2px solid #FFC107;
             border-radius: 16px;
             padding: 20px;
             display: grid;
@@ -547,6 +547,7 @@
             color: var(--text);
             box-shadow: 0 4px 16px rgba(252, 175, 69, 0.1);
             position: relative;
+            animation: borderGlow 3s ease-in-out infinite;
         }
 
         .trust::before {
@@ -555,10 +556,11 @@
             inset: -2px;
             border-radius: 18px;
             padding: 2px;
-            background: conic-gradient(from 0deg, #FFC107, #F44336, #833AB4, #FFC107 100%);
+            background: conic-gradient(from var(--angle, 0deg), #FFC107 0 20deg, transparent 20deg 100%);
             z-index: 0;
             filter: blur(0.5px);
-            animation: trust-glow-rotate 3s linear infinite;
+            pointer-events: none;
+            animation: trust-glow-rotate 2.5s linear infinite;
         }
 
         .trust>* {
@@ -568,14 +570,14 @@
 
         @keyframes trust-glow-rotate {
             0% {
-                filter: hue-rotate(0deg);
+                --angle: 0deg;
             }
 
             100% {
-                filter: hue-rotate(360deg);
+                --angle: 360deg;
             }
         }
-        
+
 
         @keyframes borderGlow {
 

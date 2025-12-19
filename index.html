@@ -198,29 +198,7 @@
             position: relative;
             overflow: hidden;
             box-shadow: 0 8px 24px rgba(131, 58, 180, 0.2);
-            /* حذف pulse و افزودن شاین */
-        }
-
-        .discount-banner::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(120deg, rgba(255, 255, 255, 0.12) 30%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.12) 70%);
-            animation: shine-banner 3s linear infinite;
-            z-index: 0;
-        }
-
-        @keyframes shine-banner {
-            0% {
-                transform: translateX(-100%) skewX(-20deg);
-            }
-
-            100% {
-                transform: translateX(100%) skewX(-20deg);
-            }
+            animation: bannerGlow 3.5s ease-in-out infinite;
         }
 
         .discount-banner::before {
@@ -237,17 +215,27 @@
             animation: shine 3s ease-in-out infinite;
         }
 
-        @keyframes pulse {
+        @keyframes bannerGlow {
 
             0%,
             100% {
-                transform: scale(1);
-                box-shadow: 0 8px 24px rgba(255, 107, 157, 0.3);
+                filter: brightness(1);
+                box-shadow: 0 8px 24px rgba(131, 58, 180, 0.2), 0 0 0px #fff;
+            }
+
+            20% {
+                filter: brightness(1.15);
+                box-shadow: 0 8px 32px #fff, 0 0 24px #fff;
             }
 
             50% {
-                transform: scale(1.02);
-                box-shadow: 0 12px 32px rgba(255, 107, 157, 0.5);
+                filter: brightness(1.08);
+                box-shadow: 0 8px 32px #fff, 0 0 32px #fff;
+            }
+
+            80% {
+                filter: brightness(1.15);
+                box-shadow: 0 8px 32px #fff, 0 0 24px #fff;
             }
         }
 
@@ -287,7 +275,7 @@
             font-size: 28px;
             margin-bottom: 6px;
             display: block;
-            animation: bounce 1s ease-in-out infinite;
+            animation: bounce 2.2s ease-in-out infinite;
         }
 
         @keyframes bounce {
@@ -297,8 +285,12 @@
                 transform: translateY(0);
             }
 
-            50% {
-                transform: translateY(-10px);
+            40% {
+                transform: translateY(-10px) scale(1.08);
+            }
+
+            60% {
+                transform: translateY(-7px) scale(1.04);
             }
         }
 
@@ -538,7 +530,7 @@
         .trust {
             margin-top: 32px;
             background: linear-gradient(135deg, rgba(225, 48, 108, 0.05), rgba(131, 58, 180, 0.05));
-            border: 2px solid #FFC107;
+            border: 2px solid rgba(252, 175, 69, 0.3);
             border-radius: 16px;
             padding: 20px;
             display: grid;
@@ -546,38 +538,8 @@
             font-size: 13px;
             color: var(--text);
             box-shadow: 0 4px 16px rgba(252, 175, 69, 0.1);
-            position: relative;
-            animation: borderGlow 3s ease-in-out infinite;
+            animation: borderGlow 4s ease-in-out infinite;
         }
-
-        .trust::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: 18px;
-            padding: 2px;
-            background: conic-gradient(from var(--angle, 0deg), #FFC107 0 20deg, transparent 20deg 100%);
-            z-index: 0;
-            filter: blur(0.5px);
-            pointer-events: none;
-            animation: trust-glow-rotate 2.5s linear infinite;
-        }
-
-        .trust>* {
-            position: relative;
-            z-index: 1;
-        }
-
-        @keyframes trust-glow-rotate {
-            0% {
-                --angle: 0deg;
-            }
-
-            100% {
-                --angle: 360deg;
-            }
-        }
-
 
         @keyframes borderGlow {
 
@@ -957,8 +919,9 @@
         <div class="discount-banner" id="discountBanner" style="display: none;">
             <div class="discount-banner-content">
                 <span class="discount-icon">🎁</span>
-                <div class="discount-title">تخفیف ویژه !</div>
-                <div class="discount-subtitle">با خرید اولین اشتراک خود ۱۰% تخفیف دریافت کنید</div>
+                <div class="discount-title">$تخفیف ویژه !</div>
+                <div class="discount-subtitle">با خرید اولین اشتراک خود ${toPersianNumbers('10')}% تخفیف دریافت کنید
+                </div>
             </div>
         </div>
 
@@ -1184,7 +1147,7 @@
 
             for (const [key, plan] of Object.entries(plans)) {
                 const highlightClass = plan.highlight ? 'highlight' : '';
-                const badge = plan.badge ? `<div class="badge">${plan.badge.replace(/\d+/g, d => toPersianNumbers(d))}</div>` : '';
+                const badge = plan.badge ? `<div class="badge">${plan.badge}</div>` : '';
 
                 // نمایش قیمت تخفیف‌دار یا عادی
                 const currentPrice = isFirstPurchase ? plan.discountPrice : plan.price;

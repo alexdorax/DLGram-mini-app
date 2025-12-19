@@ -244,6 +244,23 @@
             z-index: 1;
         }
 
+        .discount-title {
+            font-size: 20px;
+            font-weight: 900;
+            color: #fff;
+            font-family: 'B Titr', IRANSansX, 'Segoe UI', Tahoma, Arial, sans-serif;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 10px rgba(225, 48, 108, 0.3);
+        }
+
+        .discount-subtitle {
+            font-size: 14px;
+            color: #fff;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
         .discount-icon {
             font-size: 28px;
             margin-bottom: 6px;
@@ -1127,8 +1144,8 @@
                     const originalPrice = toPersianNumbers(plan.price);
                     priceHtml = `
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <div class="plan-price original-price">${originalPrice}</div>
-                            <div class="plan-price">${persianPrice} تومان</div>
+                            <div class="plan-price original-price" style="color: #B0B0B0 !important; font-size: 17px !important;">${originalPrice}</div>
+                            <div class="plan-price" style="font-size: 25px;">${persianPrice} تومان</div>
                         </div>
                     `;
                 }
@@ -1136,13 +1153,18 @@
                 html += `
                     <div class="plan-card ${highlightClass}">
                         ${badge}
-                        ${isFirstPurchase ? '<div class="badge discount-badge">🎁 10% تخفیف</div>' : ''}
+                        ${isFirstPurchase ? '<div class="badge discount-badge" style="right: unset; left: 20px;">🎁 10% تخفیف</div>' : ''}
                         <div class="plan-head">
                             <div>
                                 <div class="plan-name">${plan.name}</div>
                                 <div class="plan-duration">${plan.duration}</div>
                             </div>
-                            ${priceHtml}
+                            ${isFirstPurchase ? `
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="plan-price original-price" style="color: #B0B0B0 !important; font-size: 17px !important;">${toPersianNumbers(plan.price)}</div>
+                    <div class="plan-price" style="font-size: 25px;">${toPersianNumbers(plan.discountPrice)} تومان</div>
+                </div>
+            ` : `<div class="plan-price">${toPersianNumbers(plan.price)} تومان</div>`}
                         </div>
 
                         <div class="features">

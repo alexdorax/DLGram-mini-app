@@ -190,14 +190,14 @@
 
         /* بنر تخفیف 10% */
         .discount-banner {
-            background: linear-gradient(135deg, #FF6B9D 0%, #C44569 100%);
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 16px;
+            background: linear-gradient(135deg, #C44569 0%, #833AB4 100%);
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 20px;
             text-align: center;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 16px rgba(255, 107, 157, 0.3);
+            box-shadow: 0 8px 24px rgba(131, 58, 180, 0.2);
             animation: pulse 2s ease-in-out infinite;
         }
 
@@ -276,8 +276,11 @@
             box-shadow: 0 4px 12px rgba(131, 58, 180, 0.3);
             animation: pulse 2s infinite;
             z-index: 2;
+            height: 28px;
+            display: flex;
+            align-items: center;
         }
-        }
+
 
         .tabs {
             display: flex;
@@ -372,7 +375,7 @@
 
         .original-price {
             text-decoration: line-through !important;
-            color: #B0B0B0 !important;
+            color: #FFC107 !important;
             font-size: 18px !important;
             font-weight: bold !important;
             margin-bottom: 6px !important;
@@ -382,7 +385,7 @@
         .plan-price {
             font-size: 26px;
             font-weight: 900;
-            color: #FFC107;
+            color: #B0B0B0;
         }
 
         @keyframes pulse {
@@ -1125,7 +1128,7 @@
                     priceHtml = `
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <div class="plan-price original-price">${originalPrice}</div>
-                            <div class="plan-price" style="color: #4CAF50; font-size: 20px; font-weight: bold;">${persianPrice} تومان</div>
+                            <div class="plan-price">${persianPrice} تومان</div>
                         </div>
                     `;
                 }
@@ -1133,7 +1136,7 @@
                 html += `
                     <div class="plan-card ${highlightClass}">
                         ${badge}
-                        ${isFirstPurchase ? '<div class="badge discount-badge" style="background: linear-gradient(135deg, #4CAF50, #2196F3); left: 20px; padding: 3px 8px; font-size: 9px;">🎁 10% تخفیف</div>' : ''}
+                        ${isFirstPurchase ? '<div class="badge discount-badge">🎁 10% تخفیف</div>' : ''}
                         <div class="plan-head">
                             <div>
                                 <div class="plan-name">${plan.name}</div>

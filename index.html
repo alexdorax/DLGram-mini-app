@@ -198,7 +198,29 @@
             position: relative;
             overflow: hidden;
             box-shadow: 0 8px 24px rgba(131, 58, 180, 0.2);
-            animation: pulse 2s ease-in-out infinite;
+            /* حذف pulse و افزودن شاین */
+        }
+
+        .discount-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.12) 30%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.12) 70%);
+            animation: shine-banner 3s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes shine-banner {
+            0% {
+                transform: translateX(-100%) skewX(-20deg);
+            }
+
+            100% {
+                transform: translateX(100%) skewX(-20deg);
+            }
         }
 
         .discount-banner::before {
@@ -516,7 +538,7 @@
         .trust {
             margin-top: 32px;
             background: linear-gradient(135deg, rgba(225, 48, 108, 0.05), rgba(131, 58, 180, 0.05));
-            border: 2px solid rgba(252, 175, 69, 0.3);
+            border: 2px solid transparent;
             border-radius: 16px;
             padding: 20px;
             display: grid;
@@ -524,8 +546,36 @@
             font-size: 13px;
             color: var(--text);
             box-shadow: 0 4px 16px rgba(252, 175, 69, 0.1);
-            animation: borderGlow 4s ease-in-out infinite;
+            position: relative;
         }
+
+        .trust::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 18px;
+            padding: 2px;
+            background: conic-gradient(from 0deg, #FFC107, #F44336, #833AB4, #FFC107 100%);
+            z-index: 0;
+            filter: blur(0.5px);
+            animation: trust-glow-rotate 3s linear infinite;
+        }
+
+        .trust>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes trust-glow-rotate {
+            0% {
+                filter: hue-rotate(0deg);
+            }
+
+            100% {
+                filter: hue-rotate(360deg);
+            }
+        }
+        
 
         @keyframes borderGlow {
 
@@ -905,7 +955,7 @@
         <div class="discount-banner" id="discountBanner" style="display: none;">
             <div class="discount-banner-content">
                 <span class="discount-icon">🎁</span>
-                <div class="discount-title">10% تخفیف ویژه!</div>
+                <div class="discount-title">تخفیف ویژه !</div>
                 <div class="discount-subtitle">با خرید اولین اشتراک خود ۱۰% تخفیف دریافت کنید</div>
             </div>
         </div>
@@ -1132,7 +1182,7 @@
 
             for (const [key, plan] of Object.entries(plans)) {
                 const highlightClass = plan.highlight ? 'highlight' : '';
-                const badge = plan.badge ? `<div class="badge">${plan.badge}</div>` : '';
+                const badge = plan.badge ? `<div class="badge">${plan.badge.replace(/\d+/g, d => toPersianNumbers(d))}</div>` : '';
 
                 // نمایش قیمت تخفیف‌دار یا عادی
                 const currentPrice = isFirstPurchase ? plan.discountPrice : plan.price;
@@ -1153,7 +1203,7 @@
                 html += `
                     <div class="plan-card ${highlightClass}">
                         ${badge}
-                        ${isFirstPurchase ? '<div class="badge discount-badge" style="right: unset; left: 20px;">🎁 10% تخفیف</div>' : ''}
+                        ${isFirstPurchase ? '<div class="badge discount-badge" style="right: unset; left: 20px;">🎁 ' + toPersianNumbers('10') + '% تخفیف</div>' : ''}
                         <div class="plan-head">
                             <div>
                                 <div class="plan-name">${plan.name}</div>

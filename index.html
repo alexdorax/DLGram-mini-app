@@ -198,7 +198,7 @@
             position: relative;
             overflow: hidden;
             box-shadow: 0 8px 24px rgba(131, 58, 180, 0.2);
-            animation: bannerGlow 3.5s ease-in-out infinite;
+            /* بدون افکت انیمیشن */
         }
 
         .discount-banner::before {
@@ -217,26 +217,7 @@
 
         @keyframes bannerGlow {
 
-            0%,
-            100% {
-                filter: brightness(1);
-                box-shadow: 0 8px 24px rgba(131, 58, 180, 0.2), 0 0 0px #fff;
-            }
-
-            20% {
-                filter: brightness(1.15);
-                box-shadow: 0 8px 32px #fff, 0 0 24px #fff;
-            }
-
-            50% {
-                filter: brightness(1.08);
-                box-shadow: 0 8px 32px #fff, 0 0 32px #fff;
-            }
-
-            80% {
-                filter: brightness(1.15);
-                box-shadow: 0 8px 32px #fff, 0 0 24px #fff;
-            }
+            /* حذف افکت glow */
         }
 
         @keyframes shine {
@@ -275,22 +256,52 @@
             font-size: 28px;
             margin-bottom: 6px;
             display: block;
-            animation: bounce 2.2s ease-in-out infinite;
+            animation: floatGift 3.2s cubic-bezier(.45, .05, .55, .95) infinite;
         }
 
-        @keyframes bounce {
+        @keyframes floatGift {
+            0% {
+                transform: translateY(0) rotate(-3deg) scale(1);
+            }
 
-            0%,
-            100% {
-                transform: translateY(0);
+            10% {
+                transform: translateY(-2px) rotate(-2deg) scale(1.03);
+            }
+
+            20% {
+                transform: translateY(-4px) rotate(0deg) scale(1.05);
+            }
+
+            30% {
+                transform: translateY(-7px) rotate(2deg) scale(1.07);
             }
 
             40% {
-                transform: translateY(-10px) scale(1.08);
+                transform: translateY(-10px) rotate(3deg) scale(1.09);
+            }
+
+            50% {
+                transform: translateY(-12px) rotate(2deg) scale(1.1);
             }
 
             60% {
-                transform: translateY(-7px) scale(1.04);
+                transform: translateY(-10px) rotate(0deg) scale(1.09);
+            }
+
+            70% {
+                transform: translateY(-7px) rotate(-2deg) scale(1.07);
+            }
+
+            80% {
+                transform: translateY(-4px) rotate(-3deg) scale(1.05);
+            }
+
+            90% {
+                transform: translateY(-2px) rotate(-2deg) scale(1.03);
+            }
+
+            100% {
+                transform: translateY(0) rotate(-3deg) scale(1);
             }
         }
 
@@ -303,7 +314,9 @@
             border-radius: 18px;
             font-size: 11px;
             font-weight: 700;
+            color: #fff;
             box-shadow: 0 4px 12px rgba(131, 58, 180, 0.3);
+            animation: pulse 2s infinite;
             z-index: 2;
             height: 28px;
             display: flex;

@@ -188,6 +188,95 @@
             white-space: nowrap;
         }
 
+        /* بنر تخفیف 10% */
+        .discount-banner {
+            background: linear-gradient(135deg, #FF6B9D 0%, #C44569 100%);
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(255, 107, 157, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .discount-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg,
+                    transparent 30%,
+                    rgba(255, 255, 255, 0.1) 50%,
+                    transparent 70%);
+            animation: shine 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 8px 24px rgba(255, 107, 157, 0.3);
+            }
+
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 12px 32px rgba(255, 107, 157, 0.5);
+            }
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        .discount-banner-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .discount-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+            display: block;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .discount-title {
+            font-size: 24px;
+            font-weight: 900;
+            color: #FFFFFF;
+            margin-bottom: 4px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .discount-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+        }
+
         .tabs {
             display: flex;
             gap: 8px;
@@ -741,6 +830,15 @@
             <div class="refund">✅ بازگشت وجه تا ۲۴ ساعت در صورت نارضایتی ✅</div>
         </div>
 
+        <!-- بنر تخفیف 10% (فقط برای اولین خرید) -->
+        <div class="discount-banner" id="discountBanner" style="display: none;">
+            <div class="discount-banner-content">
+                <span class="discount-icon">🎁</span>
+                <div class="discount-title">10% تخفیف ویژه!</div>
+                <div class="discount-subtitle">اولین خرید شما را با تخفیف انجام دهید</div>
+            </div>
+        </div>
+
         <div class="tabs">
             <button class="tab active" onclick="switchTab('plans')">📦 بسته‌های اشتراک</button>
             <button class="tab" onclick="switchTab('payments')">📋 پرداخت‌های من</button>
@@ -820,12 +918,17 @@
             return str.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
         }
 
+        // متغیرهای سراسری
+        let isFirstPurchase = true; // فرض اولیه: اولین خرید است
+        let userTelegramId = null;
+
         // پلن‌های اشتراک
         const plans = {
             bronze: {
                 name: 'برنزی',
                 duration: '۳۰ روز',
                 price: '50,000',
+                discountPrice: '45,000', // با 10% تخفیف
                 description: 'دانلود پست و ریلز',
                 features: [
                     'دانلود پست و ریلز',
@@ -840,6 +943,7 @@
                 name: 'نقره‌ای',
                 duration: '۹۰ روز',
                 price: '120,000',
+                discountPrice: '108,000', // با 10% تخفیف
                 description: 'دانلود نامحدود',
                 features: [
                     'دانلود نامحدود',
@@ -855,6 +959,7 @@
                 name: 'طلایی',
                 duration: '۳۶۵ روز',
                 price: '400,000',
+                discountPrice: '360,000', // با 10% تخفیف
                 description: 'بالاترین سرعت',
                 features: [
                     'دانلود نامحدود',
@@ -957,17 +1062,33 @@
             for (const [key, plan] of Object.entries(plans)) {
                 const highlightClass = plan.highlight ? 'highlight' : '';
                 const badge = plan.badge ? `<div class="badge">${plan.badge}</div>` : '';
-                const persianPrice = toPersianNumbers(plan.price);
+
+                // نمایش قیمت تخفیف‌دار یا عادی
+                const currentPrice = isFirstPurchase ? plan.discountPrice : plan.price;
+                const persianPrice = toPersianNumbers(currentPrice);
+
+                // اگر تخفیف داریم، قیمت اصلی را خط‌دار نشان بده
+                let priceHtml = `<div class="plan-price">${persianPrice} تومان</div>`;
+                if (isFirstPurchase) {
+                    const originalPrice = toPersianNumbers(plan.price);
+                    priceHtml = `
+                        <div>
+                            <div class="plan-price" style="font-size: 14px; text-decoration: line-through; opacity: 0.5; margin-bottom: 4px;">${originalPrice}</div>
+                            <div class="plan-price" style="color: #4CAF50;">${persianPrice} تومان</div>
+                        </div>
+                    `;
+                }
 
                 html += `
                     <div class="plan-card ${highlightClass}">
                         ${badge}
+                        ${isFirstPurchase ? '<div class="badge" style="background: linear-gradient(135deg, #4CAF50, #2196F3);">🎁 10% تخفیف</div>' : ''}
                         <div class="plan-head">
                             <div>
                                 <div class="plan-name">${plan.name}</div>
                                 <div class="plan-duration">${plan.duration}</div>
                             </div>
-                            <div class="plan-price">${persianPrice} تومان</div>
+                            ${priceHtml}
                         </div>
 
                         <div class="features">
@@ -1378,8 +1499,43 @@
             }
         });
 
+        // چک کردن اولین خرید کاربر
+        async function checkFirstPurchase() {
+            try {
+                if (!userId) {
+                    console.log('User ID not available');
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/api/check-first-purchase?userId=${userId}`);
+                const data = await response.json();
+
+                if (data.ok) {
+                    isFirstPurchase = data.isFirstPurchase;
+                    userTelegramId = data.telegramId;
+
+                    // نمایش/پنهان کردن بنر تخفیف
+                    const discountBanner = document.getElementById('discountBanner');
+                    if (discountBanner) {
+                        discountBanner.style.display = isFirstPurchase ? 'block' : 'none';
+                    }
+
+                    // بارگذاری دوباره پلن‌ها با قیمت‌های به‌روز
+                    loadPlans();
+                } else {
+                    console.error('Error checking first purchase:', data.error);
+                }
+            } catch (error) {
+                console.error('Error in checkFirstPurchase:', error);
+                // در صورت خطا، فرض می‌کنیم اولین خرید است
+                isFirstPurchase = true;
+                document.getElementById('discountBanner').style.display = 'block';
+            }
+        }
+
         // بارگذاری اولیه
         loadPlans();
+        checkFirstPurchase(); // چک کردن اولین خرید
         initSwipeNavigation();
     </script>
 

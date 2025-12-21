@@ -387,11 +387,36 @@
                 linear-gradient(var(--card), var(--card)) padding-box,
                 linear-gradient(135deg, var(--primary), var(--secondary)) border-box;
             box-shadow: 0 4px 16px rgba(225, 48, 108, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .plan-card::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(225, 48, 108, 0.2), transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .plan-card:active::before {
+            width: 300px;
+            height: 300px;
         }
 
         .plan-card:active {
             transform: scale(0.98);
+            box-shadow: 0 8px 24px rgba(225, 48, 108, 0.2);
+        }
+
+        .plan-card.highlight:active {
+            box-shadow: 0 12px 32px rgba(225, 48, 108, 0.3);
         }
 
         .plan-card.highlight {
@@ -592,10 +617,118 @@
             background: var(--card);
             border-radius: 16px;
             padding: 18px;
+            padding-top: 28px;
             margin-bottom: 14px;
             border: 1px solid rgba(255, 255, 255, 0.05);
             position: relative;
             overflow: hidden;
+        }
+
+        /* Subscription Progress Bar */
+        .subscription-progress {
+            position: absolute;
+            top: 8px;
+            left: 18px;
+            right: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-capsule {
+            flex: 1;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50 0%, #4CAF50 100%);
+            border-radius: 10px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1), background 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.3) 50%,
+                    transparent 100%);
+            animation: shimmerProgress 2s infinite;
+        }
+
+        @keyframes shimmerProgress {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .progress-fill.warning {
+            background: linear-gradient(90deg, #FFC107 0%, #FF9800 100%);
+        }
+
+        .progress-fill.danger {
+            background: linear-gradient(90deg, #F44336 0%, #E91E63 100%);
+        }
+
+        .progress-fill.expired {
+            background: linear-gradient(90deg, #757575 0%, #424242 100%);
+        }
+
+        .progress-days {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text);
+            white-space: nowrap;
+            min-width: 60px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .progress-days .icon {
+            font-size: 14px;
+        }
+
+        .progress-days.warning {
+            color: #FFC107;
+        }
+
+        .progress-days.danger {
+            color: #F44336;
+            animation: blink 1.5s infinite;
+        }
+
+        .progress-days.expired {
+            color: #757575;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
         }
 
         /* حذف افکت شاین از payment-card */
@@ -1643,6 +1776,46 @@
                     const isExpired = payment.used && payment.expires_at_iso && isPaymentExpired(payment.expires_at_iso);
                     const cardId = `card-${payment.payment_id}`;
 
+                    // محاسبه پروگرس بار برای اشتراک‌های فعال
+                    let progressHtml = '';
+                    if (payment.used_at && payment.expires_at_iso) {
+                        const now = new Date();
+                        const usedDate = new Date(payment.used_at.split(' - ')[0].split('/').reverse().join('-'));
+                        const expiryDate = new Date(payment.expires_at_iso);
+
+                        const totalDays = Math.floor((expiryDate - usedDate) / (1000 * 60 * 60 * 24));
+                        const remainingDays = Math.floor((expiryDate - now) / (1000 * 60 * 60 * 24));
+                        const percentage = Math.max(0, Math.min(100, (remainingDays / totalDays) * 100));
+
+                        let statusClass = 'success';
+                        let statusIcon = '✓';
+                        let statusText = `${toPersianNumbers(remainingDays)} روز`;
+
+                        if (remainingDays <= 0) {
+                            statusClass = 'expired';
+                            statusIcon = '✕';
+                            statusText = 'منقضی شده';
+                        } else if (percentage < 20) {
+                            statusClass = 'danger';
+                            statusIcon = '⚠';
+                        } else if (percentage < 50) {
+                            statusClass = 'warning';
+                            statusIcon = '⏰';
+                        }
+
+                        progressHtml = `
+                            <div class="subscription-progress">
+                                <div class="progress-capsule">
+                                    <div class="progress-fill ${statusClass}" style="width: ${percentage}%"></div>
+                                </div>
+                                <div class="progress-days ${statusClass}">
+                                    <span class="icon">${statusIcon}</span>
+                                    <span>${statusText}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+
                     // Debug log
                     if (payment.expires_at_iso) {
                         console.log(`Payment ${payment.payment_id}: expires_at_iso=${payment.expires_at_iso}, isExpired=${isExpired}`);
@@ -1650,6 +1823,7 @@
 
                     html += `
                         <div class="payment-card" id="${cardId}" style="position: relative;">
+                            ${progressHtml}
                             <div class="payment-header">
                                 <div class="payment-plan">${plan.name || payment.plan}</div>
                                 <div class="payment-status ${statusClass}">${status}</div>

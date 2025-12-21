@@ -962,26 +962,46 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            filter: drop-shadow(0 8px 32px rgba(225, 48, 108, 0.6)) drop-shadow(0 0 20px rgba(131, 58, 180, 0.4));
             z-index: 10;
-            background: radial-gradient(circle, rgba(225, 48, 108, 0.2) 0%, rgba(131, 58, 180, 0.2) 50%, rgba(252, 175, 69, 0.2) 100%);
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .loader-logo img {
+        .loader-logo-inner {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            background: linear-gradient(135deg, #E1306C 0%, #833AB4 50%, #FCAF45 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(225, 48, 108, 0.6), 0 0 20px rgba(131, 58, 180, 0.4);
             animation: logoGlow 2s ease-in-out infinite;
-            opacity: 0;
-            transition: opacity 0.3s ease;
         }
 
-        .loader-logo img.loaded {
-            opacity: 1;
+        .loader-logo-inner::before {
+            content: '';
+            position: absolute;
+            width: 72px;
+            height: 72px;
+            background: #0F0F13;
+            border-radius: 50%;
+        }
+
+        .loader-logo-icon {
+            position: relative;
+            z-index: 1;
+            width: 36px;
+            height: 36px;
+        }
+
+        .loader-logo-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: url(#logoGradient);
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
         }
 
         @keyframes logoGlow {
@@ -1136,7 +1156,20 @@
             <div class="loader-ring"></div>
             <div class="loader-ring"></div>
             <div class="loader-logo">
-                <img src="https://biaupload.com/do.php?imgf=org-9403689caacc1.png" alt="DLGram Logo">
+                <div class="loader-logo-inner">
+                    <div class="loader-logo-icon">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#E1306C;stop-opacity:1" />
+                                    <stop offset="50%" style="stop-color:#833AB4;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#FCAF45;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                        </svg>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="loader-text">دی‌ال‌گرام</div>
@@ -1880,18 +1913,6 @@
         loadPlans();
         checkFirstPurchase(); // چک کردن اولین خرید
         initSwipeNavigation();
-
-        // نمایش لوگو بعد از بارگذاری کامل
-        const loaderLogo = document.querySelector('.loader-logo img');
-        if (loaderLogo) {
-            loaderLogo.addEventListener('load', function () {
-                this.classList.add('loaded');
-            });
-            // اگر تصویر قبلاً بارگذاری شده
-            if (loaderLogo.complete) {
-                loaderLogo.classList.add('loaded');
-            }
-        }
     </script>
 
 </body>

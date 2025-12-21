@@ -848,9 +848,40 @@
             position: relative;
         }
 
-        .expired-overlay {
+        .expired-overlay-container {
             position: absolute;
             top: -12px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            cursor: pointer;
+            z-index: 15;
+            opacity: 1;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            pointer-events: all;
+        }
+
+        .expired-overlay-container.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        .expired-progress-overlay {
+            position: absolute;
+            top: 0;
+            left: 18px;
+            right: 18px;
+            height: 22px;
+            background: linear-gradient(135deg, rgba(225, 48, 108, 0.75), rgba(131, 58, 180, 0.75));
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 11px;
+        }
+
+        .expired-overlay {
+            position: absolute;
+            top: 12px;
             left: 0;
             right: 0;
             bottom: 0;
@@ -858,28 +889,13 @@
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
             border-radius: 16px;
-            border-top-left-radius: 11px;
-            border-top-right-radius: 11px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
-            z-index: 15;
-            opacity: 1;
-            transition: opacity 0.5s ease, transform 0.5s ease;
         }
 
-        .expired-progress-overlay {
-            display: none;
-        }
 
-        .expired-overlay.hidden,
-        .expired-progress-overlay.hidden {
-            opacity: 0;
-            transform: scale(0.95);
-            pointer-events: none;
-        }
 
         @keyframes fadeOut {
             0% {
@@ -1863,10 +1879,12 @@
                             </div>
                             <div class="copy-hint">برای کپی کردن کد کلیک کنید</div>
                             ${isExpired ? `
-                            <div class="expired-progress-overlay" onclick="hideExpiredOverlay('${cardId}')"></div>
-                            <div class="expired-overlay" onclick="hideExpiredOverlay('${cardId}')">
-                                <div class="expired-text">⚠️ اشتراک منقضی شده ⚠️</div>
-                                <div class="expired-subtext">مدت اعتبار این اشتراک به پایان رسیده است<br>برای مشاهده جزئیات کلیک کنید</div>
+                            <div class="expired-overlay-container" onclick="hideExpiredOverlay('${cardId}')">
+                                <div class="expired-progress-overlay"></div>
+                                <div class="expired-overlay">
+                                    <div class="expired-text">⚠️ اشتراک منقضی شده ⚠️</div>
+                                    <div class="expired-subtext">مدت اعتبار این اشتراک به پایان رسیده است<br>برای مشاهده جزئیات کلیک کنید</div>
+                                </div>
                             </div>
                             ` : ''}
                         </div>
@@ -2024,13 +2042,9 @@
         function hideExpiredOverlay(cardId) {
             const card = document.getElementById(cardId);
             if (card) {
-                const overlay = card.querySelector('.expired-overlay');
-                const progressOverlay = card.querySelector('.expired-progress-overlay');
-                if (overlay) {
-                    overlay.classList.add('hidden');
-                }
-                if (progressOverlay) {
-                    progressOverlay.classList.add('hidden');
+                const container = card.querySelector('.expired-overlay-container');
+                if (container) {
+                    container.classList.add('hidden');
                 }
             }
         }
@@ -2040,8 +2054,8 @@
             // اگر صفحه از cache بارگذاری شده
             if (event.persisted) {
                 // نمایش دوباره overlayهای انقضا
-                document.querySelectorAll('.expired-overlay, .expired-progress-overlay').forEach(overlay => {
-                    overlay.classList.remove('hidden');
+                document.querySelectorAll('.expired-overlay-container').forEach(container => {
+                    container.classList.remove('hidden');
                 });
             }
         });

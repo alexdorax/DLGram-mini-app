@@ -964,6 +964,11 @@
             transform: translate(-50%, -50%);
             filter: drop-shadow(0 8px 32px rgba(225, 48, 108, 0.6)) drop-shadow(0 0 20px rgba(131, 58, 180, 0.4));
             z-index: 10;
+            background: radial-gradient(circle, rgba(225, 48, 108, 0.2) 0%, rgba(131, 58, 180, 0.2) 50%, rgba(252, 175, 69, 0.2) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .loader-logo img {
@@ -971,6 +976,12 @@
             height: 100%;
             object-fit: contain;
             animation: logoGlow 2s ease-in-out infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .loader-logo img.loaded {
+            opacity: 1;
         }
 
         @keyframes logoGlow {
@@ -989,7 +1000,7 @@
             width: 140px;
             height: 140px;
             position: relative;
-            margin-bottom: 28px;
+            margin-bottom: 12px;
         }
 
         .loader-ring {
@@ -1044,7 +1055,7 @@
         }
 
         .loader-text {
-            margin-top: 160px;
+            margin-top: 80px;
             font-size: 18px;
             font-weight: 900;
             background: linear-gradient(135deg, #E1306C 0%, #833AB4 50%, #FCAF45 100%);
@@ -1436,7 +1447,7 @@
                     <div class="footer-title">طراحی و توسعه توسط <strong>DLGramProBot</strong> | <strong>MrAliz</strong></div>
                     <div class="footer-links">
                         <a href="javascript:void(0)" class="footer-link" onclick="openTelegramBot()">
-                            <img src="https://cdn.imgurl.ir/uploads/v7634_Telegram_2019_Logo.svg.png" alt="Telegram">
+                            <img src="https://biaupload.com/do.php?imgf=org-b47ee26041be1.png" alt="Telegram">
                             دی‌ال‌گرام
                         </a>
                         <a href="javascript:void(0)" class="footer-link" onclick="openSupport()">
@@ -1869,6 +1880,18 @@
         loadPlans();
         checkFirstPurchase(); // چک کردن اولین خرید
         initSwipeNavigation();
+
+        // نمایش لوگو بعد از بارگذاری کامل
+        const loaderLogo = document.querySelector('.loader-logo img');
+        if (loaderLogo) {
+            loaderLogo.addEventListener('load', function () {
+                this.classList.add('loaded');
+            });
+            // اگر تصویر قبلاً بارگذاری شده
+            if (loaderLogo.complete) {
+                loaderLogo.classList.add('loaded');
+            }
+        }
     </script>
 
 </body>

@@ -956,13 +956,14 @@
         }
 
         .loader-logo {
-            width: 90px;
-            height: 90px;
-            margin-bottom: 28px;
-            position: relative;
-            animation: logoFloat 3s ease-in-out infinite;
+            width: 80px;
+            height: 80px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             filter: drop-shadow(0 8px 32px rgba(225, 48, 108, 0.6)) drop-shadow(0 0 20px rgba(131, 58, 180, 0.4));
-            z-index: 2;
+            z-index: 10;
         }
 
         .loader-logo img {
@@ -970,26 +971,6 @@
             height: 100%;
             object-fit: contain;
             animation: logoGlow 2s ease-in-out infinite;
-        }
-
-        @keyframes logoFloat {
-
-            0%,
-            100% {
-                transform: translateY(0) rotate(0deg) scale(1);
-            }
-
-            25% {
-                transform: translateY(-10px) rotate(-3deg) scale(1.05);
-            }
-
-            50% {
-                transform: translateY(-15px) rotate(0deg) scale(1.08);
-            }
-
-            75% {
-                transform: translateY(-10px) rotate(3deg) scale(1.05);
-            }
         }
 
         @keyframes logoGlow {
@@ -1007,10 +988,8 @@
         .loader-rings {
             width: 140px;
             height: 140px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            position: relative;
+            margin-bottom: 28px;
         }
 
         .loader-ring {
@@ -1095,19 +1074,32 @@
             margin-top: 10px;
             font-size: 14px;
             color: rgba(255, 255, 255, 0.6);
-            animation: fadeInOut 2s ease-in-out infinite;
             z-index: 2;
         }
 
-        @keyframes fadeInOut {
+        .loader-subtext::after {
+            content: '';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
 
             0%,
-            100% {
-                opacity: 0.6;
+            20% {
+                content: '';
             }
 
-            50% {
-                opacity: 1;
+            40% {
+                content: '.';
+            }
+
+            60% {
+                content: '..';
+            }
+
+            80%,
+            100% {
+                content: '...';
             }
         }
 
@@ -1132,12 +1124,12 @@
             <div class="loader-ring"></div>
             <div class="loader-ring"></div>
             <div class="loader-ring"></div>
-        </div>
-        <div class="loader-logo">
-            <img src="https://biaupload.com/do.php?imgf=org-9403689caacc1.png" alt="DLGram Logo">
+            <div class="loader-logo">
+                <img src="https://biaupload.com/do.php?imgf=org-9403689caacc1.png" alt="DLGram Logo">
+            </div>
         </div>
         <div class="loader-text">دی‌ال‌گرام</div>
-        <div class="loader-subtext">در حال بارگذاری...</div>
+        <div class="loader-subtext">در حال بارگذاری</div>
     </div>
 
     <div class="main-container">

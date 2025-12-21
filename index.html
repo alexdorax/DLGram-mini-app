@@ -438,6 +438,7 @@
             font-weight: 700;
             box-shadow: 0 4px 12px rgba(225, 48, 108, 0.4);
             animation: pulse 2s infinite;
+            z-index: 10;
         }
 
         .original-price {
@@ -627,31 +628,41 @@
         /* Subscription Progress Bar */
         .subscription-progress {
             position: absolute;
-            top: 8px;
+            top: -10px;
             left: 18px;
             right: 18px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .progress-capsule {
-            flex: 1;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+            height: 28px;
+            background: rgba(15, 15, 19, 0.95);
+            border-radius: 14px;
             overflow: hidden;
-            position: relative;
             border: 1.5px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
             height: 100%;
-            background: linear-gradient(90deg, #4CAF50 0%, #4CAF50 100%);
-            border-radius: 10px;
+            background: linear-gradient(90deg, #4CAF50 0%, #66BB6A 100%);
+            border-radius: 14px;
             transition: width 1s cubic-bezier(0.4, 0, 0.2, 1), background 0.5s ease;
-            position: relative;
             overflow: hidden;
+        }
+
+        .progress-text {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
         }
 
         .progress-fill::after {
@@ -679,45 +690,18 @@
         }
 
         .progress-fill.warning {
-            background: linear-gradient(90deg, #FFC107 0%, #FF9800 100%);
+            background: linear-gradient(90deg, #FFC107 0%, #FFD54F 100%);
         }
 
         .progress-fill.danger {
-            background: linear-gradient(90deg, #F44336 0%, #E91E63 100%);
+            background: linear-gradient(90deg, #F44336 0%, #EF5350 100%);
         }
 
         .progress-fill.expired {
-            background: linear-gradient(90deg, #757575 0%, #424242 100%);
+            background: linear-gradient(90deg, #616161 0%, #424242 100%);
         }
 
-        .progress-days {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text);
-            white-space: nowrap;
-            min-width: 60px;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
 
-        .progress-days .icon {
-            font-size: 14px;
-        }
-
-        .progress-days.warning {
-            color: #FFC107;
-        }
-
-        .progress-days.danger {
-            color: #F44336;
-            animation: blink 1.5s infinite;
-        }
-
-        .progress-days.expired {
-            color: #757575;
-        }
 
         @keyframes blink {
 
@@ -1788,41 +1772,44 @@
                         const percentage = Math.max(0, Math.min(100, (remainingDays / totalDays) * 100));
 
                         let statusClass = 'success';
-                        let statusIcon = '✓';
-                        let statusText = `${toPersianNumbers(remainingDays)} روز`;
+                        let statusIcon = '✅';
+                        let statusText = '';
 
+                        // رنگ‌بندی هوشمند بر اساس درصد روزهای باقیمانده
+                        // این روش برای تمام انواع اشتراک (30، 90، 365 روزه) مناسب است
                         if (remainingDays <= 0) {
                             statusClass = 'expired';
-                            statusIcon = '✕';
-                            statusText = 'منقضی شده';
+                            statusIcon = '❌';
+                            statusText = 'اشتراک منقضی شده';
                         } else if (percentage < 20) {
+                            // کمتر از 20% باقیمانده → قرمز
                             statusClass = 'danger';
-                            statusIcon = '⚠';
+                            statusIcon = '⚠️';
+                            statusText = `${toPersianNumbers(remainingDays)} روز باقیمانده`;
                         } else if (percentage < 50) {
+                            // بین 20% تا 50% باقیمانده → زرد
                             statusClass = 'warning';
                             statusIcon = '⏰';
+                            statusText = `${toPersianNumbers(remainingDays)} روز باقیمانده`;
+                        } else {
+                            // بیشتر از 50% باقیمانده → سبز
+                            statusIcon = '✅';
+                            statusText = `${toPersianNumbers(remainingDays)} روز باقیمانده`;
                         }
 
                         progressHtml = `
                             <div class="subscription-progress">
-                                <div class="progress-capsule">
-                                    <div class="progress-fill ${statusClass}" style="width: ${percentage}%"></div>
-                                </div>
-                                <div class="progress-days ${statusClass}">
-                                    <span class="icon">${statusIcon}</span>
+                                <div class="progress-fill ${statusClass}" style="width: ${percentage}%"></div>
+                                <div class="progress-text">
+                                    <span>${statusIcon}</span>
                                     <span>${statusText}</span>
                                 </div>
                             </div>
                         `;
                     }
 
-                    // Debug log
-                    if (payment.expires_at_iso) {
-                        console.log(`Payment ${payment.payment_id}: expires_at_iso=${payment.expires_at_iso}, isExpired=${isExpired}`);
-                    }
-
                     html += `
-                        <div class="payment-card" id="${cardId}" style="position: relative;">
+                        <div class="payment-card ${isExpired ? 'expired' : ''}" id="${cardId}">
                             ${progressHtml}
                             <div class="payment-header">
                                 <div class="payment-plan">${plan.name || payment.plan}</div>

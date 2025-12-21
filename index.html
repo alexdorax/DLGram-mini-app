@@ -389,7 +389,7 @@
             box-shadow: 0 4px 16px rgba(225, 48, 108, 0.1);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .plan-card::before {
@@ -425,6 +425,7 @@
                 linear-gradient(var(--card), var(--card)) padding-box,
                 linear-gradient(135deg, var(--primary), var(--secondary)) border-box;
             box-shadow: 0 8px 24px rgba(225, 48, 108, 0.15);
+            overflow: visible;
         }
 
         .badge {
@@ -622,7 +623,7 @@
             margin-bottom: 14px;
             border: 1px solid rgba(255, 255, 255, 0.05);
             position: relative;
-            overflow: hidden;
+            overflow: visible;
         }
 
         /* Subscription Progress Bar */
@@ -1772,28 +1773,25 @@
                         const percentage = Math.max(0, Math.min(100, (remainingDays / totalDays) * 100));
 
                         let statusClass = 'success';
-                        let statusIcon = '✅';
+                        let statusIcon = '';
                         let statusText = '';
 
                         // رنگ‌بندی هوشمند بر اساس درصد روزهای باقیمانده
                         // این روش برای تمام انواع اشتراک (30، 90، 365 روزه) مناسب است
                         if (remainingDays <= 0) {
                             statusClass = 'expired';
-                            statusIcon = '❌';
+                            statusIcon = '❌ ';
                             statusText = 'اشتراک منقضی شده';
                         } else if (percentage < 20) {
                             // کمتر از 20% باقیمانده → قرمز
                             statusClass = 'danger';
-                            statusIcon = '⚠️';
                             statusText = `${toPersianNumbers(remainingDays)} روز باقیمانده`;
                         } else if (percentage < 50) {
                             // بین 20% تا 50% باقیمانده → زرد
                             statusClass = 'warning';
-                            statusIcon = '⏰';
                             statusText = `${toPersianNumbers(remainingDays)} روز باقیمانده`;
                         } else {
                             // بیشتر از 50% باقیمانده → سبز
-                            statusIcon = '✅';
                             statusText = `${toPersianNumbers(remainingDays)} روز باقیمانده`;
                         }
 

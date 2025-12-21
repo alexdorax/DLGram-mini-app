@@ -637,7 +637,8 @@
             margin-bottom: 14px;
             border: 1px solid rgba(255, 255, 255, 0.05);
             position: relative;
-            overflow: visible;
+            overflow: hidden;
+            box-sizing: border-box;
         }
 
         /* Subscription Progress Bar */
@@ -850,7 +851,7 @@
 
         .expired-overlay-container {
             position: absolute;
-            top: -12px;
+            top: -30px;
             left: 0;
             right: 0;
             bottom: 0;
@@ -859,6 +860,7 @@
             opacity: 1;
             transition: opacity 0.5s ease, transform 0.5s ease;
             pointer-events: all;
+            box-sizing: border-box;
         }
 
         .expired-overlay-container.hidden {
@@ -869,7 +871,7 @@
 
         .expired-progress-overlay {
             position: absolute;
-            top: 0;
+            top: 18px;
             left: 18px;
             right: 18px;
             height: 22px;
@@ -877,22 +879,24 @@
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
             border-radius: 11px;
+            box-sizing: border-box;
         }
 
         .expired-overlay {
             position: absolute;
-            top: 12px;
+            top: 30px;
             left: 0;
             right: 0;
             bottom: 0;
             background: linear-gradient(135deg, rgba(225, 48, 108, 0.75), rgba(131, 58, 180, 0.75));
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
-            border-radius: 16px;
+            border-radius: inherit;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            box-sizing: border-box;
         }
 
 

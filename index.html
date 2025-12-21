@@ -598,20 +598,7 @@
             overflow: hidden;
         }
 
-        .payment-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg,
-                    transparent 30%,
-                    rgba(255, 255, 255, 0.08) 50%,
-                    transparent 70%);
-            animation: shine 4s ease-in-out infinite;
-            pointer-events: none;
-        }
+        /* حذف افکت شاین از payment-card */
 
         .payment-header {
             display: flex;
@@ -914,10 +901,156 @@
             height: 14px;
             object-fit: contain;
         }
+
+        /* Initial Loading Screen */
+        #initialLoader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0F0F13 0%, #1A1A22 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        #initialLoader.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        .loader-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 24px;
+            position: relative;
+            animation: logoFloat 2.5s ease-in-out infinite;
+        }
+
+        .loader-logo::before {
+            content: '📦';
+            font-size: 64px;
+            display: block;
+            filter: drop-shadow(0 4px 16px rgba(225, 48, 108, 0.4));
+        }
+
+        @keyframes logoFloat {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            25% {
+                transform: translateY(-8px) rotate(-2deg);
+            }
+
+            50% {
+                transform: translateY(-12px) rotate(0deg);
+            }
+
+            75% {
+                transform: translateY(-8px) rotate(2deg);
+            }
+        }
+
+        .loader-rings {
+            width: 120px;
+            height: 120px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .loader-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid transparent;
+            border-radius: 50%;
+            animation: rotate 2s linear infinite;
+        }
+
+        .loader-ring:nth-child(1) {
+            border-top-color: #E1306C;
+            animation-duration: 1.5s;
+        }
+
+        .loader-ring:nth-child(2) {
+            border-right-color: #833AB4;
+            animation-duration: 2s;
+            animation-direction: reverse;
+        }
+
+        .loader-ring:nth-child(3) {
+            border-bottom-color: #FCAF45;
+            animation-duration: 2.5s;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg) scale(1);
+            }
+
+            50% {
+                transform: rotate(180deg) scale(1.1);
+            }
+
+            100% {
+                transform: rotate(360deg) scale(1);
+            }
+        }
+
+        .loader-text {
+            margin-top: 140px;
+            font-size: 16px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #E1306C, #833AB4, #FCAF45);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .loader-subtext {
+            margin-top: 8px;
+            font-size: 13px;
+            color: var(--muted);
+            opacity: 0.7;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
     </style>
 </head>
 
 <body>
+    <!-- Initial Loading Screen -->
+    <div id="initialLoader">
+        <div class="loader-rings">
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+        </div>
+        <div class="loader-logo"></div>
+        <div class="loader-text">دی‌ال‌گرام</div>
+        <div class="loader-subtext">در حال بارگذاری...</div>
+    </div>
 
     <div class="main-container">
         <div class="header">
@@ -1600,11 +1733,23 @@
             }
         });
 
+        // پنهان کردن صفحه لودینگ
+        function hideInitialLoader() {
+            const loader = document.getElementById('initialLoader');
+            if (loader) {
+                loader.classList.add('hidden');
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500);
+            }
+        }
+
         // چک کردن اولین خرید کاربر
         async function checkFirstPurchase() {
             try {
                 if (!userId) {
                     console.log('User ID not available');
+                    hideInitialLoader();
                     return;
                 }
 
@@ -1623,14 +1768,20 @@
 
                     // بارگذاری دوباره پلن‌ها با قیمت‌های به‌روز
                     loadPlans();
+
+                    // پنهان کردن صفحه لودینگ پس از بارگذاری کامل
+                    hideInitialLoader();
                 } else {
                     console.error('Error checking first purchase:', data.error);
+                    hideInitialLoader();
                 }
             } catch (error) {
                 console.error('Error in checkFirstPurchase:', error);
                 // در صورت خطا، فرض می‌کنیم اولین خرید است
                 isFirstPurchase = true;
                 document.getElementById('discountBanner').style.display = 'block';
+                loadPlans();
+                hideInitialLoader();
             }
         }
 

@@ -389,8 +389,8 @@
         .carousel-wrapper {
             overflow-x: hidden;
             overflow-y: visible;
-            margin: 0 -24px;
-            padding: 0 24px;
+            margin: 0 -12px;
+            padding: 0 12px;
             padding-top: 18px;
         }
 
@@ -402,7 +402,7 @@
 
         .carousel-slide {
             flex: 0 0 85%;
-            padding: 0 8px;
+            padding: 0 4px;
             padding-top: 18px;
             box-sizing: border-box;
             transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -412,11 +412,13 @@
         .carousel-slide.active {
             transform: scale(1);
             opacity: 1;
+            z-index: 3;
         }
 
         .carousel-slide:not(.active) {
             transform: scale(0.92);
             opacity: 0.6;
+            z-index: 1;
         }
 
         .carousel-wrapper {
@@ -465,7 +467,7 @@
             transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             cursor: pointer;
             overflow: visible;
-            min-height: 320px;
+            min-height: 380px;
         }
 
         .carousel-slide.active .plan-card {
@@ -1600,60 +1602,14 @@
             }
         }
 
-        // راه‌اندازی swipe navigation
+        // راه‌اندازی swipe navigation - غیرفعال شده
         function initSwipeNavigation() {
-            let touchStartX = 0;
-            let touchEndX = 0;
-            let touchStartY = 0;
-            let touchEndY = 0;
-            const swipeThreshold = 50; // حداقل فاصله برای تشخیص swipe (پیکسل)
-
-            const container = document.body;
-
-            container.addEventListener('touchstart', (e) => {
-                touchStartX = e.changedTouches[0].screenX;
-                touchStartY = e.changedTouches[0].screenY;
-            }, { passive: true });
-
-            container.addEventListener('touchend', (e) => {
-                touchEndX = e.changedTouches[0].screenX;
-                touchEndY = e.changedTouches[0].screenY;
-                handleSwipe();
-            }, { passive: true });
-
-            function handleSwipe() {
-                const diffX = touchEndX - touchStartX;
-                const diffY = touchEndY - touchStartY;
-
-                // بررسی اینکه swipe افقی است نه عمودی
-                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > swipeThreshold) {
-                    // Haptic feedback
-                    if (WebApp.HapticFeedback) {
-                        WebApp.HapticFeedback.impactOccurred('light');
-                    }
-
-                    // swipe به راست (نمایش تب بعدی)
-                    if (diffX > 0) {
-                        const currentIndex = tabs.indexOf(currentTab);
-                        if (currentIndex < tabs.length - 1) {
-                            switchTab(tabs[currentIndex + 1]);
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }
-                    }
-                    // swipe به چپ (نمایش تب قبلی)
-                    else if (diffX < 0) {
-                        const currentIndex = tabs.indexOf(currentTab);
-                        if (currentIndex > 0) {
-                            switchTab(tabs[currentIndex - 1]);
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }
-                    }
-                }
-            }
+            // تب سوایپ غیرفعال شده تا با کاروسل تداخل نکند
+            return;
         }
 
         // بارگذاری پلن‌ها
-        let currentCarouselIndex = 0;
+        let currentCarouselIndex = 1; // شروع از پلن وسط (نقره‌ای - محبوب کاربران)
         const planKeys = Object.keys(plans);
 
         function loadPlans() {
@@ -1683,7 +1639,7 @@
                 }
 
                 slidesHtml += `
-                    <div class="carousel-slide ${slideIndex === 0 ? 'active' : ''}">
+                    <div class="carousel-slide ${slideIndex === 1 ? 'active' : ''}">
                         <div class="plan-card ${highlightClass}">
                             ${badge}
                             ${isFirstPurchase ? '<div class="badge discount-badge" style="right: unset; left: 20px;">🎁 ' + toPersianNumbers('10') + '% تخفیف</div>' : ''}
@@ -1715,7 +1671,7 @@
                     </div>
                 `;
 
-                indicatorsHtml += `<button class="carousel-indicator ${slideIndex === 0 ? 'active' : ''}" onclick="goToSlide(${slideIndex})"></button>`;
+                indicatorsHtml += `<button class="carousel-indicator ${slideIndex === 1 ? 'active' : ''}" onclick="goToSlide(${slideIndex})"></button>`;
                 slideIndex++;
             }
 
@@ -1760,8 +1716,8 @@
 
             plansContent.innerHTML = html;
 
-            // تنظیم کاروسل روی اسلاید اول
-            currentCarouselIndex = 0;
+            // تنظیم کاروسل روی اسلاید وسط (نقره‌ای)
+            currentCarouselIndex = 1;
             updateCarousel();
             initCarouselSwipe();
         }

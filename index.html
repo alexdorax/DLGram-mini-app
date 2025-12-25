@@ -396,8 +396,13 @@
 
         .carousel-container {
             display: flex;
-            transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             will-change: transform;
+            cursor: grab;
+        }
+
+        .carousel-container:active {
+            cursor: grabbing;
         }
 
         .carousel-slide {
@@ -1734,6 +1739,7 @@
                 const offset = (100 - slideWidth) / 2; // مرکز کردن
                 const translateX = (currentCarouselIndex * slideWidth) - offset;
                 container.style.transform = `translateX(${translateX}%)`;
+                container.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             }
 
             // به‌روزرسانی وضعیت اسلایدها
@@ -1777,7 +1783,7 @@
             }
         }
 
-        // سوایپ کاروسل - بهبودیافته برای تجربه موبایلی
+        // سوایپ کاروسل - بازطراحی شده برای تجربه حرفه‌ای
         function initCarouselSwipe() {
             const carousel = document.querySelector('.plans-carousel');
             if (!carousel) return;
@@ -1785,50 +1791,125 @@
             let startX = 0;
             let startY = 0;
             let isDragging = false;
-            let startTranslate = 0;
+            let currentTranslate = 0;
+            let prevTranslate = 0;
+            let animationID = 0;
+            let currentIndex = currentCarouselIndex;
+
             const container = document.getElementById('carouselContainer');
+            const slides = document.querySelectorAll('.carousel-slide');
+
+            // محاسبه موقعیت اولیه
+            function getPositionX(index) {
+                const slideWidth = 85;
+                const offset = (100 - slideWidth) / 2;
+                return (index * slideWidth) - offset;
+            }
+
+            function setSliderPosition() {
+                container.style.transform = `translateX(${currentTranslate}%)`;
+            }
+
+            function animation() {
+                setSliderPosition();
+                if (isDragging) requestAnimationFrame(animation);
+            }
+
+            function setPositionByIndex() {
+                currentTranslate = getPositionX(currentIndex);
+                prevTranslate = currentTranslate;
+                setSliderPosition();
+            }
 
             carousel.addEventListener('touchstart', (e) => {
                 startX = e.touches[0].clientX;
                 startY = e.touches[0].clientY;
                 isDragging = true;
+                animationID = requestAnimationFrame(animation);
                 container.style.transition = 'none';
+
+                // جلوگیری از انتخاب متن
+                container.style.cursor = 'grabbing';
             }, { passive: true });
 
             carousel.addEventListener('touchmove', (e) => {
                 if (!isDragging) return;
-                const currentX = e.touches[0].clientX;
-                const diffX = startX - currentX;
-                const diffY = Math.abs(startY - e.touches[0].clientY);
 
-                // فقط سوایپ افقی
+                const currentX = e.touches[0].clientX;
+                const currentY = e.touches[0].clientY;
+                const diffX = currentX - startX;
+                const diffY = Math.abs(currentY - startY);
+
+                // فقط اگر حرکت افقی باشد
                 if (diffY < 50) {
-                    const slideWidth = 85;
-                    const offset = (100 - slideWidth) / 2;
-                    const baseTranslate = (currentCarouselIndex * slideWidth) - offset;
+                    e.preventDefault();
+
+                    // محاسبه جابجایی با محدودیت
                     const dragPercent = (diffX / carousel.offsetWidth) * 100;
-                    container.style.transform = `translateX(${baseTranslate + dragPercent}%)`;
+                    currentTranslate = prevTranslate - dragPercent; // برعکس کردن جهت
+
+                    // محدود کردن حرکت در مرزها
+                    const maxTranslate = getPositionX(0);
+                    const minTranslate = getPositionX(planKeys.length - 1);
+
+                    if (currentTranslate > maxTranslate) {
+                        currentTranslate = maxTranslate + (currentTranslate - maxTranslate) * 0.3;
+                    } else if (currentTranslate < minTranslate) {
+                        currentTranslate = minTranslate + (currentTranslate - minTranslate) * 0.3;
+                    }
                 }
-            }, { passive: true });
+            }, { passive: false });
 
             carousel.addEventListener('touchend', (e) => {
                 isDragging = false;
-                container.style.transition = 'transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                cancelAnimationFrame(animationID);
 
                 const endX = e.changedTouches[0].clientX;
-                const diffX = startX - endX;
-                const threshold = carousel.offsetWidth * 0.15; // 15% عرض صفحه
+                const diffX = endX - startX;
+                const threshold = 50; // آستانه کم‌تر برای حساسیت بهتر
 
+                container.style.cursor = 'grab';
+                container.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+
+                // تشخیص جهت حرکت
                 if (Math.abs(diffX) > threshold) {
-                    if (diffX > 0) {
-                        nextSlide();
-                    } else {
-                        prevSlide();
+                    if (diffX > 0 && currentIndex > 0) {
+                        // سوایپ به راست - اسلاید قبلی
+                        currentIndex--;
+                    } else if (diffX < 0 && currentIndex < planKeys.length - 1) {
+                        // سوایپ به چپ - اسلاید بعدی  
+                        currentIndex++;
                     }
-                } else {
-                    updateCarousel(); // برگشت به موقعیت اصلی
+                }
+
+                // به‌روزرسانی موقعیت
+                currentCarouselIndex = currentIndex;
+                setPositionByIndex();
+                updateCarouselSlides();
+
+                // Haptic feedback
+                if (WebApp.HapticFeedback && Math.abs(diffX) > threshold) {
+                    WebApp.HapticFeedback.impactOccurred('light');
                 }
             }, { passive: true });
+
+            // جلوگیری از رفتار پیش‌فرض مرورگر
+            carousel.addEventListener('touchstart', () => { }, { passive: true });
+            carousel.addEventListener('contextmenu', e => e.preventDefault());
+            carousel.addEventListener('dragstart', e => e.preventDefault());
+        }
+
+        function updateCarouselSlides() {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const indicators = document.querySelectorAll('.carousel-indicator');
+
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentCarouselIndex);
+            });
+
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === currentCarouselIndex);
+            });
         }
 
         // باز کردن ربات تلگرام

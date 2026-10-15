@@ -17,7 +17,7 @@
             --accent: #FCAF45;
             --text: #FFFFFF;
             --muted: #B3B3C2;
-            --radius: 16px;
+            --success: #4CAF50;
         }
 
         * {
@@ -40,97 +40,77 @@
         .main-container {
             background: linear-gradient(135deg, rgba(225, 48, 108, 0.08), rgba(131, 58, 180, 0.08));
             border-radius: 24px;
-            padding: 24px;
+            padding: 24px 18px;
             border: 2px solid rgba(255, 255, 255, 0.06);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
             position: relative;
-            overflow: visible;
+            overflow: hidden;
             margin-bottom: 16px;
         }
 
         .main-container::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background:
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 5% 3% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 25% 5% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 45% 4% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 65% 6% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 85% 7% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 15% 22% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 35% 20% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 55% 24% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 75% 19% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 92% 15% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 10% 45% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 30% 48% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 50% 52% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 70% 47% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 90% 50% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 20% 72% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 40% 75% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 60% 70% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 80% 74% / 12px 12px no-repeat,
-                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 95% 68% / 12px 12px no-repeat;
-            opacity: 0.06;
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 8% 5% / 10px 10px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 30% 12% / 12px 12px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 55% 8% / 10px 10px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 78% 15% / 12px 12px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 15% 35% / 10px 10px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 45% 42% / 12px 12px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 72% 38% / 10px 10px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 92% 45% / 12px 12px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 10% 68% / 12px 12px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 38% 72% / 10px 10px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 65% 78% / 12px 12px no-repeat,
+                url('https://cdn.imgurl.ir/uploads/y88669_Instagram_logo_2022.svg.png') 88% 85% / 10px 10px no-repeat;
+            opacity: 0.05;
             pointer-events: none;
-            border-radius: 24px;
         }
 
-        .main-container>* {
+        .main-container > * {
             position: relative;
             z-index: 1;
         }
 
+        /* ═══════════════════ HEADER ═══════════════════ */
         .header {
             text-align: center;
-            margin-bottom: 24px;
-            position: relative;
+            margin-bottom: 20px;
         }
 
         .header h1 {
-            font-size: 30px;
+            font-size: 26px;
             font-weight: 900;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            font-family: 'B Titr', IRANSansX, 'Segoe UI', Tahoma, Arial, sans-serif;
-            text-shadow: 0 2px 10px rgba(225, 48, 108, 0.3);
             letter-spacing: -0.5px;
-            animation: glow 4s ease-in-out infinite;
-        }
-
-        @keyframes glow {
-            0%, 100% { filter: brightness(1); text-shadow: 0 2px 10px rgba(225, 48, 108, 0.3); }
-            50% { filter: brightness(1.3); text-shadow: 0 2px 20px rgba(225, 48, 108, 0.6), 0 0 30px rgba(131, 58, 180, 0.4); }
         }
 
         .header p {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.85);
-            line-height: 1.4;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.5;
             font-weight: 500;
         }
 
         .refund {
-            margin-top: 10px;
-            font-size: 13px;
+            margin-top: 12px;
+            font-size: 12px;
             color: #FFD700;
             font-weight: 700;
-            background: rgba(255, 215, 0, 0.15);
+            background: rgba(255, 215, 0, 0.12);
             padding: 8px 14px;
-            border-radius: 8px;
-            border: 1.5px solid rgba(255, 215, 0, 0.4);
+            border-radius: 10px;
+            border: 1.5px solid rgba(255, 215, 0, 0.35);
             display: inline-block;
-            white-space: nowrap;
         }
 
+        /* ═══════════════════ DISCOUNT BANNER ═══════════════════ */
         .discount-banner {
             background: linear-gradient(135deg, #C44569 0%, #833AB4 100%);
             padding: 16px;
@@ -139,16 +119,14 @@
             text-align: center;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 8px 24px rgba(131, 58, 180, 0.2);
+            box-shadow: 0 8px 24px rgba(131, 58, 180, 0.25);
         }
 
         .discount-banner::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
             background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
             animation: shine 3s ease-in-out infinite;
         }
@@ -161,30 +139,32 @@
         .discount-banner-content { position: relative; z-index: 1; }
 
         .discount-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 900;
             color: #fff;
-            font-family: 'B Titr', IRANSansX, 'Segoe UI', Tahoma, Arial, sans-serif;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             letter-spacing: -0.5px;
-            text-shadow: 0 2px 10px rgba(225, 48, 108, 0.3);
         }
 
-        .discount-subtitle { font-size: 14px; color: #fff; font-weight: 500; margin-bottom: 2px; }
+        .discount-subtitle {
+            font-size: 13px;
+            color: #fff;
+            font-weight: 500;
+        }
 
         .discount-icon {
-            font-size: 28px;
-            margin-bottom: 6px;
-            display: block;
-            animation: floatGift 3.2s cubic-bezier(.45, .05, .55, .95) infinite;
+            font-size: 26px;
+            margin-bottom: 4px;
+            display: inline-block;
+            animation: floatGift 2.5s ease-in-out infinite;
         }
 
         @keyframes floatGift {
-            0% { transform: translateY(0) rotate(-3deg) scale(1); }
-            50% { transform: translateY(-12px) rotate(2deg) scale(1.1); }
-            100% { transform: translateY(0) rotate(-3deg) scale(1); }
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-6px) scale(1.1); }
         }
 
+        /* ═══════════════════ TABS ═══════════════════ */
         .tabs {
             display: flex;
             gap: 8px;
@@ -202,213 +182,203 @@
             padding: 12px;
             border-radius: 12px;
             font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
             border: 2px solid transparent;
+            font-family: inherit;
         }
 
         .tab.active {
             color: var(--text);
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-            border: 2px solid transparent;
-            background: linear-gradient(var(--card), var(--card)) padding-box, linear-gradient(135deg, var(--primary), var(--secondary)) border-box;
+            background: linear-gradient(var(--card), var(--card)) padding-box,
+                        linear-gradient(135deg, var(--primary), var(--secondary)) border-box;
         }
 
         .content { display: none; }
-        .content.active { display: block; animation: fadeIn 0.3s; }
+        .content.active { display: block; animation: fadeIn 0.35s ease-out; }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         /* ═══════════════════════════════════════════════════════
-           CAROUSEL — REDESIGNED & FIXED
+           PLANS — VERTICAL STACK (NO CAROUSEL)
            ═══════════════════════════════════════════════════════ */
-        .plans-carousel {
-            position: relative;
-            width: 100%;
-            margin: 0 -8px 12px;
-            padding: 24px 0 8px;
-            overflow: hidden;
-        }
-
-        .carousel-wrapper {
-            width: 100%;
-            padding: 0;
-            margin: 0;
-            overflow: visible;
-        }
-
-        .carousel-container {
+        .plans-stack {
             display: flex;
-            width: 100%;
-            will-change: transform;
-            touch-action: pan-y;
-        }
-
-        .carousel-slide {
-            flex: 0 0 88%;
-            padding: 0 6px;
-            box-sizing: border-box;
-            transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                        opacity 0.45s ease;
-            will-change: transform, opacity;
-        }
-
-        .carousel-slide.active {
-            transform: scale(1);
-            opacity: 1;
-        }
-
-        .carousel-slide:not(.active) {
-            transform: scale(0.9);
-            opacity: 0.55;
-        }
-
-        .carousel-indicators {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-            margin-bottom: 8px;
-        }
-
-        .carousel-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            cursor: pointer;
-            transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            padding: 0;
-        }
-
-        .carousel-indicator.active {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            width: 28px;
-            border-radius: 6px;
-            box-shadow: 0 0 12px rgba(225, 48, 108, 0.5);
+            flex-direction: column;
+            gap: 20px;
+            padding: 8px 0;
         }
 
         .plan-card {
             background: var(--card);
             border-radius: 20px;
-            padding: 22px;
+            padding: 22px 20px;
             position: relative;
             border: 2px solid transparent;
             background: linear-gradient(var(--card), var(--card)) padding-box,
-                        linear-gradient(135deg, var(--primary), var(--secondary)) border-box;
-            box-shadow: 0 8px 32px rgba(225, 48, 108, 0.15), 0 4px 16px rgba(0, 0, 0, 0.2);
-            transition: box-shadow 0.35s ease;
-            cursor: pointer;
+                        linear-gradient(135deg, rgba(225, 48, 108, 0.4), rgba(131, 58, 180, 0.4)) border-box;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             overflow: visible;
-            min-height: 380px;
             display: flex;
             flex-direction: column;
+            animation: cardIn 0.5s ease-out backwards;
         }
 
-        .carousel-slide.active .plan-card {
-            box-shadow: 0 12px 40px rgba(225, 48, 108, 0.25), 0 8px 24px rgba(0, 0, 0, 0.3);
-        }
+        .plan-card:nth-child(1) { animation-delay: 0.05s; }
+        .plan-card:nth-child(2) { animation-delay: 0.15s; }
+        .plan-card:nth-child(3) { animation-delay: 0.25s; }
 
-        .plan-card:active {
-            box-shadow: 0 8px 24px rgba(225, 48, 108, 0.2);
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .plan-card.highlight {
             border: 2px solid transparent;
             background: linear-gradient(var(--card), var(--card)) padding-box,
                         linear-gradient(135deg, var(--primary), var(--secondary)) border-box;
-            box-shadow: 0 8px 24px rgba(225, 48, 108, 0.15);
+            box-shadow: 0 10px 32px rgba(225, 48, 108, 0.25), 0 4px 16px rgba(0, 0, 0, 0.3);
         }
 
+        .plan-card:active {
+            transform: scale(0.985);
+            box-shadow: 0 6px 20px rgba(225, 48, 108, 0.2);
+        }
+
+        /* ═══════════════════ BADGES ═══════════════════ */
         .badge {
             position: absolute;
-            top: -14px;
-            right: 20px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            padding: 6px 14px;
-            border-radius: 18px;
+            top: -12px;
+            right: 18px;
+            padding: 5px 12px;
+            border-radius: 14px;
             font-size: 11px;
             font-weight: 700;
-            box-shadow: 0 4px 16px rgba(225, 48, 108, 0.6), 0 0 20px rgba(225, 48, 108, 0.3);
-            z-index: 10;
-            border: 1.5px solid rgba(255, 255, 255, 0.2);
-            animation: badgePulse 2s infinite;
             color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+            z-index: 10;
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            white-space: nowrap;
+        }
+
+        .badge.popular {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            animation: badgePulse 2s infinite;
+        }
+
+        .badge.discount-badge {
+            background: linear-gradient(135deg, #C44569, #833AB4);
+            right: unset;
+            left: 18px;
         }
 
         @keyframes badgePulse {
-            0%, 100% { box-shadow: 0 4px 16px rgba(225, 48, 108, 0.6), 0 0 20px rgba(225, 48, 108, 0.3); }
-            50% { box-shadow: 0 4px 24px rgba(225, 48, 108, 0.9), 0 0 35px rgba(225, 48, 108, 0.5); }
+            0%, 100% { box-shadow: 0 4px 12px rgba(225, 48, 108, 0.5); }
+            50% { box-shadow: 0 4px 20px rgba(225, 48, 108, 0.9), 0 0 24px rgba(225, 48, 108, 0.4); }
         }
 
-        .original-price {
-            text-decoration: line-through !important;
-            color: #FFC107 !important;
-            font-size: 17px !important;
-            font-weight: bold !important;
-            opacity: 1 !important;
-        }
-
+        /* ═══════════════════ HEAD ═══════════════════ */
         .plan-head {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            gap: 12px;
             margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 8px;
+            padding-top: 6px;
         }
 
-        .plan-name {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--text);
-        }
-
-        .plan-duration {
-            font-size: 16px;
-            color: var(--accent);
-            margin-top: 6px;
-            font-weight: 700;
+        .plan-title-group {
             display: flex;
-            align-items: center;
+            flex-direction: column;
             gap: 6px;
         }
 
-        .plan-duration::before {
-            content: '⏰';
-            font-size: 18px;
+        .plan-name {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--text);
+            letter-spacing: -0.3px;
+        }
+
+        .plan-duration {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--accent);
+            font-weight: 700;
+            background: rgba(252, 175, 69, 0.1);
+            padding: 4px 10px;
+            border-radius: 8px;
+            width: fit-content;
+        }
+
+        .plan-price-group {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: #808090;
+            font-size: 14px;
+            font-weight: 600;
         }
 
         .plan-price {
-            font-size: 26px;
+            font-size: 22px;
             font-weight: 900;
             color: var(--accent);
+            line-height: 1;
+            white-space: nowrap;
         }
 
+        .plan-price .unit {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+            opacity: 0.9;
+        }
+
+        /* ═══════════════════ FEATURES ═══════════════════ */
         .features {
-            margin: 16px 0;
             display: grid;
             gap: 10px;
+            margin-bottom: 18px;
             flex: 1;
         }
 
         .feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-size: 13px;
-            color: var(--muted);
-            padding-right: 20px;
-            position: relative;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.5;
         }
 
         .feature::before {
             content: '✓';
-            position: absolute;
-            right: 0;
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(252, 175, 69, 0.15);
             color: var(--accent);
             font-weight: bold;
+            font-size: 11px;
         }
 
         .feature.discount {
@@ -416,51 +386,51 @@
             font-weight: 700;
         }
 
+        /* ═══════════════════ CTA ═══════════════════ */
         .cta {
             width: 100%;
             border: none;
             border-radius: 14px;
             padding: 15px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 800;
             cursor: pointer;
             color: #fff;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            transition: transform 0.2s, box-shadow 0.3s;
-            box-shadow: 0 4px 16px rgba(225, 48, 108, 0.3);
+            transition: transform 0.15s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 16px rgba(225, 48, 108, 0.35);
             position: relative;
             overflow: hidden;
+            font-family: inherit;
             margin-top: auto;
         }
 
         .cta::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
             background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.12) 50%, transparent 70%);
             animation: shine 3s ease-in-out infinite;
             pointer-events: none;
         }
 
         .cta:active {
-            transform: scale(0.96);
-            box-shadow: 0 2px 8px rgba(225, 48, 108, 0.2);
+            transform: scale(0.97);
+            box-shadow: 0 2px 10px rgba(225, 48, 108, 0.25);
         }
 
+        /* ═══════════════════ TRUST ═══════════════════ */
         .trust {
-            margin-top: 32px;
+            margin-top: 28px;
             background: linear-gradient(135deg, rgba(225, 48, 108, 0.05), rgba(131, 58, 180, 0.05));
             border: 2px solid rgba(252, 175, 69, 0.3);
             border-radius: 16px;
-            padding: 20px;
+            padding: 18px;
             display: grid;
-            gap: 14px;
+            gap: 12px;
             font-size: 13px;
             color: var(--text);
-            box-shadow: 0 4px 16px rgba(252, 175, 69, 0.1);
         }
 
         .trust div {
@@ -473,7 +443,7 @@
             content: '✓';
             color: var(--accent);
             font-weight: bold;
-            font-size: 16px;
+            font-size: 14px;
             background: rgba(252, 175, 69, 0.15);
             width: 22px;
             height: 22px;
@@ -484,6 +454,7 @@
             flex-shrink: 0;
         }
 
+        /* ═══════════════════ PAYMENT CARDS ═══════════════════ */
         .payment-card {
             background: var(--card);
             border-radius: 16px;
@@ -493,7 +464,6 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             position: relative;
             overflow: visible;
-            box-sizing: border-box;
         }
 
         .subscription-progress {
@@ -515,8 +485,7 @@
 
         .progress-fill {
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
             height: 100%;
             background: rgba(255, 255, 255, 0.25);
             border-radius: 11px;
@@ -527,8 +496,7 @@
         .progress-text {
             position: relative;
             z-index: 1;
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -580,9 +548,7 @@
         }
 
         .payment-details .payment-row span:last-child { font-size: 15px; font-weight: 600; }
-
         .payment-row { display: flex; justify-content: space-between; }
-
         .payment-row.expired-date { color: var(--primary); }
         .payment-row.expired-date span { color: var(--primary) !important; font-weight: 700; }
 
@@ -596,7 +562,6 @@
             cursor: pointer;
             transition: all 0.3s;
             border: 2px solid transparent;
-            position: relative;
             user-select: none;
         }
 
@@ -613,7 +578,6 @@
             opacity: 1;
             transition: opacity 0.5s ease, transform 0.5s ease;
             pointer-events: all;
-            box-sizing: border-box;
         }
 
         .expired-overlay-container.hidden { opacity: 0; transform: scale(0.95); pointer-events: none; }
@@ -627,7 +591,6 @@
             -webkit-backdrop-filter: blur(4px);
             border-top-left-radius: 11px;
             border-top-right-radius: 11px;
-            box-sizing: border-box;
         }
 
         .expired-overlay {
@@ -641,12 +604,13 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-sizing: border-box;
+            padding: 20px;
         }
 
-        .expired-text { font-size: 18px; font-weight: 700; color: white; margin-bottom: 8px; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
-        .expired-subtext { font-size: 13px; color: rgba(255, 255, 255, 0.9); text-align: center; padding: 0 20px; }
+        .expired-text { font-size: 17px; font-weight: 700; color: white; margin-bottom: 8px; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
+        .expired-subtext { font-size: 13px; color: rgba(255, 255, 255, 0.9); text-align: center; }
 
+        /* ═══════════════════ TOAST ═══════════════════ */
         .toast {
             position: fixed;
             bottom: 80px;
@@ -668,6 +632,7 @@
 
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+        /* ═══════════════════ EMPTY / LOADING ═══════════════════ */
         .empty-state { text-align: center; padding: 60px 20px; }
         .empty-icon { font-size: 64px; margin-bottom: 16px; opacity: 0.6; }
         .empty-text { font-size: 16px; color: var(--text); margin-bottom: 8px; font-weight: 600; }
@@ -678,8 +643,7 @@
             border: 3px solid rgba(255, 255, 255, 0.1);
             border-top: 3px solid var(--primary);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             animation: spin 1s linear infinite;
             margin: 0 auto 16px;
         }
@@ -697,21 +661,21 @@
             border: 1px solid rgba(225, 48, 108, 0.3);
         }
 
+        /* ═══════════════════ FOOTER ═══════════════════ */
         .footer {
             margin-top: 32px;
             padding-top: 24px;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
             text-align: center;
-            position: relative;
         }
 
-        .footer-title { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+        .footer-title { font-size: 12px; color: var(--muted); margin-bottom: 10px; line-height: 1.6; }
 
         .footer-links {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             margin-top: 12px;
             flex-wrap: wrap;
         }
@@ -719,14 +683,14 @@
         .footer-link {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            padding: 6px 12px;
+            gap: 6px;
+            padding: 8px 14px;
             background: rgba(225, 48, 108, 0.1);
             border: 1px solid var(--primary);
             border-radius: 10px;
             color: var(--text);
             text-decoration: none;
-            font-size: 11px;
+            font-size: 12px;
             transition: all 0.3s;
             cursor: pointer;
         }
@@ -734,6 +698,7 @@
         .footer-link:active { transform: scale(0.96); background: rgba(225, 48, 108, 0.2); }
         .footer-link img { width: 14px; height: 14px; object-fit: contain; }
 
+        /* ═══════════════════ LOADER ═══════════════════ */
         #initialLoader {
             position: fixed;
             top: 0; left: 0;
@@ -795,8 +760,7 @@
             width: 100%; height: 100%;
             border: 4px solid transparent;
             border-radius: 50%;
-            animation: rotate 2s linear infinite;
-            filter: drop-shadow(0 0 8px currentColor);
+            animation: rotateRing 2s linear infinite;
         }
 
         .loader-ring:nth-child(1) { border-top-color: #E1306C; border-left-color: rgba(225, 48, 108, 0.3); animation-duration: 1.8s; }
@@ -816,7 +780,7 @@
             top: 15%; left: 15%;
         }
 
-        @keyframes rotate {
+        @keyframes rotateRing {
             0% { transform: rotate(0deg) scale(1); }
             50% { transform: rotate(180deg) scale(1.15); }
             100% { transform: rotate(360deg) scale(1); }
@@ -832,7 +796,6 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             animation: gradientMove 3s ease-in-out infinite, pulse 1.8s ease-in-out infinite;
-            font-family: 'B Titr', IRANSansX, 'Segoe UI', Tahoma, Arial, sans-serif;
             letter-spacing: -0.5px;
             z-index: 2;
         }
@@ -861,6 +824,7 @@
 </head>
 
 <body>
+    <!-- Initial Loader -->
     <div id="initialLoader">
         <div class="loader-rings">
             <div class="loader-ring"></div>
@@ -898,7 +862,7 @@
             <div class="discount-banner-content">
                 <span class="discount-icon">🎁</span>
                 <div class="discount-title">تخفیف ویژه!</div>
-                <div class="discount-subtitle">با خرید اولین اشتراک خود ۱۰% تخفیف دریافت کنید</div>
+                <div class="discount-subtitle">با خرید اولین اشتراک خود ۱۰٪ تخفیف دریافت کنید</div>
             </div>
         </div>
 
@@ -954,7 +918,7 @@
 
         const plans = {
             bronze: {
-                name: 'برنزی',
+                name: '🥉 برنزی',
                 duration: '۳۰ روز',
                 price: '50,000',
                 discountPrice: '45,000',
@@ -964,24 +928,24 @@
                 badge: ''
             },
             silver: {
-                name: 'نقره‌ای',
+                name: '🥈 نقره‌ای',
                 duration: '۹۰ روز',
                 price: '120,000',
                 discountPrice: '108,000',
                 description: 'دانلود نامحدود',
-                features: ['دانلود نامحدود', 'پست + ریلز + استوری', 'سرعت بالا', 'پشتیبانی سریع', { text: '۲۰٪ تخفیف', discount: true }],
+                features: ['دانلود نامحدود', 'پست + ریلز + استوری', 'سرعت بالا', 'پشتیبانی سریع', { text: '۲۰٪ تخفیف نسبت به برنزی', discount: true }],
                 highlight: true,
                 badge: '🔥 محبوب کاربران'
             },
             gold: {
-                name: 'طلایی',
+                name: '🥇 طلایی',
                 duration: '۳۶۵ روز',
                 price: '400,000',
                 discountPrice: '360,000',
                 description: 'بالاترین سرعت',
-                features: ['دانلود نامحدود', 'بالاترین سرعت', 'پشتیبانی VIP', 'مخصوص تولیدکنندگان محتوا', { text: '۳۳٪ تخفیف', discount: true }],
+                features: ['دانلود نامحدود', 'بالاترین سرعت و اولویت صف', 'پشتیبانی VIP', 'مخصوص تولیدکنندگان محتوا', { text: '۳۳٪ تخفیف نسبت به برنزی', discount: true }],
                 highlight: true,
-                badge: '⭐ VIP'
+                badge: '⭐ پیشنهاد ویژه'
             }
         };
 
@@ -1001,69 +965,56 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
             if (tabName === 'payments') loadPayments();
-            if (tabName === 'plans') requestAnimationFrame(() => updateCarousel(false));
         }
 
-        let currentCarouselIndex = 1;
-        const planKeys = Object.keys(plans);
-
+        /* ═══════════════════════════════════════════════════════
+           RENDER PLANS — VERTICAL STACK
+           ═══════════════════════════════════════════════════════ */
         function loadPlans() {
             const plansContent = document.getElementById('plans-content');
-            let slidesHtml = '';
-            let indicatorsHtml = '';
-            let slideIndex = 0;
+            let cardsHtml = '';
 
             for (const [key, plan] of Object.entries(plans)) {
                 const highlightClass = plan.highlight ? 'highlight' : '';
-                const badge = plan.badge ? `<div class="badge">${plan.badge}</div>` : '';
+                const popularBadge = plan.badge ? `<div class="badge popular">${plan.badge}</div>` : '';
+                const discountBadge = isFirstPurchase ? `<div class="badge discount-badge">🎁 ۱۰٪ تخفیف</div>` : '';
+
                 const currentPrice = isFirstPurchase ? plan.discountPrice : plan.price;
                 const persianPrice = toPersianNumbers(currentPrice);
 
                 const priceBlock = isFirstPurchase
-                    ? `<div style="display: flex; align-items: center; gap: 8px;">
-                           <div class="plan-price original-price">${toPersianNumbers(plan.price)}</div>
-                           <div class="plan-price" style="font-size: 23px;">${persianPrice}</div>
-                       </div>`
-                    : `<div class="plan-price">${persianPrice} تومان</div>`;
+                    ? `<div class="original-price">${toPersianNumbers(plan.price)}</div>
+                       <div class="plan-price">${persianPrice} <span class="unit">تومان</span></div>`
+                    : `<div class="plan-price">${persianPrice} <span class="unit">تومان</span></div>`;
 
-                slidesHtml += `
-                    <div class="carousel-slide ${slideIndex === 1 ? 'active' : ''}" data-index="${slideIndex}">
-                        <div class="plan-card ${highlightClass}">
-                            ${badge}
-                            ${isFirstPurchase ? '<div class="badge" style="right: unset; left: 20px; background: linear-gradient(135deg, #C44569, #833AB4);">🎁 ۱۰% تخفیف</div>' : ''}
-                            <div class="plan-head">
-                                <div>
-                                    <div class="plan-name">${plan.name}</div>
-                                    <div class="plan-duration">${plan.duration}</div>
-                                </div>
+                cardsHtml += `
+                    <div class="plan-card ${highlightClass}">
+                        ${popularBadge}
+                        ${discountBadge}
+                        <div class="plan-head">
+                            <div class="plan-title-group">
+                                <div class="plan-name">${plan.name}</div>
+                                <div class="plan-duration">⏰ ${plan.duration}</div>
+                            </div>
+                            <div class="plan-price-group">
                                 ${priceBlock}
                             </div>
-                            <div class="features">
-                                ${plan.features.map(f => {
-                                    const text = typeof f === 'object' ? f.text : f;
-                                    const discountClass = typeof f === 'object' && f.discount ? 'discount' : '';
-                                    return `<div class="feature ${discountClass}">${text}</div>`;
-                                }).join('')}
-                            </div>
-                            <button class="cta" onclick="buyPlan('${key}')">🚀 خرید اشتراک</button>
                         </div>
+                        <div class="features">
+                            ${plan.features.map(f => {
+                                const text = typeof f === 'object' ? f.text : f;
+                                const discountClass = typeof f === 'object' && f.discount ? 'discount' : '';
+                                return `<div class="feature ${discountClass}">${text}</div>`;
+                            }).join('')}
+                        </div>
+                        <button class="cta" onclick="buyPlan('${key}')">🚀 خرید اشتراک</button>
                     </div>
                 `;
-
-                indicatorsHtml += `<button class="carousel-indicator ${slideIndex === 1 ? 'active' : ''}" onclick="goToSlide(${slideIndex})" aria-label="اسلاید ${slideIndex + 1}"></button>`;
-                slideIndex++;
             }
 
-            let html = `
-                <div class="plans-carousel" id="plansCarousel">
-                    <div class="carousel-wrapper" id="carouselWrapper">
-                        <div class="carousel-container" id="carouselContainer">
-                            ${slidesHtml}
-                        </div>
-                    </div>
-                </div>
-                <div class="carousel-indicators" id="carouselIndicators">
-                    ${indicatorsHtml}
+            const html = `
+                <div class="plans-stack">
+                    ${cardsHtml}
                 </div>
                 <div class="trust">
                     <div>پرداخت امن با کیف پول بله</div>
@@ -1084,201 +1035,11 @@
             `;
 
             plansContent.innerHTML = html;
-
-            currentCarouselIndex = 1;
-
-            requestAnimationFrame(() => {
-                updateCarousel(false);
-                requestAnimationFrame(() => {
-                    initCarouselSwipe();
-                });
-            });
         }
 
         /* ═══════════════════════════════════════════════════════
-           CAROUSEL — PIXEL-PERFECT TRANSLATION
+           OPEN LINKS
            ═══════════════════════════════════════════════════════ */
-        function updateCarousel(animate = true) {
-            const wrapper = document.getElementById('carouselWrapper');
-            const container = document.getElementById('carouselContainer');
-            if (!wrapper || !container) return;
-
-            const slides = container.querySelectorAll('.carousel-slide');
-            if (slides.length === 0) return;
-
-            const wrapperWidth = wrapper.offsetWidth;
-            const slideWidth = wrapperWidth * 0.88;
-            const leftOffset = (wrapperWidth - slideWidth) / 2;
-            const translateX = -(currentCarouselIndex * slideWidth) + leftOffset;
-
-            container.style.transition = animate
-                ? 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-                : 'none';
-            container.style.transform = `translateX(${translateX}px)`;
-
-            slides.forEach((slide, index) => {
-                slide.classList.toggle('active', index === currentCarouselIndex);
-            });
-
-            const indicators = document.querySelectorAll('.carousel-indicator');
-            indicators.forEach((indicator, index) => {
-                indicator.classList.toggle('active', index === currentCarouselIndex);
-            });
-        }
-
-        function nextSlide() {
-            if (currentCarouselIndex < planKeys.length - 1) {
-                currentCarouselIndex++;
-                updateCarousel(true);
-                if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('light');
-            }
-        }
-
-        function prevSlide() {
-            if (currentCarouselIndex > 0) {
-                currentCarouselIndex--;
-                updateCarousel(true);
-                if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('light');
-            }
-        }
-
-        function goToSlide(index) {
-            if (index === currentCarouselIndex) return;
-            currentCarouselIndex = index;
-            updateCarousel(true);
-            if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('light');
-        }
-
-        /* ═══════════════════════════════════════════════════════
-           SWIPE — SMOOTH & PROFESSIONAL
-           ═══════════════════════════════════════════════════════ */
-        function initCarouselSwipe() {
-            const carousel = document.getElementById('plansCarousel');
-            const wrapper = document.getElementById('carouselWrapper');
-            const container = document.getElementById('carouselContainer');
-            if (!carousel || !wrapper || !container) return;
-
-            let startX = 0;
-            let startY = 0;
-            let isDragging = false;
-            let isHorizontal = null;
-            let baseTranslate = 0;
-            let currentTranslate = 0;
-            let rafId = null;
-
-            function getWrapperWidth() { return wrapper.offsetWidth; }
-            function getSlideWidth() { return getWrapperWidth() * 0.88; }
-            function getLeftOffset() { return (getWrapperWidth() - getSlideWidth()) / 2; }
-            function getTranslateForIndex(idx) {
-                return -(idx * getSlideWidth()) + getLeftOffset();
-            }
-
-            function applyTranslate(px) {
-                container.style.transform = `translateX(${px}px)`;
-            }
-
-            function render() {
-                applyTranslate(currentTranslate);
-                rafId = null;
-            }
-
-            function scheduleRender() {
-                if (rafId === null) rafId = requestAnimationFrame(render);
-            }
-
-            carousel.addEventListener('touchstart', (e) => {
-                if (e.touches.length !== 1) return;
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY;
-                isDragging = true;
-                isHorizontal = null;
-                baseTranslate = getTranslateForIndex(currentCarouselIndex);
-                currentTranslate = baseTranslate;
-                container.style.transition = 'none';
-            }, { passive: true });
-
-            carousel.addEventListener('touchmove', (e) => {
-                if (!isDragging || e.touches.length !== 1) return;
-                const dx = e.touches[0].clientX - startX;
-                const dy = e.touches[0].clientY - startY;
-
-                if (isHorizontal === null) {
-                    if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
-                        isHorizontal = Math.abs(dx) > Math.abs(dy);
-                    }
-                }
-
-                if (isHorizontal !== true) return;
-
-                e.preventDefault();
-
-                let next = baseTranslate + dx;
-
-                const maxT = getTranslateForIndex(0);
-                const minT = getTranslateForIndex(planKeys.length - 1);
-
-                if (next > maxT) next = maxT + (next - maxT) * 0.35;
-                else if (next < minT) next = minT + (next - minT) * 0.35;
-
-                currentTranslate = next;
-                scheduleRender();
-            }, { passive: false });
-
-            function endSwipe(e) {
-                if (!isDragging) return;
-                isDragging = false;
-
-                const endX = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX : startX;
-                const dx = endX - startX;
-
-                const slideWidth = getSlideWidth();
-                const threshold = Math.min(60, slideWidth * 0.18);
-
-                let targetIndex = currentCarouselIndex;
-
-                if (isHorizontal === true) {
-                    if (dx < -threshold && currentCarouselIndex < planKeys.length - 1) targetIndex = currentCarouselIndex + 1;
-                    else if (dx > threshold && currentCarouselIndex > 0) targetIndex = currentCarouselIndex - 1;
-                }
-
-                currentCarouselIndex = targetIndex;
-
-                container.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-                currentTranslate = getTranslateForIndex(currentCarouselIndex);
-                applyTranslate(currentTranslate);
-
-                const slides = container.querySelectorAll('.carousel-slide');
-                slides.forEach((slide, index) => slide.classList.toggle('active', index === currentCarouselIndex));
-                const indicators = document.querySelectorAll('.carousel-indicator');
-                indicators.forEach((indicator, index) => indicator.classList.toggle('active', index === currentCarouselIndex));
-
-                if (WebApp.HapticFeedback && Math.abs(dx) > 20) {
-                    WebApp.HapticFeedback.impactOccurred('light');
-                }
-
-                isHorizontal = null;
-            }
-
-            carousel.addEventListener('touchend', endSwipe, { passive: true });
-            carousel.addEventListener('touchcancel', endSwipe, { passive: true });
-
-            carousel.addEventListener('dragstart', e => e.preventDefault());
-            carousel.addEventListener('contextmenu', e => e.preventDefault());
-        }
-
-        window.addEventListener('resize', () => {
-            const container = document.getElementById('carouselContainer');
-            if (container) {
-                container.style.transition = 'none';
-                updateCarousel(false);
-                setTimeout(() => { container.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)'; }, 60);
-            }
-        });
-
-        window.addEventListener('orientationchange', () => {
-            setTimeout(() => updateCarousel(false), 300);
-        });
-
         function openTelegramBot() {
             if (WebApp.openTelegramLink) WebApp.openTelegramLink('https://t.me/DLGramProBot');
             else if (WebApp.openLink) WebApp.openLink('https://t.me/DLGramProBot');
@@ -1291,6 +1052,9 @@
             else window.open('https://ble.ir/MrAliz', '_blank');
         }
 
+        /* ═══════════════════════════════════════════════════════
+           BUY PLAN
+           ═══════════════════════════════════════════════════════ */
         async function buyPlan(planKey) {
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('medium');
             try {
@@ -1318,19 +1082,22 @@
             const plansContent = document.getElementById('plans-content');
             plansContent.innerHTML = `
                 <div class="empty-state" style="animation: zoomIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);">
-                    <div class="empty-icon" style="animation: rotate 1s ease-in-out;">🎊</div>
+                    <div class="empty-icon" style="animation: rotateIn 1s ease-in-out;">🎊</div>
                     <div class="empty-text" style="color: var(--primary);">پرداخت با موفقیت انجام شد!</div>
                     <div class="empty-subtext">کد پیگیری شما ذخیره شد و در تاریخچه قابل مشاهده است</div>
                 </div>
                 <style>
                     @keyframes zoomIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-                    @keyframes rotate { 0% { transform: rotate(0deg) scale(0); } 50% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(360deg) scale(1); } }
+                    @keyframes rotateIn { 0% { transform: rotate(0deg) scale(0); } 50% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(360deg) scale(1); } }
                 </style>
             `;
             showToast('✅ پرداخت موفق! کد شما آماده است');
             setTimeout(() => { document.querySelector('.tab:nth-child(2)').click(); }, 2500);
         }
 
+        /* ═══════════════════════════════════════════════════════
+           PAYMENTS HISTORY
+           ═══════════════════════════════════════════════════════ */
         async function loadPayments() {
             const paymentsContent = document.getElementById('payments-content');
             try {
@@ -1345,16 +1112,7 @@
                             <div class="empty-text">هنوز پرداختی ندارید</div>
                             <div class="empty-subtext">برای خرید اشتراک به تب بسته‌ها بروید</div>
                         </div>
-                        <div class="footer">
-                            <div class="footer-title">تمامی حقوق محفوظ است | © 2025 DLGram</div>
-                            <div class="footer-title">طراحی و توسعه توسط <strong>DLGramProBot</strong> | <strong>MrAliz</strong></div>
-                            <div class="footer-links">
-                                <a href="javascript:void(0)" class="footer-link" onclick="openTelegramBot()">
-                                    <img src="https://biaupload.com/do.php?imgf=org-b47ee26041be1.png" alt="Telegram">دی‌ال‌گرام
-                                </a>
-                                <a href="javascript:void(0)" class="footer-link" onclick="openSupport()">📞 پشتیبانی در بله</a>
-                            </div>
-                        </div>
+                        ${footerHtml()}
                     `;
                     return;
                 }
@@ -1451,19 +1209,7 @@
                     `;
                 }
 
-                html += `
-                    <div class="footer">
-                        <div class="footer-title">تمامی حقوق محفوظ است | © 2025 DLGram</div>
-                        <div class="footer-title">طراحی و توسعه توسط <strong>DLGramProBot</strong> | <strong>MrAliz</strong></div>
-                        <div class="footer-links">
-                            <a href="javascript:void(0)" class="footer-link" onclick="openTelegramBot()">
-                                <img src="https://biaupload.com/do.php?imgf=org-b47ee26041be1.png" alt="Telegram">دی‌ال‌گرام
-                            </a>
-                            <a href="javascript:void(0)" class="footer-link" onclick="openSupport()">📞 پشتیبانی در بله</a>
-                        </div>
-                    </div>
-                `;
-
+                html += footerHtml();
                 paymentsContent.innerHTML = html;
             } catch (error) {
                 console.error('Error loading payments:', error);
@@ -1471,6 +1217,24 @@
             }
         }
 
+        function footerHtml() {
+            return `
+                <div class="footer">
+                    <div class="footer-title">تمامی حقوق محفوظ است | © 2025 DLGram</div>
+                    <div class="footer-title">طراحی و توسعه توسط <strong>DLGramProBot</strong> | <strong>MrAliz</strong></div>
+                    <div class="footer-links">
+                        <a href="javascript:void(0)" class="footer-link" onclick="openTelegramBot()">
+                            <img src="https://biaupload.com/do.php?imgf=org-b47ee26041be1.png" alt="Telegram">دی‌ال‌گرام
+                        </a>
+                        <a href="javascript:void(0)" class="footer-link" onclick="openSupport()">📞 پشتیبانی در بله</a>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           HELPERS
+           ═══════════════════════════════════════════════════════ */
         function showMessage(message) { WebApp.showAlert(message); }
 
         function showToast(message, duration = 3000) {
@@ -1528,9 +1292,7 @@
         function isPaymentExpired(expiresAtISO) {
             try {
                 if (!expiresAtISO) return false;
-                const expiryDate = new Date(expiresAtISO);
-                const now = new Date();
-                return now > expiryDate;
+                return new Date() > new Date(expiresAtISO);
             } catch (e) { return false; }
         }
 
@@ -1590,12 +1352,11 @@
             }
         }
 
+        /* ═══════════════════════════════════════════════════════
+           INIT
+           ═══════════════════════════════════════════════════════ */
         loadPlans();
         checkFirstPurchase();
-
-        window.addEventListener('load', () => {
-            setTimeout(() => updateCarousel(false), 100);
-        });
     </script>
 </body>
 

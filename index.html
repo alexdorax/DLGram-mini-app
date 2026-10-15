@@ -17,6 +17,7 @@
             --accent: #FCAF45;
             --text: #FFFFFF;
             --muted: #B3B3C2;
+            --danger: #F44336;
             --success: #4CAF50;
         }
 
@@ -89,6 +90,20 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: -0.5px;
+            /* ⭐ انیمیشن درخشش برگشت */
+            animation: titleGlow 3s ease-in-out infinite;
+            will-change: filter;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 4px rgba(225, 48, 108, 0.35)) brightness(1);
+            }
+            50% {
+                filter: drop-shadow(0 0 14px rgba(225, 48, 108, 0.75))
+                        drop-shadow(0 0 24px rgba(131, 58, 180, 0.45))
+                        brightness(1.15);
+            }
         }
 
         .header p {
@@ -204,9 +219,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ═══════════════════════════════════════════════════════
-           PLANS — VERTICAL STACK (NO CAROUSEL)
-           ═══════════════════════════════════════════════════════ */
+        /* ═══════════════════ PLANS STACK ═══════════════════ */
         .plans-stack {
             display: flex;
             flex-direction: column;
@@ -224,7 +237,6 @@
                         linear-gradient(135deg, rgba(225, 48, 108, 0.4), rgba(131, 58, 180, 0.4)) border-box;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            overflow: visible;
             display: flex;
             flex-direction: column;
             animation: cardIn 0.5s ease-out backwards;
@@ -251,7 +263,6 @@
             box-shadow: 0 6px 20px rgba(225, 48, 108, 0.2);
         }
 
-        /* ═══════════════════ BADGES ═══════════════════ */
         .badge {
             position: absolute;
             top: -12px;
@@ -283,7 +294,6 @@
             50% { box-shadow: 0 4px 20px rgba(225, 48, 108, 0.9), 0 0 24px rgba(225, 48, 108, 0.4); }
         }
 
-        /* ═══════════════════ HEAD ═══════════════════ */
         .plan-head {
             display: flex;
             justify-content: space-between;
@@ -349,7 +359,6 @@
             opacity: 0.9;
         }
 
-        /* ═══════════════════ FEATURES ═══════════════════ */
         .features {
             display: grid;
             gap: 10px;
@@ -386,7 +395,6 @@
             font-weight: 700;
         }
 
-        /* ═══════════════════ CTA ═══════════════════ */
         .cta {
             width: 100%;
             border: none;
@@ -420,7 +428,6 @@
             box-shadow: 0 2px 10px rgba(225, 48, 108, 0.25);
         }
 
-        /* ═══════════════════ TRUST ═══════════════════ */
         .trust {
             margin-top: 28px;
             background: linear-gradient(135deg, rgba(225, 48, 108, 0.05), rgba(131, 58, 180, 0.05));
@@ -570,45 +577,172 @@
 
         .copy-hint { text-align: center; font-size: 11px; color: var(--primary); margin-top: 8px; opacity: 0.8; }
 
+        /* ═══════════════════════════════════════════════════════
+           EXPIRED OVERLAY — REDESIGNED (GLASS DARK + NEON WARNING)
+           ═══════════════════════════════════════════════════════ */
         .expired-overlay-container {
             position: absolute;
-            top: -8px; left: 0; right: 0; bottom: 0;
+            top: -8px;
+            left: 0;
+            right: 0;
+            bottom: 0;
             cursor: pointer;
             z-index: 15;
             opacity: 1;
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            transition: opacity 0.4s ease, transform 0.4s ease;
             pointer-events: all;
         }
 
-        .expired-overlay-container.hidden { opacity: 0; transform: scale(0.95); pointer-events: none; }
-
-        .expired-progress-overlay {
-            position: absolute;
-            top: 0; left: 18px; right: 18px;
-            height: 30px;
-            background: linear-gradient(135deg, rgba(225, 48, 108, 0.8), rgba(131, 58, 180, 0.8));
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            border-top-left-radius: 11px;
-            border-top-right-radius: 11px;
+        .expired-overlay-container.hidden {
+            opacity: 0;
+            transform: scale(0.96);
+            pointer-events: none;
         }
 
         .expired-overlay {
             position: absolute;
-            top: 8px; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, rgba(225, 48, 108, 0.8), rgba(131, 58, 180, 0.8));
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(circle at 50% 30%, rgba(244, 67, 54, 0.08) 0%, transparent 60%),
+                linear-gradient(180deg, rgba(15, 15, 19, 0.94) 0%, rgba(10, 10, 14, 0.97) 100%);
+            backdrop-filter: blur(6px) saturate(130%);
+            -webkit-backdrop-filter: blur(6px) saturate(130%);
             border-radius: 16px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 24px 20px;
+            border: 1.5px solid rgba(244, 67, 54, 0.3);
+            overflow: hidden;
         }
 
-        .expired-text { font-size: 17px; font-weight: 700; color: white; margin-bottom: 8px; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
-        .expired-subtext { font-size: 13px; color: rgba(255, 255, 255, 0.9); text-align: center; }
+        /* هاله نورانی داخلی */
+        .expired-overlay::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg,
+                rgba(244, 67, 54, 0.06) 0%,
+                transparent 30%,
+                transparent 70%,
+                rgba(131, 58, 180, 0.06) 100%);
+            pointer-events: none;
+        }
+
+        /* ذرات کوچک پس‌زمینه */
+        .expired-overlay::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(244, 67, 54, 0.15) 1px, transparent 1.5px),
+                radial-gradient(circle at 80% 70%, rgba(131, 58, 180, 0.15) 1px, transparent 1.5px),
+                radial-gradient(circle at 40% 80%, rgba(244, 67, 54, 0.1) 1px, transparent 1.5px),
+                radial-gradient(circle at 70% 25%, rgba(131, 58, 180, 0.1) 1px, transparent 1.5px);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .expired-icon-wrap {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.18), rgba(211, 47, 47, 0.28));
+            border: 1.5px solid rgba(244, 67, 54, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 14px;
+            position: relative;
+            z-index: 2;
+            animation: warnPulse 2s ease-in-out infinite;
+            box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4);
+        }
+
+        @keyframes warnPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4), 0 6px 20px rgba(244, 67, 54, 0.25);
+            }
+            50% {
+                transform: scale(1.06);
+                box-shadow: 0 0 0 12px rgba(244, 67, 54, 0), 0 6px 28px rgba(244, 67, 54, 0.55);
+            }
+        }
+
+        .expired-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #ff6b6b;
+            background: rgba(244, 67, 54, 0.14);
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(244, 67, 54, 0.35);
+            letter-spacing: 0.3px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .expired-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ff5252;
+            box-shadow: 0 0 8px #ff5252;
+            animation: badgeBlink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes badgeBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.35; }
+        }
+
+        .expired-text {
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 6px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .expired-subtext {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.65);
+            text-align: center;
+            line-height: 1.6;
+            position: relative;
+            z-index: 2;
+            max-width: 240px;
+        }
+
+        .expired-tap-hint {
+            position: absolute;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.55);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            z-index: 2;
+            animation: hintBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes hintBounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-3px); }
+        }
 
         /* ═══════════════════ TOAST ═══════════════════ */
         .toast {
@@ -693,10 +827,74 @@
             font-size: 12px;
             transition: all 0.3s;
             cursor: pointer;
+            font-family: inherit;
         }
 
         .footer-link:active { transform: scale(0.96); background: rgba(225, 48, 108, 0.2); }
-        .footer-link img { width: 14px; height: 14px; object-fit: contain; }
+
+        /* ⭐ آیکون SVG اینلاین (سریع و بدون مشکل لود) */
+        .footer-link svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           SCROLL TO TOP BUTTON
+           ═══════════════════════════════════════════════════════ */
+        #scrollTopBtn {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(225, 48, 108, 0.45),
+                        0 2px 8px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(80px) scale(0.8);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 999;
+            pointer-events: none;
+            font-family: inherit;
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+        }
+
+        #scrollTopBtn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%);
+            animation: shine 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        #scrollTopBtn.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        #scrollTopBtn:active {
+            transform: translateY(0) scale(0.9);
+            box-shadow: 0 4px 14px rgba(225, 48, 108, 0.6);
+        }
+
+        #scrollTopBtn svg {
+            width: 22px;
+            height: 22px;
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
 
         /* ═══════════════════ LOADER ═══════════════════ */
         #initialLoader {
@@ -886,6 +1084,13 @@
         </div>
     </div>
 
+    <!-- Scroll To Top Button -->
+    <button id="scrollTopBtn" aria-label="بازگشت به بالا" onclick="scrollToTop()">
+        <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4l-8 8h5v8h6v-8h5z"/>
+        </svg>
+    </button>
+
     <script>
         const Bale = window.Bale;
         const WebApp = Bale.WebApp;
@@ -967,9 +1172,17 @@
             if (tabName === 'payments') loadPayments();
         }
 
-        /* ═══════════════════════════════════════════════════════
-           RENDER PLANS — VERTICAL STACK
-           ═══════════════════════════════════════════════════════ */
+        /* ═══════════════════ TELEGRAM ICON (SVG INLINE) ═══════════════════ */
+        function telegramIconSvg() {
+            return `
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <circle cx="12" cy="12" r="12" fill="#229ED9"/>
+                    <path fill="#fff" d="M5.5 11.9l10.9-4.2c.5-.2.9.1.8.8l-1.9 8.8c-.1.6-.5.8-1.1.5l-2.9-2.2-1.4 1.4c-.2.2-.3.3-.6.3l.2-3 5.4-4.9c.2-.2 0-.3-.4-.1l-6.7 4.2-2.9-.9c-.6-.2-.6-.6.1-.9z"/>
+                </svg>
+            `;
+        }
+
+        /* ═══════════════════ RENDER PLANS ═══════════════════ */
         function loadPlans() {
             const plansContent = document.getElementById('plans-content');
             let cardsHtml = '';
@@ -1021,25 +1234,30 @@
                     <div>بازگشت وجه تا ۲۴ ساعت</div>
                     <div>صدها کاربر فعال</div>
                 </div>
+                ${footerHtml()}
+            `;
+
+            plansContent.innerHTML = html;
+        }
+
+        /* ═══════════════════ FOOTER ═══════════════════ */
+        function footerHtml() {
+            return `
                 <div class="footer">
                     <div class="footer-title">تمامی حقوق محفوظ است | © 2025 DLGram</div>
                     <div class="footer-title">طراحی و توسعه توسط <strong>DLGramProBot</strong> | <strong>MrAliz</strong></div>
                     <div class="footer-links">
                         <a href="javascript:void(0)" class="footer-link" onclick="openTelegramBot()">
-                            <img src="https://biaupload.com/do.php?imgf=org-b47ee26041be1.png" alt="Telegram">
+                            ${telegramIconSvg()}
                             دی‌ال‌گرام
                         </a>
                         <a href="javascript:void(0)" class="footer-link" onclick="openSupport()">📞 پشتیبانی در بله</a>
                     </div>
                 </div>
             `;
-
-            plansContent.innerHTML = html;
         }
 
-        /* ═══════════════════════════════════════════════════════
-           OPEN LINKS
-           ═══════════════════════════════════════════════════════ */
+        /* ═══════════════════ OPEN LINKS ═══════════════════ */
         function openTelegramBot() {
             if (WebApp.openTelegramLink) WebApp.openTelegramLink('https://t.me/DLGramProBot');
             else if (WebApp.openLink) WebApp.openLink('https://t.me/DLGramProBot');
@@ -1052,9 +1270,7 @@
             else window.open('https://ble.ir/MrAliz', '_blank');
         }
 
-        /* ═══════════════════════════════════════════════════════
-           BUY PLAN
-           ═══════════════════════════════════════════════════════ */
+        /* ═══════════════════ BUY PLAN ═══════════════════ */
         async function buyPlan(planKey) {
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('medium');
             try {
@@ -1095,9 +1311,7 @@
             setTimeout(() => { document.querySelector('.tab:nth-child(2)').click(); }, 2500);
         }
 
-        /* ═══════════════════════════════════════════════════════
-           PAYMENTS HISTORY
-           ═══════════════════════════════════════════════════════ */
+        /* ═══════════════════ PAYMENTS HISTORY ═══════════════════ */
         async function loadPayments() {
             const paymentsContent = document.getElementById('payments-content');
             try {
@@ -1142,7 +1356,8 @@
                         let statusIcon = '';
                         let statusText = '';
 
-                        if (remainingDays <= 0) {
+                        // ⭐ اولویت با isExpired — جلوگیری از تناقض
+                        if (isExpired || remainingDays <= 0) {
                             pClass = 'expired';
                             statusIcon = '❌ ';
                             statusText = 'اشتراک منقضی شده';
@@ -1198,10 +1413,12 @@
                             <div class="copy-hint">برای کپی کردن کد کلیک کنید</div>
                             ${isExpired ? `
                             <div class="expired-overlay-container" onclick="hideExpiredOverlay('${cardId}')">
-                                <div class="expired-progress-overlay"></div>
                                 <div class="expired-overlay">
-                                    <div class="expired-text">⚠️ اشتراک منقضی شده ⚠️</div>
-                                    <div class="expired-subtext">مدت اعتبار این اشتراک به پایان رسیده است<br>برای مشاهده جزئیات کلیک کنید</div>
+                                    <div class="expired-icon-wrap">⚠️</div>
+                                    <div class="expired-badge">منقضی شده</div>
+                                    <div class="expired-text">این اشتراک به پایان رسیده است</div>
+                                    <div class="expired-subtext">مدت اعتبار این اشتراک تمام شده.<br>برای مشاهده جزئیات، ضربه بزنید.</div>
+                                    <div class="expired-tap-hint">👆 ضربه بزنید</div>
                                 </div>
                             </div>
                             ` : ''}
@@ -1217,24 +1434,7 @@
             }
         }
 
-        function footerHtml() {
-            return `
-                <div class="footer">
-                    <div class="footer-title">تمامی حقوق محفوظ است | © 2025 DLGram</div>
-                    <div class="footer-title">طراحی و توسعه توسط <strong>DLGramProBot</strong> | <strong>MrAliz</strong></div>
-                    <div class="footer-links">
-                        <a href="javascript:void(0)" class="footer-link" onclick="openTelegramBot()">
-                            <img src="https://biaupload.com/do.php?imgf=org-b47ee26041be1.png" alt="Telegram">دی‌ال‌گرام
-                        </a>
-                        <a href="javascript:void(0)" class="footer-link" onclick="openSupport()">📞 پشتیبانی در بله</a>
-                    </div>
-                </div>
-            `;
-        }
-
-        /* ═══════════════════════════════════════════════════════
-           HELPERS
-           ═══════════════════════════════════════════════════════ */
+        /* ═══════════════════ HELPERS ═══════════════════ */
         function showMessage(message) { WebApp.showAlert(message); }
 
         function showToast(message, duration = 3000) {
@@ -1320,6 +1520,22 @@
             }
         }
 
+        /* ═══════════════════ SCROLL TO TOP ═══════════════════ */
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('light');
+        }
+
+        function handleScrollTopVisibility() {
+            const btn = document.getElementById('scrollTopBtn');
+            if (!btn) return;
+            if (window.scrollY > 400) btn.classList.add('visible');
+            else btn.classList.remove('visible');
+        }
+
+        window.addEventListener('scroll', handleScrollTopVisibility, { passive: true });
+
+        /* ═══════════════════ CHECK FIRST PURCHASE ═══════════════════ */
         async function checkFirstPurchase() {
             try {
                 if (!userId) {
@@ -1352,11 +1568,10 @@
             }
         }
 
-        /* ═══════════════════════════════════════════════════════
-           INIT
-           ═══════════════════════════════════════════════════════ */
+        /* ═══════════════════ INIT ═══════════════════ */
         loadPlans();
         checkFirstPurchase();
+        handleScrollTopVisibility();
     </script>
 </body>
 

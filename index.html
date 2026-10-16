@@ -342,9 +342,14 @@
         .feature.discount { color: var(--accent); font-weight: 700; }
 
         /* ═══════════════════════════════════════════════════════════
-           ⭐ دکمه خرید — سایز کاملاً ثابت
-           متن به‌صورت absolute روی دکمه قرار می‌گیرد و اصلاً روی
-           عرض/ارتفاع دکمه تأثیر نمی‌گذارد، حتی اگر متن طولانی شود.
+           ⭐⭐ دکمه خرید — سایز ۱۰۰٪ ثابت (غیرقابل تغییر)
+           ────────────────────────────────────────────────────────────
+           استراتژی:
+           1) ارتفاع دکمه دقیقاً 50px قفل شده (height + min + max)
+           2) هیچ متن مستقیمی داخل دکمه نیست
+           3) دو span مجزا با position: absolute روی دکمه قرار دارن
+           4) فقط opacity بینشون سوییچ می‌شه — متن DOM اصلاً تغییر نمی‌کنه
+           5) هیچ عملیات DOM textContent انجام نمی‌شه
            ═══════════════════════════════════════════════════════════ */
         .cta {
             position: relative;
@@ -360,27 +365,34 @@
             box-shadow: 0 4px 16px rgba(225, 48, 108, 0.35);
             cursor: pointer;
             font-family: inherit;
-            font-size: 0;
-            line-height: 0;
             overflow: hidden;
             margin-top: auto;
             flex-shrink: 0;
+            flex-grow: 0;
             transition: transform 0.15s ease, box-shadow 0.3s ease, opacity 0.2s;
-            color: transparent;
-            text-indent: -9999px;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            text-rendering: optimizeLegibility;
         }
 
         .cta::before {
             content: '';
             position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
             background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.12) 50%, transparent 70%);
             animation: shine 3s ease-in-out infinite;
             pointer-events: none;
         }
 
-        .cta:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(225, 48, 108, 0.25); }
+        .cta:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 10px rgba(225, 48, 108, 0.25);
+        }
 
         .cta:disabled,
         .cta.loading {
@@ -389,7 +401,7 @@
             transform: none;
         }
 
-        /* ⭐ متن دکمه — absolute، جدا از جریان layout، هیچ تأثیری روی سایز دکمه ندارد */
+        /* هر دو span از جریان layout خارج هستن */
         .cta-text {
             position: absolute;
             top: 0;
@@ -407,14 +419,20 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            text-indent: 0;
-            z-index: 2;
             pointer-events: none;
-            transition: opacity 0.15s ease;
+            z-index: 2;
+            transition: opacity 0.18s ease;
+            box-sizing: border-box;
+            margin: 0;
         }
 
-        /* ⭐ حالت loading — فقط متن عوض می‌شود، سایز دست‌نخورده */
-        .cta.loading .cta-text { opacity: 0.95; }
+        /* حالت عادی: span معمولی نمایان، span لودینگ مخفی */
+        .cta-text-normal { opacity: 1; }
+        .cta-text-loading { opacity: 0; }
+
+        /* حالت loading: برعکس */
+        .cta.loading .cta-text-normal { opacity: 0; }
+        .cta.loading .cta-text-loading { opacity: 1; }
 
         .trust {
             margin-top: 28px;
@@ -1086,9 +1104,6 @@
             return str.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
         }
 
-        /* ═══════════════════════════════════════════════════════════
-           CACHE — فقط برای تخفیف اولین خرید (user-specific)
-           ═══════════════════════════════════════════════════════════ */
         const CACHE_TTL_MS = 5 * 60 * 1000;
         const CACHE_KEY_FIRST = 'dlgram_first_purchase_v1';
 
@@ -1114,9 +1129,6 @@
             try { localStorage.removeItem(key); } catch (_) {}
         }
 
-        /* ═══════════════════════════════════════════════════════════
-           STATE
-           ═══════════════════════════════════════════════════════════ */
         let isFirstPurchase = true;
         let userTelegramId = null;
         let activeDiscount = null;
@@ -1171,7 +1183,6 @@
             if (tabName === 'payments') loadPayments();
         }
 
-        /* ═══════════════════ ICONS ═══════════════════ */
         function telegramIconSvg() {
             return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#229ED9"/><path fill="#fff" d="M5.5 11.9l10.9-4.2c.5-.2.9.1.8.8l-1.9 8.8c-.1.6-.5.8-1.1.5l-2.9-2.2-1.4 1.4c-.2.2-.3.3-.6.3l.2-3 5.4-4.9c.2-.2 0-.3-.4-.1l-6.7 4.2-2.9-.9c-.6-.2-.6-.6.1-.9z"/></svg>`;
         }
@@ -1180,9 +1191,6 @@
             return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="#ff5252" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13.5" stroke="#ff5252" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1.1" fill="#ff5252"/></svg>`;
         }
 
-        /* ═══════════════════════════════════════════════════════════
-           محاسبه‌ی قیمت نهایی
-           ═══════════════════════════════════════════════════════════ */
         function computeFinalPrice(basePriceStr, planKey) {
             const basePrice = parseInt(String(basePriceStr).replace(/,/g, ''), 10) || 0;
             let totalPercent = 0;
@@ -1205,9 +1213,6 @@
             return Number(num).toLocaleString('en-US');
         }
 
-        /* ═══════════════════════════════════════════════════════════
-           FETCH PLANS CONFIG — همیشه تازه از API (بدون cache)
-           ═══════════════════════════════════════════════════════════ */
         async function fetchPlansConfig() {
             try {
                 const controller = new AbortController();
@@ -1229,9 +1234,6 @@
             return null;
         }
 
-        /* ═══════════════════════════════════════════════════════════
-           FETCH FIRST PURCHASE (با cache کوتاه)
-           ═══════════════════════════════════════════════════════════ */
         async function fetchFirstPurchaseCached() {
             const cached = cacheGet(CACHE_KEY_FIRST);
             if (cached) {
@@ -1252,9 +1254,6 @@
             return { isFirstPurchase: true, telegramId: null };
         }
 
-        /* ═══════════════════════════════════════════════════════════
-           DISCOUNT BANNER + COUNTDOWN
-           ═══════════════════════════════════════════════════════════ */
         function updateDiscountBanner() {
             const banner = document.getElementById('discountBanner');
             const titleEl = document.getElementById('discountTitle');
@@ -1322,9 +1321,6 @@
             countdownTimer = setInterval(tick, 1000);
         }
 
-        /* ═══════════════════════════════════════════════════════════
-           RENDER PLANS
-           ═══════════════════════════════════════════════════════════ */
         function loadPlans() {
             const plansContent = document.getElementById('plans-content');
             let cardsHtml = '';
@@ -1345,6 +1341,7 @@
                        <div class="plan-price">${persianFinal} <span class="unit">تومان</span></div>`
                     : `<div class="plan-price">${persianFinal} <span class="unit">تومان</span></div>`;
 
+                // ⭐⭐ دکمه با دو span مطلق — فقط با opacity سوییچ می‌شن
                 cardsHtml += `
                     <div class="plan-card ${highlightClass}">
                         ${popularBadge}
@@ -1364,7 +1361,8 @@
                             }).join('')}
                         </div>
                         <button class="cta" onclick="buyPlan('${key}', this)" data-plan="${key}" type="button" aria-label="خرید اشتراک">
-                            <span class="cta-text">🚀 خرید اشتراک</span>
+                            <span class="cta-text cta-text-normal">🚀 خرید اشتراک</span>
+                            <span class="cta-text cta-text-loading">⏳ در حال آماده‌سازی...</span>
                         </button>
                     </div>
                 `;
@@ -1411,25 +1409,21 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           BUY PLAN — فقط متن عوض می‌شود، سایز دکمه اصلاً تغییر نمی‌کند
+           BUY PLAN — فقط کلاس loading اضافه/حذف می‌شود
+           هیچ متنی در DOM عوض نمی‌شود
            ═══════════════════════════════════════════════════════════ */
         async function buyPlan(planKey, btnEl) {
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('medium');
 
-            const textSpan = btnEl ? btnEl.querySelector('.cta-text') : null;
-            const originalText = textSpan ? textSpan.textContent : null;
-
             if (btnEl) {
                 btnEl.disabled = true;
                 btnEl.classList.add('loading');
-                if (textSpan) textSpan.textContent = '⏳ در حال آماده‌سازی...';
             }
 
             function restoreBtn() {
                 if (btnEl) {
                     btnEl.disabled = false;
                     btnEl.classList.remove('loading');
-                    if (textSpan && originalText !== null) textSpan.textContent = originalText;
                 }
             }
 
@@ -1482,7 +1476,6 @@
             setTimeout(() => { switchTab('payments'); }, 2500);
         }
 
-        /* ═══════════════════ PAYMENTS ═══════════════════ */
         function getPaymentOrder(payment) {
             if (!payment.used) return 2;
             const isExpired = payment.expires_at_iso && isPaymentExpired(payment.expires_at_iso);
@@ -1638,7 +1631,6 @@
             }
         }
 
-        /* ═══════════════════ HELPERS ═══════════════════ */
         function showMessage(message) { WebApp.showAlert(message); }
 
         function showToast(message, duration = 3000) {
@@ -1735,7 +1727,6 @@
 
         window.addEventListener('scroll', handleScrollTopVisibility, { passive: true });
 
-        /* ═══════════════════ SWIPE ═══════════════════ */
         function initTabSwipe() {
             const container = document.getElementById('mainContainer');
             if (!container) return;
@@ -1785,9 +1776,6 @@
             container.addEventListener('touchcancel', () => { tracking = false; isHorizontal = null; }, { passive: true });
         }
 
-        /* ═══════════════════════════════════════════════════════════
-           INIT — تخفیف همیشه تازه از سرور خوانده می‌شود
-           ═══════════════════════════════════════════════════════════ */
         async function init() {
             try {
                 const [plansConfig, fpData] = await Promise.all([
@@ -1823,7 +1811,6 @@
             }
         }
 
-        /* ═══════════════════ START ═══════════════════ */
         loadPlans();
         init();
         handleScrollTopVisibility();

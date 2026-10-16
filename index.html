@@ -80,7 +80,6 @@
 
         .main-container > * { position: relative; z-index: 1; }
 
-        /* ═══════════════════ HEADER ═══════════════════ */
         .header { text-align: center; margin-bottom: 20px; position: relative; }
 
         .header h1 {
@@ -127,7 +126,6 @@
             display: inline-block;
         }
 
-        /* ═══════════════════ DISCOUNT BANNER ═══════════════════ */
         .discount-banner {
             background: linear-gradient(135deg, #C44569 0%, #833AB4 100%);
             padding: 16px;
@@ -177,7 +175,6 @@
             50% { transform: translateY(-6px) scale(1.1); }
         }
 
-        /* ═══════════════════ TABS ═══════════════════ */
         .tabs {
             display: flex;
             gap: 8px;
@@ -217,7 +214,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ═══════════════════ PLANS STACK ═══════════════════ */
         .plans-stack { display: flex; flex-direction: column; gap: 20px; padding: 8px 0; }
 
         .plan-card {
@@ -342,16 +338,6 @@
 
         .feature.discount { color: var(--accent); font-weight: 700; }
 
-        /* ═══════════════════════════════════════════════════════════
-           ⭐⭐⭐ دکمه خرید — راه‌حل قطعی با line-height
-           ────────────────────────────────────────────────────────────
-           نکات کلیدی:
-           1) height: 50px + line-height: 50px → متن همیشه عمودی وسط
-           2) min-width: 0 → جلوگیری از رشد عرض توسط محتوا
-           3) max-width: 100% → تضمین عدم سرریز
-           4) هیچ flex/grid در دکمه → سازگاری کامل با همه WebViewها
-           5) فقط textContent عوض می‌شود
-           ═══════════════════════════════════════════════════════════ */
         .cta-wrapper {
             position: relative;
             width: 100%;
@@ -386,7 +372,6 @@
             font-size: 15px;
             font-weight: 800;
             color: #fff;
-            /* ⭐ نکته کلیدی: line-height = height */
             line-height: var(--btn-height);
             text-align: center;
             white-space: nowrap;
@@ -409,7 +394,6 @@
             box-shadow: 0 2px 10px rgba(225, 48, 108, 0.25);
         }
 
-        /* ⭐ حالت disabled/loading — رنگ و ابعاد هیچ تغییری نمی‌کند */
         .cta:disabled,
         .cta.loading {
             color: #fff;
@@ -448,7 +432,6 @@
             flex-shrink: 0;
         }
 
-        /* ═══════════════════ PAYMENT CARDS ═══════════════════ */
         .payment-card {
             background: var(--card);
             border-radius: 16px;
@@ -513,7 +496,6 @@
             animation: shimmerProgress 2s infinite;
         }
 
-        /* ⭐ افکت از راست به چپ */
         @keyframes shimmerProgress {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
@@ -527,7 +509,6 @@
             gap: 8px;
         }
 
-        /* ⭐ نام پلن بزرگ‌تر، تعداد روز کوچک‌تر */
         .payment-plan {
             font-size: 16px;
             font-weight: 700;
@@ -614,7 +595,6 @@
             background: linear-gradient(90deg, transparent, rgba(128, 128, 144, 0.5), transparent);
         }
 
-        /* ═══════════════════ EXPIRED OVERLAY ═══════════════════ */
         .expired-overlay-container {
             position: absolute;
             top: -8px;
@@ -776,7 +756,6 @@
             50% { transform: translateX(-50%) translateY(-3px); }
         }
 
-        /* ═══════════════════ TOAST ═══════════════════ */
         .toast {
             position: fixed;
             bottom: 80px;
@@ -1100,7 +1079,6 @@
         WebApp.ready();
         WebApp.expand();
 
-        // ⭐ زمان شروع برای محاسبه حداقل زمان لودینگ
         const APP_START_TIME = Date.now();
 
         document.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -1355,8 +1333,6 @@
                        <div class="plan-price">${persianFinal} <span class="unit">تومان</span></div>`
                     : `<div class="plan-price">${persianFinal} <span class="unit">تومان</span></div>`;
 
-                /* ⭐⭐⭐ دکمه: ساختار بسیار ساده — بدون span، بدون flex/grid
-                   فقط متن مستقیم داخل button. در JS فقط textContent عوض می‌شود. */
                 cardsHtml += `
                     <div class="plan-card ${highlightClass}">
                         ${popularBadge}
@@ -1422,22 +1398,22 @@
             else window.open('https://ble.ir/MrAliz', '_blank');
         }
 
-        /* ═══════════════════════════════════════════════════════════
-           BUY PLAN — فقط textContent عوض می‌شود
-           با line-height: 50px روی دکمه، هیچ شیفت عمودی رخ نمی‌دهد
-           ═══════════════════════════════════════════════════════════ */
         async function buyPlan(planKey, btnEl) {
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('medium');
 
             const originalText = btnEl.textContent;
+            const startTime = Date.now();
+
             btnEl.textContent = '⏳ در حال آماده‌سازی...';
             btnEl.classList.add('loading');
             btnEl.style.pointerEvents = 'none';
 
             function restoreBtn() {
-                btnEl.textContent = originalText;
-                btnEl.classList.remove('loading');
-                btnEl.style.pointerEvents = '';
+                try {
+                    btnEl.textContent = originalText;
+                    btnEl.classList.remove('loading');
+                    btnEl.style.pointerEvents = '';
+                } catch (_) {}
             }
 
             try {
@@ -1454,13 +1430,20 @@
 
                 if (!data.success) throw new Error(data.error || 'خطا در ایجاد فاکتور');
 
-                restoreBtn();
+                const elapsed = Date.now() - startTime;
+                const waitMore = Math.max(0, 600 - elapsed);
+                if (waitMore > 0) {
+                    await new Promise(r => setTimeout(r, waitMore));
+                }
 
                 WebApp.openInvoice(data.invoice_params, (status, invoiceId) => {
+                    restoreBtn();
+
                     if (status === 'paid') showPaymentSuccess(invoiceId);
                     else if (status === 'cancelled') showMessage('پرداخت لغو شد');
                     else if (status === 'failed') showMessage('خطا در پرداخت. لطفاً دوباره تلاش کنید.');
                 });
+
             } catch (error) {
                 console.error('Error buying plan:', error);
                 restoreBtn();
@@ -1489,7 +1472,6 @@
             setTimeout(() => { switchTab('payments'); }, 2500);
         }
 
-        /* ═══════════════════ PAYMENTS ═══════════════════ */
         function getPaymentOrder(payment) {
             if (!payment.used) return 2;
             const isExpired = payment.expires_at_iso && isPaymentExpired(payment.expires_at_iso);
@@ -1506,7 +1488,6 @@
             }
         }
 
-        /* ⭐⭐⭐ نام پلن به‌همراه تعداد روز — تعداد روز کوچک‌تر */
         function getPlanDisplayName(planKey) {
             const planInfo = plans[planKey];
             const days = PLAN_DURATIONS[planKey];
@@ -1730,7 +1711,6 @@
             }
         });
 
-        /* ⭐⭐⭐ لودینگ با حداقل زمان نمایش ۱.۵ ثانیه */
         const MIN_LOADER_DURATION_MS = 1500;
         let loaderHidden = false;
 

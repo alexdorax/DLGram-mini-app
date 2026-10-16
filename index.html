@@ -338,6 +338,13 @@
 
         .feature.discount { color: var(--accent); font-weight: 700; }
 
+        /* ═══════════════════════════════════════════════════════════
+           ⭐⭐⭐ بخش جدید: دکمه خرید با دو عنصر مجزا
+           ────────────────────────────────────────────────────────────
+           به جای تغییر متن داخل دکمه، دو عنصر جدا در DOM قرار می‌گیرند
+           و فقط display آن‌ها toggle می‌شود. هیچ DOM manipulation ای
+           روی متن دکمه انجام نمی‌شود.
+           ═══════════════════════════════════════════════════════════ */
         .cta-wrapper {
             position: relative;
             width: 100%;
@@ -352,14 +359,14 @@
             border-radius: 14px;
         }
 
-        .cta {
-            display: block;
+        .cta-item {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             width: 100%;
-            min-width: 0;
-            max-width: 100%;
-            height: var(--btn-height);
-            min-height: var(--btn-height);
-            max-height: var(--btn-height);
+            height: 100%;
             padding: 0 15px;
             border: 0;
             outline: 0;
@@ -367,7 +374,6 @@
             border-radius: 14px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             box-shadow: 0 4px 16px rgba(225, 48, 108, 0.35);
-            cursor: pointer;
             font-family: inherit;
             font-size: 15px;
             font-weight: 800;
@@ -382,25 +388,35 @@
             -moz-appearance: none;
             appearance: none;
             -webkit-tap-highlight-color: transparent;
-            transition: transform 0.15s ease, opacity 0.2s ease;
-            position: relative;
+            cursor: pointer;
+            transition: transform 0.15s ease;
             vertical-align: top;
+            display: block;
         }
 
-        .cta::-moz-focus-inner { border: 0; padding: 0; }
+        .cta-item::-moz-focus-inner { border: 0; padding: 0; }
 
-        .cta:active {
+        .cta-normal {
+            display: block;
+        }
+
+        .cta-normal:active {
             transform: scale(0.97);
-            box-shadow: 0 2px 10px rgba(225, 48, 108, 0.25);
         }
 
-        .cta:disabled,
-        .cta.loading {
-            color: #fff;
-            opacity: 0.85;
+        .cta-loading {
+            display: none;
             cursor: wait;
-            transform: none;
-            box-shadow: 0 4px 16px rgba(225, 48, 108, 0.35);
+            opacity: 0.9;
+            background: linear-gradient(135deg, #b5255a, #6b2e94);
+        }
+
+        .cta-wrapper.is-loading .cta-normal {
+            display: none;
+        }
+
+        .cta-wrapper.is-loading .cta-loading {
+            display: block;
         }
 
         .trust {
@@ -1333,6 +1349,7 @@
                        <div class="plan-price">${persianFinal} <span class="unit">تومان</span></div>`
                     : `<div class="plan-price">${persianFinal} <span class="unit">تومان</span></div>`;
 
+                /* ⭐⭐⭐ دکمه خرید با دو عنصر مجزا — هیچ text manipulation ای انجام نمی‌شود */
                 cardsHtml += `
                     <div class="plan-card ${highlightClass}">
                         ${popularBadge}
@@ -1351,8 +1368,9 @@
                                 return `<div class="feature ${discountClass}">${text}</div>`;
                             }).join('')}
                         </div>
-                        <div class="cta-wrapper">
-                            <button class="cta" onclick="buyPlan('${key}', this)" data-plan="${key}" type="button" aria-label="خرید اشتراک">🚀 خرید اشتراک</button>
+                        <div class="cta-wrapper" id="cta-${key}">
+                            <button class="cta-item cta-normal" onclick="buyPlan('${key}')" type="button" aria-label="خرید اشتراک">🚀 خرید اشتراک</button>
+                            <div class="cta-item cta-loading" aria-hidden="true">⏳ در حال آماده‌سازی...</div>
                         </div>
                     </div>
                 `;
@@ -1398,22 +1416,35 @@
             else window.open('https://ble.ir/MrAliz', '_blank');
         }
 
-        async function buyPlan(planKey, btnEl) {
+        /* ═══════════════════════════════════════════════════════════
+           BUY PLAN — روش جدید: toggle کلاس روی wrapper
+           ────────────────────────────────────────────────────────────
+           هیچ DOM manipulation ای روی button انجام نمی‌شود.
+           فقط یک کلاس CSS روی wrapper اضافه می‌شود و CSS خودش
+           display دو عنصر را عوض می‌کند.
+           ═══════════════════════════════════════════════════════════ */
+        async function buyPlan(planKey) {
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('medium');
 
-            const originalText = btnEl.textContent;
+            const wrapper = document.getElementById(`cta-${planKey}`);
+            if (!wrapper) {
+                console.error('CTA wrapper not found for plan:', planKey);
+                return;
+            }
+
+            // ⭐ جلوگیری از کلیک مجدد
+            if (wrapper.classList.contains('is-loading')) return;
+
+            // ⭐ فعال کردن حالت loading با یک کلاس CSS
+            wrapper.classList.add('is-loading');
+
+            // ⭐ اجازه دادن به مرورگر برای رندر تغییر
+            await new Promise(r => setTimeout(r, 50));
+
             const startTime = Date.now();
 
-            btnEl.textContent = '⏳ در حال آماده‌سازی...';
-            btnEl.classList.add('loading');
-            btnEl.style.pointerEvents = 'none';
-
-            function restoreBtn() {
-                try {
-                    btnEl.textContent = originalText;
-                    btnEl.classList.remove('loading');
-                    btnEl.style.pointerEvents = '';
-                } catch (_) {}
+            function reset() {
+                wrapper.classList.remove('is-loading');
             }
 
             try {
@@ -1430,14 +1461,16 @@
 
                 if (!data.success) throw new Error(data.error || 'خطا در ایجاد فاکتور');
 
+                // ⭐ حداقل 800ms نمایش حالت loading
                 const elapsed = Date.now() - startTime;
-                const waitMore = Math.max(0, 600 - elapsed);
+                const waitMore = Math.max(0, 800 - elapsed);
                 if (waitMore > 0) {
                     await new Promise(r => setTimeout(r, waitMore));
                 }
 
+                // ⭐ باز کردن دیالوگ پرداخت
                 WebApp.openInvoice(data.invoice_params, (status, invoiceId) => {
-                    restoreBtn();
+                    reset();
 
                     if (status === 'paid') showPaymentSuccess(invoiceId);
                     else if (status === 'cancelled') showMessage('پرداخت لغو شد');
@@ -1446,7 +1479,7 @@
 
             } catch (error) {
                 console.error('Error buying plan:', error);
-                restoreBtn();
+                reset();
                 showMessage('خطا در برقراری ارتباط. لطفاً دوباره تلاش کنید.');
             }
         }
@@ -1754,7 +1787,7 @@
             container.addEventListener('touchstart', (e) => {
                 if (e.touches.length !== 1) return;
                 const target = e.target;
-                if (target.closest('button, a, input, textarea, .cta, .footer-link, #scrollTopBtn')) {
+                if (target.closest('button, a, input, textarea, .cta-item, .footer-link, #scrollTopBtn')) {
                     tracking = false; return;
                 }
                 startX = e.touches[0].clientX;

@@ -8,7 +8,6 @@
 
     <script src="https://tapi.bale.ai/miniapp.js?3"></script>
 
-    <!-- ⭐ Preload Fonts: preconnect + async CSS load برای سرعت بالا -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
@@ -342,32 +341,33 @@
 
         .feature.discount { color: var(--accent); font-weight: 700; }
 
-        /* ⭐ CTA — ارتفاع ثابت تا با تغییر متن سایز عوض نشود */
+        /* ═══════════════════════════════════════════════════════════
+           ⭐ دکمه خرید — سایز کاملاً ثابت
+           متن به‌صورت absolute روی دکمه قرار می‌گیرد و اصلاً روی
+           عرض/ارتفاع دکمه تأثیر نمی‌گذارد، حتی اگر متن طولانی شود.
+           ═══════════════════════════════════════════════════════════ */
         .cta {
+            position: relative;
+            display: block;
             width: 100%;
+            height: 50px;
+            min-height: 50px;
+            max-height: 50px;
+            padding: 0;
             border: none;
             border-radius: 14px;
-            padding: 0 15px;
-            font-size: 15px;
-            font-weight: 800;
-            cursor: pointer;
-            color: #fff;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            transition: transform 0.15s ease, box-shadow 0.3s ease, opacity 0.2s;
             box-shadow: 0 4px 16px rgba(225, 48, 108, 0.35);
-            position: relative;
-            overflow: hidden;
+            cursor: pointer;
             font-family: inherit;
+            font-size: 0;
+            line-height: 0;
+            overflow: hidden;
             margin-top: auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            /* ⭐ جلوگیری از تغییر سایز */
-            white-space: nowrap;
-            min-height: 50px;
-            height: 50px;
-            line-height: 1;
+            flex-shrink: 0;
+            transition: transform 0.15s ease, box-shadow 0.3s ease, opacity 0.2s;
+            color: transparent;
+            text-indent: -9999px;
         }
 
         .cta::before {
@@ -389,24 +389,32 @@
             transform: none;
         }
 
+        /* ⭐ متن دکمه — absolute، جدا از جریان layout، هیچ تأثیری روی سایز دکمه ندارد */
         .cta-text {
-            display: inline-block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 15px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-indent: 0;
+            z-index: 2;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
         }
 
-        .btn-spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: btnSpin 0.7s linear infinite;
-            display: inline-block;
-        }
-
-        @keyframes btnSpin {
-            to { transform: rotate(360deg); }
-        }
+        /* ⭐ حالت loading — فقط متن عوض می‌شود، سایز دست‌نخورده */
+        .cta.loading .cta-text { opacity: 0.95; }
 
         .trust {
             margin-top: 28px;
@@ -1079,8 +1087,7 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           ⭐ CACHE — فقط برای تخفیف اولین خرید (user-specific)
-           تخفیف ادمین دیگر cache نمی‌شود و هر بار تازه خوانده می‌شود
+           CACHE — فقط برای تخفیف اولین خرید (user-specific)
            ═══════════════════════════════════════════════════════════ */
         const CACHE_TTL_MS = 5 * 60 * 1000;
         const CACHE_KEY_FIRST = 'dlgram_first_purchase_v1';
@@ -1112,7 +1119,7 @@
            ═══════════════════════════════════════════════════════════ */
         let isFirstPurchase = true;
         let userTelegramId = null;
-        let activeDiscount = null; // { percent, label, expires_at }
+        let activeDiscount = null;
         let countdownTimer = null;
 
         const FIRST_PURCHASE_DISCOUNT = 10;
@@ -1174,7 +1181,7 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           ⭐ محاسبه‌ی قیمت نهایی با تخفیف‌های پویا
+           محاسبه‌ی قیمت نهایی
            ═══════════════════════════════════════════════════════════ */
         function computeFinalPrice(basePriceStr, planKey) {
             const basePrice = parseInt(String(basePriceStr).replace(/,/g, ''), 10) || 0;
@@ -1199,7 +1206,7 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           ⭐ FETCH PLANS CONFIG — همیشه تازه از API (بدون cache)
+           FETCH PLANS CONFIG — همیشه تازه از API (بدون cache)
            ═══════════════════════════════════════════════════════════ */
         async function fetchPlansConfig() {
             try {
@@ -1223,7 +1230,7 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           ⭐ FETCH FIRST PURCHASE (با cache کوتاه — چون مربوط به کاربر است)
+           FETCH FIRST PURCHASE (با cache کوتاه)
            ═══════════════════════════════════════════════════════════ */
         async function fetchFirstPurchaseCached() {
             const cached = cacheGet(CACHE_KEY_FIRST);
@@ -1246,7 +1253,7 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           ⭐ DISCOUNT BANNER + COUNTDOWN
+           DISCOUNT BANNER + COUNTDOWN
            ═══════════════════════════════════════════════════════════ */
         function updateDiscountBanner() {
             const banner = document.getElementById('discountBanner');
@@ -1356,7 +1363,7 @@
                                 return `<div class="feature ${discountClass}">${text}</div>`;
                             }).join('')}
                         </div>
-                        <button class="cta" onclick="buyPlan('${key}', this)" data-plan="${key}">
+                        <button class="cta" onclick="buyPlan('${key}', this)" data-plan="${key}" type="button" aria-label="خرید اشتراک">
                             <span class="cta-text">🚀 خرید اشتراک</span>
                         </button>
                     </div>
@@ -1404,14 +1411,14 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           ⭐ BUY PLAN — فقط متن دکمه عوض می‌شود، سایز تغییر نمی‌کند
+           BUY PLAN — فقط متن عوض می‌شود، سایز دکمه اصلاً تغییر نمی‌کند
            ═══════════════════════════════════════════════════════════ */
         async function buyPlan(planKey, btnEl) {
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('medium');
 
-            // ⭐ فقط متن داخل span عوض می‌شود — ساختار و سایز دست‌نخورده می‌ماند
             const textSpan = btnEl ? btnEl.querySelector('.cta-text') : null;
             const originalText = textSpan ? textSpan.textContent : null;
+
             if (btnEl) {
                 btnEl.disabled = true;
                 btnEl.classList.add('loading');
@@ -1457,7 +1464,6 @@
         function showPaymentSuccess(invoiceId) {
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.notificationOccurred('success');
 
-            // ⭐ فقط cache مربوط به "اولین خرید" پاک می‌شود چون کاربر دیگه اولین خریدش رو انجام داده
             cacheClear(CACHE_KEY_FIRST);
 
             const plansContent = document.getElementById('plans-content');

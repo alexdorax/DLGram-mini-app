@@ -286,14 +286,14 @@
         }
 
         .discount-banner-content { position: relative; z-index: 1; }
-        .discount-title { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 4px; letter-spacing: -0.5px; }
-        .discount-subtitle { font-size: 13px; color: #fff; font-weight: 500; }
+        .discount-title { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 6px; letter-spacing: -0.5px; }
+        .discount-subtitle { font-size: 13px; color: #fff; font-weight: 500; line-height: 1.7; padding: 0 4px; }
         .discount-icon { font-size: 26px; margin-bottom: 4px; display: inline-block; animation: floatGift 2.5s ease-in-out infinite; }
         .discount-timer {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            margin-top: 8px;
+            margin-top: 10px;
             background: rgba(0, 0, 0, 0.25);
             padding: 5px 12px;
             border-radius: 20px;
@@ -1411,7 +1411,7 @@
 
             let showBanner = false;
             let title = '';
-            let subtitle = '';
+            let subtitleHTML = '';
 
             const globalActive = activeDiscount && activeDiscount.percent > 0 &&
                                 (!activeDiscount.expires_at || new Date(activeDiscount.expires_at) > new Date());
@@ -1422,26 +1422,37 @@
 
             if (globalActive && isFirstPurchase) {
                 showBanner = true;
-                title = '🎉 جشنواره تخفیف!';
-                subtitle = selectedPlans
-                    ? `${activeDiscount.label || ''} روی پلن ${selectedPlans} + ${toPersianNumbers(FIRST_PURCHASE_DISCOUNT)}٪ تخفیف اولین خرید`
-                    : `${activeDiscount.label || ''} + ${toPersianNumbers(FIRST_PURCHASE_DISCOUNT)}٪ تخفیف اولین خرید`;
+                title = '\u200E🎉 جشنواره تخفیف‌ها!';
+
+                const adminLabel = activeDiscount.label || 'تخفیف ویژه';
+                const adminPercent = toPersianNumbers(activeDiscount.percent);
+                const firstPercent = toPersianNumbers(FIRST_PURCHASE_DISCOUNT);
+                const totalPercent = toPersianNumbers(Math.min(activeDiscount.percent + FIRST_PURCHASE_DISCOUNT, 100));
+
+                const line1 = selectedPlans
+                    ? `${adminLabel} ${adminPercent}٪ روی پلن ${selectedPlans} + ${firstPercent}٪ تخفیف اولین خرید`
+                    : `${adminLabel} ${adminPercent}٪ + ${firstPercent}٪ تخفیف اولین خرید`;
+
+                const line2 = `مجموعاً ${totalPercent}٪ تخفیف دریافت می‌کنید`;
+
+                subtitleHTML = `${line1}<br>${line2}`;
             } else if (globalActive) {
                 showBanner = true;
-                title = activeDiscount.label || '🎉 تخفیف ویژه!';
-                subtitle = selectedPlans
-                    ? `${toPersianNumbers(activeDiscount.percent)}٪ تخفیف روی پلن ${selectedPlans}`
-                    : `${toPersianNumbers(activeDiscount.percent)}٪ تخفیف روی تمام پلن‌ها`;
+                title = activeDiscount.label || '\u200E🎉 تخفیف ویژه!';
+                const adminPercent = toPersianNumbers(activeDiscount.percent);
+                subtitleHTML = selectedPlans
+                    ? `${adminPercent}٪ تخفیف روی پلن ${selectedPlans}`
+                    : `${adminPercent}٪ تخفیف روی تمام پلن‌ها`;
             } else if (isFirstPurchase) {
                 showBanner = true;
                 title = 'تخفیف ویژه!';
-                subtitle = `با خرید اولین اشتراک خود ${toPersianNumbers(FIRST_PURCHASE_DISCOUNT)}٪ تخفیف دریافت کنید`;
+                subtitleHTML = `با خرید اولین اشتراک خود ${toPersianNumbers(FIRST_PURCHASE_DISCOUNT)}٪ تخفیف دریافت کنید`;
             }
 
             if (showBanner) {
                 banner.style.display = 'block';
                 titleEl.textContent = title;
-                subtitleEl.textContent = subtitle;
+                subtitleEl.innerHTML = subtitleHTML;
 
                 if (activeDiscount?.expires_at && globalActive) {
                     timerEl.style.display = 'inline-flex';

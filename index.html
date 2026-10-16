@@ -343,11 +343,13 @@
         .feature.discount { color: var(--accent); font-weight: 700; }
 
         /* ═══════════════════════════════════════════════════════════
-           ⭐⭐ راه‌حل قطعی مشکل دکمه — Wrapper با ارتفاع ثابت
+           ⭐⭐⭐ دکمه خرید — Wrapper قفل‌شده + Grid Overlay
            ────────────────────────────────────────────────────────────
-           چون دکمه در یک wrapper با ارتفاع دقیقاً قفل‌شده قرار داره
-           و خودش position: absolute داخلش گرفته، از نظر فیزیکی
-           غیرممکنه که wrapper تغییر سایز بده.
+           • Wrapper ارتفاع 50px قفل‌شده
+           • Grid با یک خانه مشترک برای هر دو span
+           • هر دو span با styles کاملاً یکسان → تراز عمودی یکسان
+           • حالت loading فقط یک کلاس CSS → فقط opacity عوض می‌شه
+           • حذف ایموجی از حالت loading برای جلوگیری از شیفت baseline
            ═══════════════════════════════════════════════════════════ */
         .cta-wrapper {
             position: relative;
@@ -361,17 +363,15 @@
             margin-top: auto;
             border-radius: 14px;
             overflow: hidden;
-            /* ⭐ جلوگیری از هرگونه reflow در parent */
             contain: layout style paint;
             isolation: isolate;
         }
 
         .cta {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            position: relative;
+            display: grid;
+            grid-template-columns: 100%;
+            grid-template-rows: 100%;
             width: 100%;
             height: 100%;
             padding: 0;
@@ -383,19 +383,13 @@
             cursor: pointer;
             font-family: inherit;
             overflow: hidden;
-            transition: transform 0.15s ease, box-shadow 0.3s ease, opacity 0.2s;
+            transition: transform 0.15s ease, box-shadow 0.3s ease;
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
             -webkit-tap-highlight-color: transparent;
-            /* ⭐ صفر کردن فونت/متن که هیچ چیز نشت نکنه */
-            font-size: 0;
-            line-height: 0;
-            color: transparent;
-            text-indent: -9999px;
             box-sizing: border-box;
             margin: 0;
-            display: block;
         }
 
         .cta::-moz-focus-inner { border: 0; padding: 0; }
@@ -410,28 +404,29 @@
             background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.12) 50%, transparent 70%);
             animation: shine 3s ease-in-out infinite;
             pointer-events: none;
+            z-index: 1;
         }
 
         .cta:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(225, 48, 108, 0.25); }
 
-        .cta:disabled,
         .cta.loading {
             opacity: 0.85;
             cursor: wait;
             transform: none;
         }
 
-        /* هر دو span خارج از جریان layout */
+        /* ⭐ هر دو span در یک خانه گرید قرار می‌گیرند و کاملاً روی هم می‌افتند */
         .cta-text {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            grid-column: 1;
+            grid-row: 1;
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 100%;
+            height: 100%;
+            margin: 0;
             padding: 0 15px;
+            box-sizing: border-box;
             color: #fff;
             font-size: 15px;
             font-weight: 800;
@@ -439,12 +434,29 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            text-align: center;
             pointer-events: none;
-            z-index: 2;
             transition: opacity 0.18s ease;
-            box-sizing: border-box;
-            margin: 0;
-            text-indent: 0;
+            will-change: opacity;
+            z-index: 2;
+            /* ⭐ فونت‌سایز صریح و line-height 1 برای تراز دقیق */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ⭐ ایموجی جداگانه با ابعاد ثابت برای حذف شیفت baseline */
+        .cta-ico {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+            font-size: 15px;
+            flex-shrink: 0;
+            margin-left: 6px;
+            overflow: hidden;
+            vertical-align: middle;
         }
 
         .cta-text-normal { opacity: 1; }
@@ -553,9 +565,34 @@
             100% { transform: translateX(-100%); }
         }
 
-        .payment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; }
-        .payment-plan { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.4; }
-        .payment-plan .plan-days { color: var(--accent); font-weight: 800; font-size: 13px; opacity: 0.95; }
+        .payment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 8px;
+        }
+
+        /* ⭐⭐⭐ عنوان پلن — نام پلن بزرگ‌تر، تعداد روز کوچک‌تر */
+        .payment-plan {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.4;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .payment-plan .plan-days {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 11px;
+            opacity: 0.95;
+            margin-right: 4px;
+            display: inline-block;
+            vertical-align: baseline;
+            line-height: 1;
+        }
 
         .payment-status { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; flex-shrink: 0; white-space: nowrap; }
         .status-used { background: rgba(76, 175, 80, 0.2); color: #81c784; }
@@ -1160,8 +1197,6 @@
         const FIRST_PURCHASE_DISCOUNT = 10;
 
         const PLAN_DURATIONS = { bronze: 30, silver: 90, gold: 365 };
-        const PLAN_SHORT_NAMES = { bronze: 'برنزی', silver: 'نقره‌ای', gold: 'طلایی' };
-        const PLAN_EMOJIS = { bronze: '🥉', silver: '🥈', gold: '🥇' };
 
         const plans = {
             bronze: {
@@ -1366,7 +1401,12 @@
                        <div class="plan-price">${persianFinal} <span class="unit">تومان</span></div>`
                     : `<div class="plan-price">${persianFinal} <span class="unit">تومان</span></div>`;
 
-                // ⭐⭐⭐ دکمه در Wrapper با ارتفاع قفل‌شده — غیرقابل تغییر سایز
+                /* ⭐⭐⭐ دکمه با ساختار:
+                   - Wrapper ارتفاع قفل‌شده
+                   - Grid با یک خانه مشترک
+                   - ایموجی در span با ابعاد ثابت (.cta-ico)
+                   - حالت loading فاقد ایموجی (برای تراز یکسان)
+                */
                 cardsHtml += `
                     <div class="plan-card ${highlightClass}">
                         ${popularBadge}
@@ -1387,8 +1427,8 @@
                         </div>
                         <div class="cta-wrapper">
                             <button class="cta" onclick="buyPlan('${key}', this)" data-plan="${key}" type="button" aria-label="خرید اشتراک">
-                                <span class="cta-text cta-text-normal">🚀 خرید اشتراک</span>
-                                <span class="cta-text cta-text-loading">⏳ در حال آماده‌سازی...</span>
+                                <span class="cta-text cta-text-normal"><span class="cta-ico">🚀</span>خرید اشتراک</span>
+                                <span class="cta-text cta-text-loading">در حال آماده‌سازی...</span>
                             </button>
                         </div>
                     </div>
@@ -1436,15 +1476,13 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           BUY PLAN — فقط class عوض می‌شود. هیچ چیز روی DOM دست نمی‌خورد
+           BUY PLAN — فقط یک کلاس اضافه/حذف می‌شود
            ═══════════════════════════════════════════════════════════ */
         async function buyPlan(planKey, btnEl) {
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('medium');
 
             if (btnEl) {
                 btnEl.classList.add('loading');
-                // ⭐ disabled را ست نمی‌کنیم تا مرورگر style disabled اعمال نکنه
-                // فقط جلوی کلیک مجدد را با pointer-events می‌گیریم که در CSS loading هست
                 btnEl.style.pointerEvents = 'none';
             }
 
@@ -1521,7 +1559,7 @@
             }
         }
 
-        /* ⭐ نام پلن به‌همراه تعداد روز — مثلاً «🥇 طلایی (365 روز)» */
+        /* ⭐⭐⭐ نام پلن به‌همراه تعداد روز (کوچک‌تر از نام پلن) */
         function getPlanDisplayName(planKey) {
             const planInfo = plans[planKey];
             const days = PLAN_DURATIONS[planKey];
@@ -1619,7 +1657,6 @@
                         `;
                     }
 
-                    // ⭐ نام پلن حالا با تعداد روز نمایش داده می‌شود
                     html += `
                         <div class="payment-card ${isExpired ? 'expired' : ''}" id="${cardId}">
                             ${progressHtml}

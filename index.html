@@ -343,13 +343,14 @@
         .feature.discount { color: var(--accent); font-weight: 700; }
 
         /* ═══════════════════════════════════════════════════════════
-           ⭐⭐⭐ دکمه خرید — Wrapper قفل‌شده + Grid Overlay
+           ⭐⭐⭐ دکمه خرید — راه‌حل قطعی با line-height
            ────────────────────────────────────────────────────────────
-           • Wrapper ارتفاع 50px قفل‌شده
-           • Grid با یک خانه مشترک برای هر دو span
-           • هر دو span با styles کاملاً یکسان → تراز عمودی یکسان
-           • حالت loading فقط یک کلاس CSS → فقط opacity عوض می‌شه
-           • حذف ایموجی از حالت loading برای جلوگیری از شیفت baseline
+           نکات کلیدی:
+           1) height: 50px + line-height: 50px → متن همیشه عمودی وسط
+           2) min-width: 0 → جلوگیری از رشد عرض توسط محتوا
+           3) max-width: 100% → تضمین عدم سرریز
+           4) هیچ flex/grid در دکمه → سازگاری کامل با همه WebViewها
+           5) فقط textContent عوض می‌شود
            ═══════════════════════════════════════════════════════════ */
         .cta-wrapper {
             position: relative;
@@ -361,109 +362,62 @@
             flex-shrink: 0;
             flex-grow: 0;
             margin-top: auto;
-            border-radius: 14px;
             overflow: hidden;
-            contain: layout style paint;
-            isolation: isolate;
+            border-radius: 14px;
         }
 
         .cta {
-            position: relative;
-            display: grid;
-            grid-template-columns: 100%;
-            grid-template-rows: 100%;
+            display: block;
             width: 100%;
-            height: 100%;
-            padding: 0;
+            min-width: 0;
+            max-width: 100%;
+            height: var(--btn-height);
+            min-height: var(--btn-height);
+            max-height: var(--btn-height);
+            padding: 0 15px;
             border: 0;
             outline: 0;
+            margin: 0;
             border-radius: 14px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             box-shadow: 0 4px 16px rgba(225, 48, 108, 0.35);
             cursor: pointer;
             font-family: inherit;
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+            /* ⭐ نکته کلیدی: line-height = height */
+            line-height: var(--btn-height);
+            text-align: center;
+            white-space: nowrap;
             overflow: hidden;
-            transition: transform 0.15s ease, box-shadow 0.3s ease;
+            text-overflow: ellipsis;
+            box-sizing: border-box;
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
             -webkit-tap-highlight-color: transparent;
-            box-sizing: border-box;
-            margin: 0;
+            transition: transform 0.15s ease, opacity 0.2s ease;
+            position: relative;
+            vertical-align: top;
         }
 
         .cta::-moz-focus-inner { border: 0; padding: 0; }
 
-        .cta::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.12) 50%, transparent 70%);
-            animation: shine 3s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 1;
+        .cta:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 10px rgba(225, 48, 108, 0.25);
         }
 
-        .cta:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(225, 48, 108, 0.25); }
-
+        /* ⭐ حالت disabled/loading — رنگ و ابعاد هیچ تغییری نمی‌کند */
+        .cta:disabled,
         .cta.loading {
+            color: #fff;
             opacity: 0.85;
             cursor: wait;
             transform: none;
+            box-shadow: 0 4px 16px rgba(225, 48, 108, 0.35);
         }
-
-        /* ⭐ هر دو span در یک خانه گرید قرار می‌گیرند و کاملاً روی هم می‌افتند */
-        .cta-text {
-            grid-column: 1;
-            grid-row: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0 15px;
-            box-sizing: border-box;
-            color: #fff;
-            font-size: 15px;
-            font-weight: 800;
-            line-height: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-align: center;
-            pointer-events: none;
-            transition: opacity 0.18s ease;
-            will-change: opacity;
-            z-index: 2;
-            /* ⭐ فونت‌سایز صریح و line-height 1 برای تراز دقیق */
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        /* ⭐ ایموجی جداگانه با ابعاد ثابت برای حذف شیفت baseline */
-        .cta-ico {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 18px;
-            height: 18px;
-            line-height: 18px;
-            font-size: 15px;
-            flex-shrink: 0;
-            margin-left: 6px;
-            overflow: hidden;
-            vertical-align: middle;
-        }
-
-        .cta-text-normal { opacity: 1; }
-        .cta-text-loading { opacity: 0; }
-
-        .cta.loading .cta-text-normal { opacity: 0; }
-        .cta.loading .cta-text-loading { opacity: 1; }
 
         .trust {
             margin-top: 28px;
@@ -573,7 +527,7 @@
             gap: 8px;
         }
 
-        /* ⭐⭐⭐ عنوان پلن — نام پلن بزرگ‌تر، تعداد روز کوچک‌تر */
+        /* ⭐ نام پلن بزرگ‌تر، تعداد روز کوچک‌تر */
         .payment-plan {
             font-size: 16px;
             font-weight: 700;
@@ -1401,12 +1355,8 @@
                        <div class="plan-price">${persianFinal} <span class="unit">تومان</span></div>`
                     : `<div class="plan-price">${persianFinal} <span class="unit">تومان</span></div>`;
 
-                /* ⭐⭐⭐ دکمه با ساختار:
-                   - Wrapper ارتفاع قفل‌شده
-                   - Grid با یک خانه مشترک
-                   - ایموجی در span با ابعاد ثابت (.cta-ico)
-                   - حالت loading فاقد ایموجی (برای تراز یکسان)
-                */
+                /* ⭐⭐⭐ دکمه: ساختار بسیار ساده — بدون span، بدون flex/grid
+                   فقط متن مستقیم داخل button. در JS فقط textContent عوض می‌شود. */
                 cardsHtml += `
                     <div class="plan-card ${highlightClass}">
                         ${popularBadge}
@@ -1426,10 +1376,7 @@
                             }).join('')}
                         </div>
                         <div class="cta-wrapper">
-                            <button class="cta" onclick="buyPlan('${key}', this)" data-plan="${key}" type="button" aria-label="خرید اشتراک">
-                                <span class="cta-text cta-text-normal"><span class="cta-ico">🚀</span>خرید اشتراک</span>
-                                <span class="cta-text cta-text-loading">در حال آماده‌سازی...</span>
-                            </button>
+                            <button class="cta" onclick="buyPlan('${key}', this)" data-plan="${key}" type="button" aria-label="خرید اشتراک">🚀 خرید اشتراک</button>
                         </div>
                     </div>
                 `;
@@ -1476,21 +1423,21 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           BUY PLAN — فقط یک کلاس اضافه/حذف می‌شود
+           BUY PLAN — فقط textContent عوض می‌شود
+           با line-height: 50px روی دکمه، هیچ شیفت عمودی رخ نمی‌دهد
            ═══════════════════════════════════════════════════════════ */
         async function buyPlan(planKey, btnEl) {
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('medium');
 
-            if (btnEl) {
-                btnEl.classList.add('loading');
-                btnEl.style.pointerEvents = 'none';
-            }
+            const originalText = btnEl.textContent;
+            btnEl.textContent = '⏳ در حال آماده‌سازی...';
+            btnEl.classList.add('loading');
+            btnEl.style.pointerEvents = 'none';
 
             function restoreBtn() {
-                if (btnEl) {
-                    btnEl.classList.remove('loading');
-                    btnEl.style.pointerEvents = '';
-                }
+                btnEl.textContent = originalText;
+                btnEl.classList.remove('loading');
+                btnEl.style.pointerEvents = '';
             }
 
             try {
@@ -1559,7 +1506,7 @@
             }
         }
 
-        /* ⭐⭐⭐ نام پلن به‌همراه تعداد روز (کوچک‌تر از نام پلن) */
+        /* ⭐⭐⭐ نام پلن به‌همراه تعداد روز — تعداد روز کوچک‌تر */
         function getPlanDisplayName(planKey) {
             const planInfo = plans[planKey];
             const days = PLAN_DURATIONS[planKey];

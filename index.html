@@ -80,6 +80,7 @@
 
         .main-container > * { position: relative; z-index: 1; }
 
+        /* ═══════════════════ HEADER ═══════════════════ */
         .header { text-align: center; margin-bottom: 20px; position: relative; }
 
         .header h1 {
@@ -126,6 +127,7 @@
             display: inline-block;
         }
 
+        /* ═══════════════════ DISCOUNT BANNER ═══════════════════ */
         .discount-banner {
             background: linear-gradient(135deg, #C44569 0%, #833AB4 100%);
             padding: 16px;
@@ -175,6 +177,7 @@
             50% { transform: translateY(-6px) scale(1.1); }
         }
 
+        /* ═══════════════════ TABS ═══════════════════ */
         .tabs {
             display: flex;
             gap: 8px;
@@ -214,6 +217,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* ═══════════════════ PLANS STACK ═══════════════════ */
         .plans-stack { display: flex; flex-direction: column; gap: 20px; padding: 8px 0; }
 
         .plan-card {
@@ -339,11 +343,7 @@
         .feature.discount { color: var(--accent); font-weight: 700; }
 
         /* ═══════════════════════════════════════════════════════════
-           ⭐⭐⭐ بخش جدید: دکمه خرید با دو عنصر مجزا
-           ────────────────────────────────────────────────────────────
-           به جای تغییر متن داخل دکمه، دو عنصر جدا در DOM قرار می‌گیرند
-           و فقط display آن‌ها toggle می‌شود. هیچ DOM manipulation ای
-           روی متن دکمه انجام نمی‌شود.
+           ⭐ دکمه خرید — دو عنصر مجزا با toggle کلاس
            ═══════════════════════════════════════════════════════════ */
         .cta-wrapper {
             position: relative;
@@ -448,6 +448,7 @@
             flex-shrink: 0;
         }
 
+        /* ═══════════════════ PAYMENT CARDS ═══════════════════ */
         .payment-card {
             background: var(--card);
             border-radius: 16px;
@@ -611,6 +612,7 @@
             background: linear-gradient(90deg, transparent, rgba(128, 128, 144, 0.5), transparent);
         }
 
+        /* ═══════════════════ EXPIRED OVERLAY ═══════════════════ */
         .expired-overlay-container {
             position: absolute;
             top: -8px;
@@ -772,6 +774,7 @@
             50% { transform: translateX(-50%) translateY(-3px); }
         }
 
+        /* ═══════════════════ TOAST ═══════════════════ */
         .toast {
             position: fixed;
             bottom: 80px;
@@ -885,6 +888,96 @@
             position: relative;
             z-index: 1;
             filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+        }
+
+        /* ═══════════════════ PULL TO REFRESH ═══════════════════ */
+        .pull-refresh-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 500;
+            opacity: 0;
+            transform: translateY(-70px);
+            transition: opacity 0.2s ease;
+            will-change: transform, opacity;
+        }
+
+        .pull-refresh-container.visible {
+            opacity: 1;
+        }
+
+        .pull-refresh-inner {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--card);
+            border: 2px solid rgba(225, 48, 108, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(225, 48, 108, 0.35);
+            position: relative;
+            transition: transform 0.15s ease;
+        }
+
+        .pull-refresh-icon {
+            width: 20px;
+            height: 20px;
+            stroke: var(--primary);
+            stroke-width: 2.5;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: transform 0.25s ease;
+            transform: rotate(0deg);
+        }
+
+        .pull-refresh-container.ready .pull-refresh-icon {
+            transform: rotate(180deg);
+            stroke: var(--accent);
+        }
+
+        .pull-refresh-container.loading .pull-refresh-icon {
+            animation: pullRefreshSpin 0.8s linear infinite;
+            stroke: var(--accent);
+        }
+
+        .pull-refresh-container.loading .pull-refresh-inner {
+            border-color: var(--accent);
+            box-shadow: 0 4px 20px rgba(252, 175, 69, 0.5);
+        }
+
+        @keyframes pullRefreshSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .pull-refresh-text {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .pull-refresh-container.visible .pull-refresh-text {
+            opacity: 1;
+        }
+
+        .pull-refresh-container.ready .pull-refresh-text {
+            color: var(--accent);
         }
 
         #initialLoader {
@@ -1012,6 +1105,15 @@
 </head>
 
 <body>
+    <div class="pull-refresh-container" id="pullRefresh">
+        <div class="pull-refresh-inner">
+            <svg class="pull-refresh-icon" viewBox="0 0 24 24">
+                <path d="M12 5v14M5 12l7 7 7-7"/>
+            </svg>
+            <div class="pull-refresh-text" id="pullRefreshText">برای بروزرسانی بکشید</div>
+        </div>
+    </div>
+
     <div id="initialLoader">
         <div class="loader-rings">
             <div class="loader-ring"></div>
@@ -1349,7 +1451,6 @@
                        <div class="plan-price">${persianFinal} <span class="unit">تومان</span></div>`
                     : `<div class="plan-price">${persianFinal} <span class="unit">تومان</span></div>`;
 
-                /* ⭐⭐⭐ دکمه خرید با دو عنصر مجزا — هیچ text manipulation ای انجام نمی‌شود */
                 cardsHtml += `
                     <div class="plan-card ${highlightClass}">
                         ${popularBadge}
@@ -1416,13 +1517,6 @@
             else window.open('https://ble.ir/MrAliz', '_blank');
         }
 
-        /* ═══════════════════════════════════════════════════════════
-           BUY PLAN — روش جدید: toggle کلاس روی wrapper
-           ────────────────────────────────────────────────────────────
-           هیچ DOM manipulation ای روی button انجام نمی‌شود.
-           فقط یک کلاس CSS روی wrapper اضافه می‌شود و CSS خودش
-           display دو عنصر را عوض می‌کند.
-           ═══════════════════════════════════════════════════════════ */
         async function buyPlan(planKey) {
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('medium');
 
@@ -1432,13 +1526,10 @@
                 return;
             }
 
-            // ⭐ جلوگیری از کلیک مجدد
             if (wrapper.classList.contains('is-loading')) return;
 
-            // ⭐ فعال کردن حالت loading با یک کلاس CSS
             wrapper.classList.add('is-loading');
 
-            // ⭐ اجازه دادن به مرورگر برای رندر تغییر
             await new Promise(r => setTimeout(r, 50));
 
             const startTime = Date.now();
@@ -1461,14 +1552,12 @@
 
                 if (!data.success) throw new Error(data.error || 'خطا در ایجاد فاکتور');
 
-                // ⭐ حداقل 800ms نمایش حالت loading
                 const elapsed = Date.now() - startTime;
                 const waitMore = Math.max(0, 800 - elapsed);
                 if (waitMore > 0) {
                     await new Promise(r => setTimeout(r, waitMore));
                 }
 
-                // ⭐ باز کردن دیالوگ پرداخت
                 WebApp.openInvoice(data.invoice_params, (status, invoiceId) => {
                     reset();
 
@@ -1826,6 +1915,132 @@
             container.addEventListener('touchcancel', () => { tracking = false; isHorizontal = null; }, { passive: true });
         }
 
+        /* ═══════════════════════════════════════════════════════════
+           PULL TO REFRESH
+           ═══════════════════════════════════════════════════════════ */
+        function initPullToRefresh() {
+            const THRESHOLD = 90;
+            const MAX_PULL = 130;
+            const RESISTANCE = 0.5;
+
+            const indicator = document.getElementById('pullRefresh');
+            const indicatorText = document.getElementById('pullRefreshText');
+            if (!indicator) return;
+
+            let startY = 0;
+            let currentPull = 0;
+            let isPulling = false;
+            let isHorizontal = false;
+            let triggered = false;
+
+            function updateIndicator(pull) {
+                const y = Math.min(MAX_PULL, pull) - 70;
+                indicator.style.transform = `translateY(${y}px)`;
+
+                if (pull > 5) {
+                    indicator.classList.add('visible');
+                } else {
+                    indicator.classList.remove('visible');
+                }
+
+                if (pull >= THRESHOLD) {
+                    indicator.classList.add('ready');
+                    indicatorText.textContent = 'رها کنید تا بروزرسانی شود';
+                } else {
+                    indicator.classList.remove('ready');
+                    indicatorText.textContent = 'برای بروزرسانی بکشید';
+                }
+            }
+
+            function resetIndicator() {
+                indicator.classList.remove('visible', 'ready');
+                indicator.style.transform = 'translateY(-70px)';
+                setTimeout(() => {
+                    if (!indicator.classList.contains('loading')) {
+                        indicatorText.textContent = 'برای بروزرسانی بکشید';
+                    }
+                }, 200);
+            }
+
+            function triggerRefresh() {
+                triggered = true;
+                indicator.classList.remove('ready');
+                indicator.classList.add('visible', 'loading');
+                indicator.style.transform = 'translateY(0px)';
+                indicatorText.textContent = 'در حال بروزرسانی...';
+
+                if (WebApp.HapticFeedback) {
+                    try { WebApp.HapticFeedback.notificationOccurred('success'); } catch (_) {}
+                }
+
+                setTimeout(() => {
+                    try { window.location.reload(); } catch (_) {}
+                }, 500);
+            }
+
+            document.addEventListener('touchstart', (e) => {
+                if (triggered) return;
+                if (e.touches.length !== 1) return;
+                if (window.scrollY > 0) return;
+
+                const target = e.target;
+                if (target.closest('button, a, input, textarea, .cta-item, .footer-link, #scrollTopBtn, .payment-code')) {
+                    return;
+                }
+
+                startY = e.touches[0].clientY;
+                currentPull = 0;
+                isPulling = true;
+                isHorizontal = false;
+            }, { passive: true });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!isPulling || triggered) return;
+                if (e.touches.length !== 1) return;
+
+                const currentY = e.touches[0].clientY;
+                const diffY = currentY - startY;
+
+                if (Math.abs(diffY) < 3) return;
+
+                if (diffY > 0 && window.scrollY <= 0) {
+                    if (isHorizontal) return;
+                    currentPull = diffY * RESISTANCE;
+                    updateIndicator(currentPull);
+
+                    if (currentPull > 5 && e.cancelable) {
+                        e.preventDefault();
+                    }
+                } else if (diffY < 0) {
+                    isPulling = false;
+                    resetIndicator();
+                    currentPull = 0;
+                }
+            }, { passive: false });
+
+            document.addEventListener('touchend', () => {
+                if (!isPulling || triggered) return;
+                isPulling = false;
+
+                if (currentPull >= THRESHOLD) {
+                    triggerRefresh();
+                } else {
+                    resetIndicator();
+                }
+
+                currentPull = 0;
+                isHorizontal = false;
+            }, { passive: true });
+
+            document.addEventListener('touchcancel', () => {
+                if (triggered) return;
+                isPulling = false;
+                currentPull = 0;
+                isHorizontal = false;
+                resetIndicator();
+            }, { passive: true });
+        }
+
         async function init() {
             try {
                 const [plansConfig, fpData] = await Promise.all([
@@ -1865,6 +2080,7 @@
         init();
         handleScrollTopVisibility();
         initTabSwipe();
+        initPullToRefresh();
     </script>
 </body>
 

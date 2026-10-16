@@ -8,6 +8,12 @@
 
     <script src="https://tapi.bale.ai/miniapp.js?3"></script>
 
+    <!-- ⭐ Preload Fonts: preconnect + async CSS load برای سرعت بالا -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+
     <style>
         :root {
             --bg: #0F0F13;
@@ -31,7 +37,8 @@
         html, body { overscroll-behavior-x: none; }
 
         body {
-            font-family: IRANSansX, 'Segoe UI', Tahoma, Arial, sans-serif;
+            /* ⭐ font-display: swap روی IRANSansX و Vazirmatn (fallback سریع) */
+            font-family: IRANSansX, Vazirmatn, 'Segoe UI', Tahoma, Arial, sans-serif;
             background: var(--bg);
             color: var(--text);
             padding: 16px;
@@ -75,11 +82,7 @@
         .main-container > * { position: relative; z-index: 1; }
 
         /* ═══════════════════ HEADER ═══════════════════ */
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-            position: relative;
-        }
+        .header { text-align: center; margin-bottom: 20px; position: relative; }
 
         .header h1 {
             position: relative;
@@ -92,19 +95,14 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: -0.5px;
-            font-family: 'B Titr', IRANSansX, 'Segoe UI', Tahoma, Arial, sans-serif;
-            /* ⭐ دقیقاً مثل بج محبوب: 2s، smooth، بدون ایست */
+            font-family: 'B Titr', IRANSansX, Vazirmatn, Tahoma, Arial, sans-serif;
             animation: titleGlow 2s infinite;
             will-change: filter;
         }
 
         @keyframes titleGlow {
-            0%, 100% {
-                filter: brightness(1) drop-shadow(0 2px 6px rgba(225, 48, 108, 0.35));
-            }
-            50% {
-                filter: brightness(1.28) drop-shadow(0 4px 18px rgba(225, 48, 108, 0.85));
-            }
+            0%, 100% { filter: brightness(1) drop-shadow(0 2px 6px rgba(225, 48, 108, 0.35)); }
+            50% { filter: brightness(1.28) drop-shadow(0 4px 18px rgba(225, 48, 108, 0.85)); }
         }
 
         .header p {
@@ -160,6 +158,20 @@
         .discount-title { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 4px; letter-spacing: -0.5px; }
         .discount-subtitle { font-size: 13px; color: #fff; font-weight: 500; }
         .discount-icon { font-size: 26px; margin-bottom: 4px; display: inline-block; animation: floatGift 2.5s ease-in-out infinite; }
+        .discount-timer {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #FFD700;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            font-variant-numeric: tabular-nums;
+        }
 
         @keyframes floatGift {
             0%, 100% { transform: translateY(0) scale(1); }
@@ -283,7 +295,6 @@
         }
 
         .plan-title-group { display: flex; flex-direction: column; gap: 6px; }
-
         .plan-name { font-size: 20px; font-weight: 900; color: var(--text); letter-spacing: -0.3px; }
 
         .plan-duration {
@@ -332,6 +343,7 @@
 
         .feature.discount { color: var(--accent); font-weight: 700; }
 
+        /* ⭐ CTA با loading state (Optimistic UI) */
         .cta {
             width: 100%;
             border: none;
@@ -342,12 +354,16 @@
             cursor: pointer;
             color: #fff;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            transition: transform 0.15s ease, box-shadow 0.3s ease;
+            transition: transform 0.15s ease, box-shadow 0.3s ease, opacity 0.2s;
             box-shadow: 0 4px 16px rgba(225, 48, 108, 0.35);
             position: relative;
             overflow: hidden;
             font-family: inherit;
             margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .cta::before {
@@ -361,6 +377,27 @@
         }
 
         .cta:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(225, 48, 108, 0.25); }
+
+        .cta:disabled,
+        .cta.loading {
+            opacity: 0.85;
+            cursor: wait;
+            transform: none;
+        }
+
+        .btn-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: btnSpin 0.7s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes btnSpin {
+            to { transform: rotate(360deg); }
+        }
 
         .trust {
             margin-top: 28px;
@@ -403,7 +440,6 @@
             overflow: visible;
         }
 
-        /* ⭐ Progress Bar — بازطراحی شده: پیش‌فرض تاریک، پر شدن رنگی */
         .subscription-progress {
             position: absolute;
             top: -8px;
@@ -462,22 +498,10 @@
             100% { transform: translateX(100%); }
         }
 
-        .payment-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
+        .payment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .payment-plan { font-size: 16px; font-weight: 700; color: var(--text); }
 
-        .payment-status {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
+        .payment-status { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; }
         .status-used { background: rgba(76, 175, 80, 0.2); color: #81c784; }
         .status-unused { background: rgba(252, 175, 69, 0.2); color: var(--accent); }
 
@@ -512,7 +536,6 @@
 
         .copy-hint { text-align: center; font-size: 11px; color: var(--primary); margin-top: 8px; opacity: 0.8; }
 
-        /* ⭐ لیبل گروه‌بندی با خطوط دو طرف */
         .payment-group-label {
             display: flex;
             align-items: center;
@@ -526,16 +549,8 @@
 
         .payment-group-label:first-child { margin-top: 4px; }
 
-        .payment-group-label .gl-line {
-            flex: 1;
-            height: 1px;
-            max-width: 80px;
-        }
-
-        .payment-group-label .gl-text {
-            flex-shrink: 0;
-            padding: 0 4px;
-        }
+        .payment-group-label .gl-line { flex: 1; height: 1px; max-width: 80px; }
+        .payment-group-label .gl-text { flex-shrink: 0; padding: 0 4px; }
 
         .payment-group-label.active-label .gl-text { color: #81c784; }
         .payment-group-label.active-label .gl-line {
@@ -552,9 +567,7 @@
             background: linear-gradient(90deg, transparent, rgba(128, 128, 144, 0.5), transparent);
         }
 
-        /* ═══════════════════════════════════════════════════════
-           EXPIRED OVERLAY
-           ═══════════════════════════════════════════════════════ */
+        /* ═══════════════════ EXPIRED OVERLAY ═══════════════════ */
         .expired-overlay-container {
             position: absolute;
             top: -8px;
@@ -596,11 +609,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg,
-                rgba(244, 67, 54, 0.06) 0%,
-                transparent 30%,
-                transparent 70%,
-                rgba(131, 58, 180, 0.06) 100%);
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.06) 0%, transparent 30%, transparent 70%, rgba(131, 58, 180, 0.06) 100%);
             pointer-events: none;
         }
 
@@ -742,7 +751,6 @@
 
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* ═══════════════════ EMPTY / LOADING ═══════════════════ */
         .empty-state { text-align: center; padding: 60px 20px; }
         .empty-icon { font-size: 64px; margin-bottom: 16px; opacity: 0.6; }
         .empty-text { font-size: 16px; color: var(--text); margin-bottom: 8px; font-weight: 600; }
@@ -771,7 +779,6 @@
             border: 1px solid rgba(225, 48, 108, 0.3);
         }
 
-        /* ═══════════════════ FOOTER ═══════════════════ */
         .footer {
             margin-top: 32px;
             padding-top: 24px;
@@ -781,14 +788,7 @@
 
         .footer-title { font-size: 12px; color: var(--muted); margin-bottom: 10px; line-height: 1.6; }
 
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-        }
+        .footer-links { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
 
         .footer-link {
             display: inline-flex;
@@ -807,12 +807,8 @@
         }
 
         .footer-link:active { transform: scale(0.96); background: rgba(225, 48, 108, 0.2); }
-
         .footer-link svg { width: 16px; height: 16px; flex-shrink: 0; }
 
-        /* ═══════════════════════════════════════════════════════
-           SCROLL TO TOP
-           ═══════════════════════════════════════════════════════ */
         #scrollTopBtn {
             position: fixed;
             bottom: 24px;
@@ -839,10 +835,7 @@
 
         #scrollTopBtn.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
 
-        #scrollTopBtn:active {
-            transform: translateY(0) scale(0.92);
-            box-shadow: 0 2px 8px rgba(225, 48, 108, 0.45);
-        }
+        #scrollTopBtn:active { transform: translateY(0) scale(0.92); box-shadow: 0 2px 8px rgba(225, 48, 108, 0.45); }
 
         #scrollTopBtn svg {
             width: 22px;
@@ -852,7 +845,6 @@
             filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
         }
 
-        /* ═══════════════════ LOADER ═══════════════════ */
         #initialLoader {
             position: fixed;
             top: 0; left: 0;
@@ -1014,8 +1006,12 @@
         <div class="discount-banner" id="discountBanner" style="display: none;">
             <div class="discount-banner-content">
                 <span class="discount-icon">🎁</span>
-                <div class="discount-title">تخفیف ویژه!</div>
-                <div class="discount-subtitle">با خرید اولین اشتراک خود ۱۰٪ تخفیف دریافت کنید</div>
+                <div class="discount-title" id="discountTitle">تخفیف ویژه!</div>
+                <div class="discount-subtitle" id="discountSubtitle">با خرید اولین اشتراک خود ۱۰٪ تخفیف دریافت کنید</div>
+                <div class="discount-timer" id="discountTimer" style="display: none;">
+                    <span>⏰</span>
+                    <span id="discountCountdown">--:--:--</span>
+                </div>
             </div>
         </div>
 
@@ -1072,10 +1068,46 @@
             return str.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
         }
 
+        /* ═══════════════════════════════════════════════════════════
+           ⭐ CACHE API RESULTS (5 دقیقه)
+           ═══════════════════════════════════════════════════════════ */
+        const CACHE_TTL_MS = 5 * 60 * 1000;
+        const CACHE_KEY_PLANS = 'dlgram_plans_v1';
+        const CACHE_KEY_FIRST = 'dlgram_first_purchase_v1';
+
+        function cacheGet(key) {
+            try {
+                const raw = localStorage.getItem(key);
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                if (!parsed || typeof parsed.ts !== 'number') return null;
+                if (Date.now() - parsed.ts > CACHE_TTL_MS) {
+                    localStorage.removeItem(key);
+                    return null;
+                }
+                return parsed.data;
+            } catch (_) { return null; }
+        }
+
+        function cacheSet(key, data) {
+            try { localStorage.setItem(key, JSON.stringify({ data, ts: Date.now() })); } catch (_) {}
+        }
+
+        function cacheClear(key) {
+            try { localStorage.removeItem(key); } catch (_) {}
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           STATE
+           ═══════════════════════════════════════════════════════════ */
         let isFirstPurchase = true;
         let userTelegramId = null;
+        let activeDiscount = null; // { percent, label, expires_at }
+        let countdownTimer = null;
 
-        // ⭐ مدت پلن‌ها برای محاسبه‌ی صحیح درصد
+        const FIRST_PURCHASE_DISCOUNT = 10; // درصد تخفیف اولین خرید
+
+        // ⭐ مدت پلن‌ها برای محاسبه‌ی صحیح درصد پروگرس
         const PLAN_DURATIONS = { bronze: 30, silver: 90, gold: 365 };
 
         const plans = {
@@ -1084,7 +1116,6 @@
                 duration: '۳۰ روز',
                 price: '50,000',
                 discountPrice: '45,000',
-                description: 'دانلود پست و ریلز',
                 features: ['دانلود پست و ریلز', 'کیفیت HD بدون واترمارک', 'سرعت استاندارد', 'پشتیبانی ۲۴/۷'],
                 highlight: false,
                 badge: ''
@@ -1094,7 +1125,6 @@
                 duration: '۹۰ روز',
                 price: '120,000',
                 discountPrice: '108,000',
-                description: 'دانلود نامحدود',
                 features: ['دانلود نامحدود', 'پست + ریلز + استوری', 'سرعت بالا', 'پشتیبانی سریع', { text: '۲۰٪ تخفیف نسبت به برنزی', discount: true }],
                 highlight: true,
                 badge: '🔥 محبوب کاربران'
@@ -1104,7 +1134,6 @@
                 duration: '۳۶۵ روز',
                 price: '400,000',
                 discountPrice: '360,000',
-                description: 'بالاترین سرعت',
                 features: ['دانلود نامحدود', 'بالاترین سرعت و اولویت صف', 'پشتیبانی VIP', 'مخصوص تولیدکنندگان محتوا', { text: '۳۳٪ تخفیف نسبت به برنزی', discount: true }],
                 highlight: true,
                 badge: '⭐ پیشنهاد ویژه'
@@ -1115,43 +1144,184 @@
 
         function switchTab(tabName, fromSwipe = false) {
             if (currentTab === tabName && !fromSwipe) return;
-
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             const targetButton = document.querySelector(`.tab[data-tab="${tabName}"]`);
             if (targetButton) targetButton.classList.add('active');
-
             document.querySelectorAll('.content').forEach(content => content.classList.remove('active'));
             const contentEl = document.getElementById(tabName + '-content');
             if (contentEl) contentEl.classList.add('active');
-
             currentTab = tabName;
             window.scrollTo({ top: 0, behavior: 'smooth' });
-
             if (tabName === 'payments') loadPayments();
         }
 
         /* ═══════════════════ ICONS ═══════════════════ */
         function telegramIconSvg() {
-            return `
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <circle cx="12" cy="12" r="12" fill="#229ED9"/>
-                    <path fill="#fff" d="M5.5 11.9l10.9-4.2c.5-.2.9.1.8.8l-1.9 8.8c-.1.6-.5.8-1.1.5l-2.9-2.2-1.4 1.4c-.2.2-.3.3-.6.3l.2-3 5.4-4.9c.2-.2 0-.3-.4-.1l-6.7 4.2-2.9-.9c-.6-.2-.6-.6.1-.9z"/>
-                </svg>
-            `;
+            return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#229ED9"/><path fill="#fff" d="M5.5 11.9l10.9-4.2c.5-.2.9.1.8.8l-1.9 8.8c-.1.6-.5.8-1.1.5l-2.9-2.2-1.4 1.4c-.2.2-.3.3-.6.3l.2-3 5.4-4.9c.2-.2 0-.3-.4-.1l-6.7 4.2-2.9-.9c-.6-.2-.6-.6.1-.9z"/></svg>`;
         }
 
         function warningIconSvg() {
-            return `
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
-                          stroke="#ff5252" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                    <line x1="12" y1="9" x2="12" y2="13.5" stroke="#ff5252" stroke-width="1.8" stroke-linecap="round"/>
-                    <circle cx="12" cy="17" r="1.1" fill="#ff5252"/>
-                </svg>
-            `;
+            return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="#ff5252" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13.5" stroke="#ff5252" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1.1" fill="#ff5252"/></svg>`;
         }
 
-        /* ═══════════════════ RENDER PLANS ═══════════════════ */
+        /* ═══════════════════════════════════════════════════════════
+           ⭐ محاسبه‌ی قیمت نهایی با تخفیف‌های پویا
+           ═══════════════════════════════════════════════════════════ */
+        function computeFinalPrice(basePriceStr, planKey) {
+            const basePrice = parseInt(String(basePriceStr).replace(/,/g, ''), 10) || 0;
+            let totalPercent = 0;
+
+            // تخفیف جهانی از ادمین (اگر فعال و منقضی نشده)
+            if (activeDiscount && activeDiscount.percent > 0) {
+                const expired = activeDiscount.expires_at && new Date(activeDiscount.expires_at) <= new Date();
+                if (!expired) totalPercent += activeDiscount.percent;
+            }
+
+            // تخفیف اولین خرید
+            if (isFirstPurchase && FIRST_PURCHASE_DISCOUNT > 0) {
+                totalPercent += FIRST_PURCHASE_DISCOUNT;
+            }
+
+            totalPercent = Math.min(totalPercent, 60); // سقف 60٪
+            const final = Math.round(basePrice * (1 - totalPercent / 100));
+            return { basePrice, finalPrice: final, totalPercent };
+        }
+
+        function formatPrice(num) {
+            return Number(num).toLocaleString('en-US');
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           ⭐ FETCH PLANS CONFIG از API (با cache)
+           ═══════════════════════════════════════════════════════════ */
+        async function fetchPlansConfig() {
+            // 1) تلاش از cache
+            const cached = cacheGet(CACHE_KEY_PLANS);
+            if (cached) {
+                console.log('[CACHE] plans config from cache');
+                return cached;
+            }
+
+            // 2) درخواست از API
+            try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 5000);
+                const response = await fetch(`${API_BASE}/api/plans`, {
+                    method: 'GET',
+                    signal: controller.signal
+                });
+                clearTimeout(timeout);
+
+                const data = await response.json();
+                if (data?.ok) {
+                    cacheSet(CACHE_KEY_PLANS, data);
+                    console.log('[API] plans config fetched');
+                    return data;
+                }
+            } catch (e) {
+                console.warn('[API] plans fetch failed:', e.message);
+            }
+            return null;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           ⭐ FETCH FIRST PURCHASE (با cache)
+           ═══════════════════════════════════════════════════════════ */
+        async function fetchFirstPurchaseCached() {
+            const cached = cacheGet(CACHE_KEY_FIRST);
+            if (cached) {
+                console.log('[CACHE] first purchase from cache');
+                return cached;
+            }
+            try {
+                const response = await fetch(`${API_BASE}/api/check-first-purchase?userId=${userId}`);
+                const data = await response.json();
+                if (data?.ok) {
+                    cacheSet(CACHE_KEY_FIRST, data);
+                    console.log('[API] first purchase fetched');
+                    return data;
+                }
+            } catch (e) {
+                console.warn('[API] first purchase fetch failed:', e.message);
+            }
+            return { isFirstPurchase: true, telegramId: null };
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           ⭐ DISCOUNT BANNER + COUNTDOWN
+           ═══════════════════════════════════════════════════════════ */
+        function updateDiscountBanner() {
+            const banner = document.getElementById('discountBanner');
+            const titleEl = document.getElementById('discountTitle');
+            const subtitleEl = document.getElementById('discountSubtitle');
+            const timerEl = document.getElementById('discountTimer');
+
+            let showBanner = false;
+            let title = '';
+            let subtitle = '';
+
+            const globalActive = activeDiscount && activeDiscount.percent > 0 &&
+                                (!activeDiscount.expires_at || new Date(activeDiscount.expires_at) > new Date());
+
+            if (globalActive && isFirstPurchase) {
+                showBanner = true;
+                title = '🎉 جشنواره تخفیف!';
+                subtitle = `${activeDiscount.label || ''} + ${toPersianNumbers(FIRST_PURCHASE_DISCOUNT)}٪ تخفیف اولین خرید`;
+            } else if (globalActive) {
+                showBanner = true;
+                title = activeDiscount.label || '🎉 تخفیف ویژه!';
+                subtitle = `${toPersianNumbers(activeDiscount.percent)}٪ تخفیف روی تمام پلن‌ها`;
+            } else if (isFirstPurchase) {
+                showBanner = true;
+                title = 'تخفیف ویژه!';
+                subtitle = `با خرید اولین اشتراک خود ${toPersianNumbers(FIRST_PURCHASE_DISCOUNT)}٪ تخفیف دریافت کنید`;
+            }
+
+            if (showBanner) {
+                banner.style.display = 'block';
+                titleEl.textContent = title;
+                subtitleEl.textContent = subtitle;
+
+                // ⭐ شمارش معکوس (اگر expires_at دارد)
+                if (activeDiscount?.expires_at && globalActive) {
+                    timerEl.style.display = 'inline-flex';
+                    startCountdown(new Date(activeDiscount.expires_at));
+                } else {
+                    timerEl.style.display = 'none';
+                }
+            } else {
+                banner.style.display = 'none';
+            }
+        }
+
+        function startCountdown(expiresAt) {
+            if (countdownTimer) clearInterval(countdownTimer);
+            const el = document.getElementById('discountCountdown');
+
+            function tick() {
+                const diff = expiresAt - new Date();
+                if (diff <= 0) {
+                    clearInterval(countdownTimer);
+                    countdownTimer = null;
+                    // زمان تمام شد → banner مخفی و پلن‌ها refresh بدون تخفیف
+                    activeDiscount = null;
+                    updateDiscountBanner();
+                    loadPlans();
+                    return;
+                }
+                const h = Math.floor(diff / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                const pad = (n) => String(n).padStart(2, '0');
+                el.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+            }
+            tick();
+            countdownTimer = setInterval(tick, 1000);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           RENDER PLANS
+           ═══════════════════════════════════════════════════════════ */
         function loadPlans() {
             const plansContent = document.getElementById('plans-content');
             let cardsHtml = '';
@@ -1159,15 +1329,18 @@
             for (const [key, plan] of Object.entries(plans)) {
                 const highlightClass = plan.highlight ? 'highlight' : '';
                 const popularBadge = plan.badge ? `<div class="badge popular">${plan.badge}</div>` : '';
-                const discountBadge = isFirstPurchase ? `<div class="badge discount-badge">🎁 ۱۰٪ تخفیف</div>` : '';
 
-                const currentPrice = isFirstPurchase ? plan.discountPrice : plan.price;
-                const persianPrice = toPersianNumbers(currentPrice);
+                const { basePrice, finalPrice, totalPercent } = computeFinalPrice(plan.price, key);
+                const hasDiscount = totalPercent > 0;
+                const persianFinal = toPersianNumbers(formatPrice(finalPrice));
+                const persianBase = toPersianNumbers(formatPrice(basePrice));
 
-                const priceBlock = isFirstPurchase
-                    ? `<div class="original-price">${toPersianNumbers(plan.price)}</div>
-                       <div class="plan-price">${persianPrice} <span class="unit">تومان</span></div>`
-                    : `<div class="plan-price">${persianPrice} <span class="unit">تومان</span></div>`;
+                const discountBadge = hasDiscount ? `<div class="badge discount-badge">🎁 ${toPersianNumbers(totalPercent)}٪ تخفیف</div>` : '';
+
+                const priceBlock = hasDiscount
+                    ? `<div class="original-price">${persianBase}</div>
+                       <div class="plan-price">${persianFinal} <span class="unit">تومان</span></div>`
+                    : `<div class="plan-price">${persianFinal} <span class="unit">تومان</span></div>`;
 
                 cardsHtml += `
                     <div class="plan-card ${highlightClass}">
@@ -1178,9 +1351,7 @@
                                 <div class="plan-name">${plan.name}</div>
                                 <div class="plan-duration">⏰ ${plan.duration}</div>
                             </div>
-                            <div class="plan-price-group">
-                                ${priceBlock}
-                            </div>
+                            <div class="plan-price-group">${priceBlock}</div>
                         </div>
                         <div class="features">
                             ${plan.features.map(f => {
@@ -1189,15 +1360,15 @@
                                 return `<div class="feature ${discountClass}">${text}</div>`;
                             }).join('')}
                         </div>
-                        <button class="cta" onclick="buyPlan('${key}')">🚀 خرید اشتراک</button>
+                        <button class="cta" onclick="buyPlan('${key}', this)" data-plan="${key}">
+                            <span class="cta-text">🚀 خرید اشتراک</span>
+                        </button>
                     </div>
                 `;
             }
 
             const html = `
-                <div class="plans-stack">
-                    ${cardsHtml}
-                </div>
+                <div class="plans-stack">${cardsHtml}</div>
                 <div class="trust">
                     <div>پرداخت امن با کیف پول بله</div>
                     <div>بازگشت وجه تا ۲۴ ساعت</div>
@@ -1216,8 +1387,7 @@
                     <div class="footer-title">طراحی و توسعه توسط <strong>DLGramProBot</strong> | <strong>MrAliz</strong></div>
                     <div class="footer-links">
                         <a href="javascript:void(0)" class="footer-link" onclick="openTelegramBot()">
-                            ${telegramIconSvg()}
-                            دی‌ال‌گرام
+                            ${telegramIconSvg()} دی‌ال‌گرام
                         </a>
                         <a href="javascript:void(0)" class="footer-link" onclick="openSupport()">📞 پشتیبانی در بله</a>
                     </div>
@@ -1237,17 +1407,43 @@
             else window.open('https://ble.ir/MrAliz', '_blank');
         }
 
-        /* ═══════════════════ BUY PLAN ═══════════════════ */
-        async function buyPlan(planKey) {
+        /* ═══════════════════════════════════════════════════════════
+           ⭐ BUY PLAN — با Optimistic UI
+           ═══════════════════════════════════════════════════════════ */
+        async function buyPlan(planKey, btnEl) {
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('medium');
+
+            // ⭐ Optimistic UI: فوراً دکمه رو loading کن
+            const originalHTML = btnEl ? btnEl.innerHTML : null;
+            if (btnEl) {
+                btnEl.disabled = true;
+                btnEl.classList.add('loading');
+                btnEl.innerHTML = `<span class="btn-spinner"></span><span>در حال آماده‌سازی...</span>`;
+            }
+
+            function restoreBtn() {
+                if (btnEl && originalHTML !== null) {
+                    btnEl.disabled = false;
+                    btnEl.classList.remove('loading');
+                    btnEl.innerHTML = originalHTML;
+                }
+            }
+
             try {
                 const response = await fetch(`${API_BASE}/api/create-invoice`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ plan: planKey, user_id: userId, init_data: WebApp.initData })
+                    body: JSON.stringify({
+                        plan: planKey,
+                        user_id: userId,
+                        init_data: WebApp.initData
+                    })
                 });
                 const data = await response.json();
+
                 if (!data.success) throw new Error(data.error || 'خطا در ایجاد فاکتور');
+
+                restoreBtn();
 
                 WebApp.openInvoice(data.invoice_params, (status, invoiceId) => {
                     if (status === 'paid') showPaymentSuccess(invoiceId);
@@ -1256,12 +1452,18 @@
                 });
             } catch (error) {
                 console.error('Error buying plan:', error);
+                restoreBtn();
                 showMessage('خطا در برقراری ارتباط. لطفاً دوباره تلاش کنید.');
             }
         }
 
         function showPaymentSuccess(invoiceId) {
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.notificationOccurred('success');
+
+            // ⭐ پاک کردن cache چون user دیگه "اولین خرید" نداره
+            cacheClear(CACHE_KEY_FIRST);
+            cacheClear(CACHE_KEY_PLANS);
+
             const plansContent = document.getElementById('plans-content');
             plansContent.innerHTML = `
                 <div class="empty-state" style="animation: zoomIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);">
@@ -1278,14 +1480,12 @@
             setTimeout(() => { switchTab('payments'); }, 2500);
         }
 
-        /* ═══════════════════════════════════════════════════════
-           PAYMENTS HISTORY — مرتب‌سازی + لیبل خط‌دار
-           ═══════════════════════════════════════════════════════ */
+        /* ═══════════════════ PAYMENTS ═══════════════════ */
         function getPaymentOrder(payment) {
-            if (!payment.used) return 2; // استفاده نشده
+            if (!payment.used) return 2;
             const isExpired = payment.expires_at_iso && isPaymentExpired(payment.expires_at_iso);
-            if (isExpired) return 3; // منقضی شده
-            return 1; // فعال
+            if (isExpired) return 3;
+            return 1;
         }
 
         function getPaymentGroupInfo(order) {
@@ -1316,7 +1516,6 @@
                     return;
                 }
 
-                // مرتب‌سازی: فعال → استفاده نشده → منقضی
                 const sortedPayments = [...data.payments].sort((a, b) => {
                     const oa = getPaymentOrder(a);
                     const ob = getPaymentOrder(b);
@@ -1356,7 +1555,6 @@
                         const now = new Date();
                         const expiryDate = new Date(payment.expires_at_iso);
 
-                        // ⭐ محاسبه‌ی صحیح بر اساس مدت پلن (نه از تاریخ فارسی)
                         const totalDays = PLAN_DURATIONS[payment.plan] || 30;
                         const remainingDays = Math.max(0, Math.floor((expiryDate - now) / 86400000));
                         const percentage = Math.max(0, Math.min(100, (remainingDays / totalDays) * 100));
@@ -1444,14 +1642,11 @@
         function showToast(message, duration = 3000) {
             const existingToast = document.querySelector('.toast');
             if (existingToast) existingToast.remove();
-
             const toast = document.createElement('div');
             toast.className = 'toast';
             toast.textContent = message;
             document.body.appendChild(toast);
-
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.notificationOccurred('success');
-
             setTimeout(() => toast.classList.add('show'), 10);
             setTimeout(() => {
                 toast.classList.remove('show');
@@ -1524,7 +1719,6 @@
             }
         }
 
-        /* ═══════════════════ SCROLL TO TOP ═══════════════════ */
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('light');
@@ -1539,18 +1733,11 @@
 
         window.addEventListener('scroll', handleScrollTopVisibility, { passive: true });
 
-        /* ═══════════════════════════════════════════════════════
-           SWIPE NAVIGATION — جهت برعکس شده (طبق درخواست)
-           ═══════════════════════════════════════════════════════ */
+        /* ═══════════════════ SWIPE ═══════════════════ */
         function initTabSwipe() {
             const container = document.getElementById('mainContainer');
             if (!container) return;
-
-            let startX = 0;
-            let startY = 0;
-            let tracking = false;
-            let isHorizontal = null;
-
+            let startX = 0, startY = 0, tracking = false, isHorizontal = null;
             const SWIPE_THRESHOLD = 70;
             const HORIZONTAL_BIAS = 1.3;
 
@@ -1558,8 +1745,7 @@
                 if (e.touches.length !== 1) return;
                 const target = e.target;
                 if (target.closest('button, a, input, textarea, .cta, .footer-link, #scrollTopBtn')) {
-                    tracking = false;
-                    return;
+                    tracking = false; return;
                 }
                 startX = e.touches[0].clientX;
                 startY = e.touches[0].clientY;
@@ -1571,7 +1757,6 @@
                 if (!tracking || e.touches.length !== 1) return;
                 const dx = e.touches[0].clientX - startX;
                 const dy = e.touches[0].clientY - startY;
-
                 if (isHorizontal === null) {
                     if (Math.abs(dx) > 14 || Math.abs(dy) > 14) {
                         isHorizontal = Math.abs(dx) > Math.abs(dy) * HORIZONTAL_BIAS;
@@ -1582,15 +1767,10 @@
             container.addEventListener('touchend', (e) => {
                 if (!tracking) return;
                 tracking = false;
-
                 if (isHorizontal !== true) return;
-
                 const endX = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX : startX;
                 const dx = endX - startX;
-
                 if (Math.abs(dx) < SWIPE_THRESHOLD) return;
-
-                // ⭐ جهت برعکس: کشیدن به راست → رفتن به پرداخت‌ها (چپ)، کشیدن به چپ → رفتن به پلن‌ها (راست)
                 if (dx > 0 && currentTab === 'plans') {
                     if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('light');
                     switchTab('payments', true);
@@ -1600,48 +1780,48 @@
                 }
             }, { passive: true });
 
-            container.addEventListener('touchcancel', () => {
-                tracking = false;
-                isHorizontal = null;
-            }, { passive: true });
+            container.addEventListener('touchcancel', () => { tracking = false; isHorizontal = null; }, { passive: true });
         }
 
-        /* ═══════════════════ CHECK FIRST PURCHASE ═══════════════════ */
-        async function checkFirstPurchase() {
+        /* ═══════════════════════════════════════════════════════════
+           INIT — با cache + API
+           ═══════════════════════════════════════════════════════════ */
+        async function init() {
             try {
-                if (!userId) {
-                    hideInitialLoader();
-                    loadPlans();
-                    return;
+                // ⭐ موازی: هم plans config و هم first purchase
+                const [plansConfig, fpData] = await Promise.all([
+                    fetchPlansConfig(),
+                    userId ? fetchFirstPurchaseCached() : Promise.resolve({ isFirstPurchase: true, telegramId: null })
+                ]);
+
+                // اعمال discount از API
+                if (plansConfig?.discount?.active) {
+                    const expired = plansConfig.discount.expires_at && new Date(plansConfig.discount.expires_at) <= new Date();
+                    if (!expired) {
+                        activeDiscount = plansConfig.discount;
+                        console.log('[DISCOUNT] active:', activeDiscount);
+                    }
                 }
-                const response = await fetch(`${API_BASE}/api/check-first-purchase?userId=${userId}`);
-                const data = await response.json();
 
-                if (data.ok) {
-                    isFirstPurchase = data.isFirstPurchase;
-                    userTelegramId = data.telegramId;
-
-                    const discountBanner = document.getElementById('discountBanner');
-                    if (discountBanner) discountBanner.style.display = isFirstPurchase ? 'block' : 'none';
-
-                    loadPlans();
-                    hideInitialLoader();
-                } else {
-                    hideInitialLoader();
-                    loadPlans();
+                if (fpData?.ok !== false) {
+                    isFirstPurchase = fpData.isFirstPurchase !== false;
+                    userTelegramId = fpData.telegramId || null;
                 }
-            } catch (error) {
-                isFirstPurchase = true;
-                const banner = document.getElementById('discountBanner');
-                if (banner) banner.style.display = 'block';
+
+                updateDiscountBanner();
+                loadPlans();
+                hideInitialLoader();
+            } catch (e) {
+                console.error('Init error:', e);
                 loadPlans();
                 hideInitialLoader();
             }
         }
 
-        /* ═══════════════════ INIT ═══════════════════ */
+        /* ═══════════════════ START ═══════════════════ */
+        // رندر اولیه سریع (با hardcoded) — سپس init به‌روزرسانی می‌کند
         loadPlans();
-        checkFirstPurchase();
+        init();
         handleScrollTopVisibility();
         initTabSwipe();
     </script>

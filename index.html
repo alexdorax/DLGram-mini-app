@@ -91,14 +91,16 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 70px;
+            height: 90px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 8px;
             pointer-events: none;
             z-index: 500;
             opacity: 0;
-            transform: translateY(-70px);
+            transform: translateY(-90px);
             will-change: transform, opacity;
         }
 
@@ -106,6 +108,7 @@
         .pull-refresh-container.snapping { transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.2s ease; }
 
         .pull-refresh-inner {
+            position: relative;
             width: 44px;
             height: 44px;
             border-radius: 50%;
@@ -115,8 +118,8 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 16px rgba(225, 48, 108, 0.35);
-            position: relative;
-            transition: transform 0.15s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            flex-shrink: 0;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
         }
 
         .pull-refresh-icon {
@@ -154,10 +157,14 @@
 
         /* ═══════════════════ SIMPLE SPINNER (12 خط) ═══════════════════ */
         .simple-spinner {
-            position: relative;
-            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
             width: 32px;
             height: 32px;
+            margin-top: -16px;
+            margin-left: -16px;
+            display: none;
         }
 
         .pull-refresh-container.loading .simple-spinner {
@@ -196,20 +203,14 @@
         }
 
         .pull-refresh-text {
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            margin-top: 8px;
             font-size: 11px;
             font-weight: 700;
             color: var(--muted);
             white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.2s ease, color 0.2s ease;
+            transition: color 0.2s ease;
+            line-height: 1;
         }
 
-        .pull-refresh-container.visible .pull-refresh-text { opacity: 1; }
         .pull-refresh-container.ready .pull-refresh-text { color: var(--accent); }
         .pull-refresh-container.loading .pull-refresh-text { color: var(--accent); }
 
@@ -1141,8 +1142,8 @@
                 <div></div><div></div><div></div>
                 <div></div><div></div><div></div>
             </div>
-            <div class="pull-refresh-text" id="pullRefreshText">برای بروزرسانی بکشید</div>
         </div>
+        <div class="pull-refresh-text" id="pullRefreshText">برای بروزرسانی بکشید</div>
     </div>
 
     <div id="initialLoader">
@@ -1947,13 +1948,15 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           PULL TO REFRESH — با اسپینر ساده ۱۲ خطی
+           PULL TO REFRESH — با رفع دو مشکل:
+           1) حذف فاصله بین نشانگر و کارت در حالت loading
+           2) لغو صحیح وقتی کاربر منصرف می‌شود
            ═══════════════════════════════════════════════════════════ */
         function initPullToRefresh() {
             const THRESHOLD = 90;
             const MAX_PULL = 130;
             const RESISTANCE = 0.5;
-            const INDICATOR_HEIGHT = 70;
+            const INDICATOR_HEIGHT = 90; // ⭐ هم‌اندازه با CSS container
 
             const indicator = document.getElementById('pullRefresh');
             const indicatorText = document.getElementById('pullRefreshText');
@@ -1979,6 +1982,7 @@
             function updateIndicator(pull) {
                 const y = Math.min(MAX_PULL, pull);
 
+                // ⭐ کارت به پایین و نشانگر دقیقاً چسبیده به بالای کارت
                 mainContainer.style.transform = `translateY(${y}px)`;
                 indicator.style.transform = `translateY(${y - INDICATOR_HEIGHT}px)`;
 
@@ -1998,7 +2002,7 @@
             }
 
             function resetIndicator(animate = true) {
-                indicator.classList.remove('visible', 'ready');
+                indicator.classList.remove('visible', 'ready', 'loading');
 
                 if (animate) {
                     setSnapping(true);
@@ -2010,11 +2014,7 @@
                     mainContainer.style.transform = 'translateY(0px)';
                 }
 
-                setTimeout(() => {
-                    if (!indicator.classList.contains('loading')) {
-                        indicatorText.textContent = 'برای بروزرسانی بکشید';
-                    }
-                }, 200);
+                indicatorText.textContent = 'برای بروزرسانی بکشید';
             }
 
             function triggerRefresh() {
@@ -2022,8 +2022,12 @@
                 indicator.classList.remove('ready');
                 indicator.classList.add('visible', 'loading');
                 setSnapping(true);
-                indicator.style.transform = 'translateY(0px)';
-                mainContainer.style.transform = `translateY(${MAX_PULL}px)`;
+
+                // ⭐⭐⭐ حذف فاصله: کارت دقیقاً به اندازه‌ی ارتفاع نشانگر پایین می‌رود
+                //     و نشانگر در بالای صفحه قرار می‌گیرد → صفر فاصله
+                indicator.style.transform = `translateY(0px)`;
+                mainContainer.style.transform = `translateY(${INDICATOR_HEIGHT}px)`;
+
                 indicatorText.textContent = 'در حال بروزرسانی...';
 
                 if (WebApp.HapticFeedback) {
@@ -2060,9 +2064,8 @@
                 const currentY = e.touches[0].clientY;
                 const diffY = currentY - startY;
 
-                if (Math.abs(diffY) < 3) return;
-
                 if (diffY > 0 && window.scrollY <= 0) {
+                    // ⭐⭐⭐ به‌جای early return، همیشه currentPull را دقیق آپدیت کن
                     if (isHorizontal) return;
                     currentPull = diffY * RESISTANCE;
                     updateIndicator(currentPull);
@@ -2070,10 +2073,14 @@
                     if (currentPull > 5 && e.cancelable) {
                         e.preventDefault();
                     }
-                } else if (diffY < 0) {
+                } else if (diffY <= 0) {
+                    // ⭐⭐⭐ کاربر انگشت را به سمت بالا (یا مبدأ) برد → لغو کامل
+                    if (!isPulling) return;
                     isPulling = false;
-                    resetIndicator(true);
                     currentPull = 0;
+                    isHorizontal = false;
+                    setSnapping(true);
+                    resetIndicator(true);
                 }
             }, { passive: false });
 
@@ -2081,7 +2088,13 @@
                 if (!isPulling || triggered) return;
                 isPulling = false;
 
-                if (currentPull >= THRESHOLD) {
+                // ⭐⭐⭐ شرط دوگانه: هم currentPull کافی باشد هم indicator در حالت ready باشد
+                const genuinelyReady =
+                    currentPull >= THRESHOLD &&
+                    indicator.classList.contains('ready') &&
+                    indicator.classList.contains('visible');
+
+                if (genuinelyReady) {
                     triggerRefresh();
                 } else {
                     resetIndicator(true);

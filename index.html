@@ -1383,24 +1383,26 @@
             return null;
         }
 
-        async function fetchFirstPurchaseCached() {
-            const cached = cacheGet(CACHE_KEY_FIRST);
-            if (cached) {
-                console.log('[CACHE] first purchase from cache');
-                return cached;
-            }
+        /* ⭐ حذف cache - همیشه تازه از سرور می‌خوانیم تا برای هر کاربر درست باشد */
+        async function fetchFirstPurchaseFresh() {
             try {
-                const response = await fetch(`${API_BASE}/api/check-first-purchase?userId=${userId}`);
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 5000);
+                const response = await fetch(`${API_BASE}/api/check-first-purchase?userId=${userId}&_t=${Date.now()}`, {
+                    method: 'GET',
+                    signal: controller.signal,
+                    cache: 'no-store'
+                });
+                clearTimeout(timeout);
                 const data = await response.json();
                 if (data?.ok) {
-                    cacheSet(CACHE_KEY_FIRST, data);
-                    console.log('[API] first purchase fetched');
+                    console.log('[API] first purchase fetched:', data.isFirstPurchase);
                     return data;
                 }
             } catch (e) {
                 console.warn('[API] first purchase fetch failed:', e.message);
             }
-            return { isFirstPurchase: true, telegramId: null };
+            return { ok: true, isFirstPurchase: true, telegramId: null };
         }
 
         function updateDiscountBanner() {
@@ -1416,32 +1418,48 @@
             const globalActive = activeDiscount && activeDiscount.percent > 0 &&
                                 (!activeDiscount.expires_at || new Date(activeDiscount.expires_at) > new Date());
 
-            const selectedPlans = (activeDiscount && Array.isArray(activeDiscount.plans) && activeDiscount.plans.length > 0 && activeDiscount.plans.length < 3)
-                ? activeDiscount.plans.map(p => PLAN_NAME_MAP[p] || p).join(' و ')
+            const allPlans = ['bronze', 'silver', 'gold'];
+            const adminPlans = (activeDiscount && Array.isArray(activeDiscount.plans) && activeDiscount.plans.length > 0)
+                ? activeDiscount.plans
+                : allPlans;
+            const isPartial = adminPlans.length > 0 && adminPlans.length < 3;
+
+            const selectedPlansNames = isPartial
+                ? adminPlans.map(p => PLAN_NAME_MAP[p] || p).join(' و ')
                 : null;
 
             if (globalActive && isFirstPurchase) {
                 showBanner = true;
-                title = '\u200E🎉 جشنواره تخفیف‌ها!';
+                title = '🎉 جشنواره تخفیف‌ها!';
 
                 const adminLabel = activeDiscount.label || 'تخفیف ویژه';
-                const adminPercent = toPersianNumbers(activeDiscount.percent);
-                const firstPercent = toPersianNumbers(FIRST_PURCHASE_DISCOUNT);
-                const totalPercent = toPersianNumbers(Math.min(activeDiscount.percent + FIRST_PURCHASE_DISCOUNT, 100));
+                const adminPercent = activeDiscount.percent;
+                const firstPercent = FIRST_PURCHASE_DISCOUNT;
 
-                const line1 = selectedPlans
-                    ? `${adminLabel} ${adminPercent}٪ روی پلن ${selectedPlans} + ${firstPercent}٪ تخفیف اولین خرید`
-                    : `${adminLabel} ${adminPercent}٪ + ${firstPercent}٪ تخفیف اولین خرید`;
+                let line1 = '';
+                if (isPartial) {
+                    line1 = `${adminLabel} ${toPersianNumbers(adminPercent)}٪ روی پلن ${selectedPlansNames} + ${toPersianNumbers(firstPercent)}٪ تخفیف اولین خرید`;
+                } else {
+                    line1 = `${adminLabel} ${toPersianNumbers(adminPercent)}٪ + ${toPersianNumbers(firstPercent)}٪ تخفیف اولین خرید`;
+                }
 
-                const line2 = `مجموعاً ${totalPercent}٪ تخفیف دریافت می‌کنید`;
+                let line2 = '';
+                if (isPartial) {
+                    const withAdminTotal = Math.min(adminPercent + firstPercent, 100);
+                    const withoutAdminTotal = Math.min(firstPercent, 100);
+                    line2 = `تا ${toPersianNumbers(withAdminTotal)}٪ روی پلن ${selectedPlansNames} — سایر پلن‌ها ${toPersianNumbers(withoutAdminTotal)}٪`;
+                } else {
+                    const total = Math.min(adminPercent + firstPercent, 100);
+                    line2 = `مجموعاً ${toPersianNumbers(total)}٪ تخفیف دریافت می‌کنید`;
+                }
 
                 subtitleHTML = `${line1}<br>${line2}`;
             } else if (globalActive) {
                 showBanner = true;
-                title = activeDiscount.label || '\u200E🎉 تخفیف ویژه!';
+                title = activeDiscount.label || '🎉 تخفیف ویژه!';
                 const adminPercent = toPersianNumbers(activeDiscount.percent);
-                subtitleHTML = selectedPlans
-                    ? `${adminPercent}٪ تخفیف روی پلن ${selectedPlans}`
+                subtitleHTML = isPartial
+                    ? `${adminPercent}٪ تخفیف روی پلن ${selectedPlansNames}`
                     : `${adminPercent}٪ تخفیف روی تمام پلن‌ها`;
             } else if (isFirstPurchase) {
                 showBanner = true;
@@ -2132,7 +2150,7 @@
             try {
                 const [plansConfig, fpData] = await Promise.all([
                     fetchPlansConfig(),
-                    userId ? fetchFirstPurchaseCached() : Promise.resolve({ isFirstPurchase: true, telegramId: null })
+                    userId ? fetchFirstPurchaseFresh() : Promise.resolve({ ok: true, isFirstPurchase: true, telegramId: null })
                 ]);
 
                 if (plansConfig?.discount?.active) {
@@ -2151,6 +2169,7 @@
                 if (fpData?.ok !== false) {
                     isFirstPurchase = fpData.isFirstPurchase !== false;
                     userTelegramId = fpData.telegramId || null;
+                    console.log('[FIRST_PURCHASE] isFirstPurchase =', isFirstPurchase);
                 }
 
                 updateDiscountBanner();

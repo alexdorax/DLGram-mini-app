@@ -37,7 +37,6 @@
         html, body { overscroll-behavior-x: none; }
 
         body {
-            /* ⭐ font-display: swap روی IRANSansX و Vazirmatn (fallback سریع) */
             font-family: IRANSansX, Vazirmatn, 'Segoe UI', Tahoma, Arial, sans-serif;
             background: var(--bg);
             color: var(--text);
@@ -343,12 +342,12 @@
 
         .feature.discount { color: var(--accent); font-weight: 700; }
 
-        /* ⭐ CTA با loading state (Optimistic UI) */
+        /* ⭐ CTA — ارتفاع ثابت تا با تغییر متن سایز عوض نشود */
         .cta {
             width: 100%;
             border: none;
             border-radius: 14px;
-            padding: 15px;
+            padding: 0 15px;
             font-size: 15px;
             font-weight: 800;
             cursor: pointer;
@@ -364,6 +363,11 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            /* ⭐ جلوگیری از تغییر سایز */
+            white-space: nowrap;
+            min-height: 50px;
+            height: 50px;
+            line-height: 1;
         }
 
         .cta::before {
@@ -383,6 +387,11 @@
             opacity: 0.85;
             cursor: wait;
             transform: none;
+        }
+
+        .cta-text {
+            display: inline-block;
+            white-space: nowrap;
         }
 
         .btn-spinner {
@@ -493,9 +502,10 @@
             animation: shimmerProgress 2s infinite;
         }
 
+        /* ⭐ افکت از راست به چپ */
         @keyframes shimmerProgress {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
         }
 
         .payment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
@@ -1069,10 +1079,10 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           ⭐ CACHE API RESULTS (5 دقیقه)
+           ⭐ CACHE — فقط برای تخفیف اولین خرید (user-specific)
+           تخفیف ادمین دیگر cache نمی‌شود و هر بار تازه خوانده می‌شود
            ═══════════════════════════════════════════════════════════ */
         const CACHE_TTL_MS = 5 * 60 * 1000;
-        const CACHE_KEY_PLANS = 'dlgram_plans_v1';
         const CACHE_KEY_FIRST = 'dlgram_first_purchase_v1';
 
         function cacheGet(key) {
@@ -1105,9 +1115,8 @@
         let activeDiscount = null; // { percent, label, expires_at }
         let countdownTimer = null;
 
-        const FIRST_PURCHASE_DISCOUNT = 10; // درصد تخفیف اولین خرید
+        const FIRST_PURCHASE_DISCOUNT = 10;
 
-        // ⭐ مدت پلن‌ها برای محاسبه‌ی صحیح درصد پروگرس
         const PLAN_DURATIONS = { bronze: 30, silver: 90, gold: 365 };
 
         const plans = {
@@ -1171,18 +1180,16 @@
             const basePrice = parseInt(String(basePriceStr).replace(/,/g, ''), 10) || 0;
             let totalPercent = 0;
 
-            // تخفیف جهانی از ادمین (اگر فعال و منقضی نشده)
             if (activeDiscount && activeDiscount.percent > 0) {
                 const expired = activeDiscount.expires_at && new Date(activeDiscount.expires_at) <= new Date();
                 if (!expired) totalPercent += activeDiscount.percent;
             }
 
-            // تخفیف اولین خرید
             if (isFirstPurchase && FIRST_PURCHASE_DISCOUNT > 0) {
                 totalPercent += FIRST_PURCHASE_DISCOUNT;
             }
 
-            totalPercent = Math.min(totalPercent, 60); // سقف 60٪
+            totalPercent = Math.min(totalPercent, 60);
             const final = Math.round(basePrice * (1 - totalPercent / 100));
             return { basePrice, finalPrice: final, totalPercent };
         }
@@ -1192,30 +1199,21 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           ⭐ FETCH PLANS CONFIG از API (با cache)
+           ⭐ FETCH PLANS CONFIG — همیشه تازه از API (بدون cache)
            ═══════════════════════════════════════════════════════════ */
         async function fetchPlansConfig() {
-            // 1) تلاش از cache
-            const cached = cacheGet(CACHE_KEY_PLANS);
-            if (cached) {
-                console.log('[CACHE] plans config from cache');
-                return cached;
-            }
-
-            // 2) درخواست از API
             try {
                 const controller = new AbortController();
                 const timeout = setTimeout(() => controller.abort(), 5000);
-                const response = await fetch(`${API_BASE}/api/plans`, {
+                const response = await fetch(`${API_BASE}/api/plans?_t=${Date.now()}`, {
                     method: 'GET',
-                    signal: controller.signal
+                    signal: controller.signal,
+                    cache: 'no-store'
                 });
                 clearTimeout(timeout);
-
                 const data = await response.json();
                 if (data?.ok) {
-                    cacheSet(CACHE_KEY_PLANS, data);
-                    console.log('[API] plans config fetched');
+                    console.log('[API] plans config fetched:', data.discount);
                     return data;
                 }
             } catch (e) {
@@ -1225,7 +1223,7 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           ⭐ FETCH FIRST PURCHASE (با cache)
+           ⭐ FETCH FIRST PURCHASE (با cache کوتاه — چون مربوط به کاربر است)
            ═══════════════════════════════════════════════════════════ */
         async function fetchFirstPurchaseCached() {
             const cached = cacheGet(CACHE_KEY_FIRST);
@@ -1282,7 +1280,6 @@
                 titleEl.textContent = title;
                 subtitleEl.textContent = subtitle;
 
-                // ⭐ شمارش معکوس (اگر expires_at دارد)
                 if (activeDiscount?.expires_at && globalActive) {
                     timerEl.style.display = 'inline-flex';
                     startCountdown(new Date(activeDiscount.expires_at));
@@ -1303,7 +1300,6 @@
                 if (diff <= 0) {
                     clearInterval(countdownTimer);
                     countdownTimer = null;
-                    // زمان تمام شد → banner مخفی و پلن‌ها refresh بدون تخفیف
                     activeDiscount = null;
                     updateDiscountBanner();
                     loadPlans();
@@ -1408,24 +1404,25 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           ⭐ BUY PLAN — با Optimistic UI
+           ⭐ BUY PLAN — فقط متن دکمه عوض می‌شود، سایز تغییر نمی‌کند
            ═══════════════════════════════════════════════════════════ */
         async function buyPlan(planKey, btnEl) {
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('medium');
 
-            // ⭐ Optimistic UI: فوراً دکمه رو loading کن
-            const originalHTML = btnEl ? btnEl.innerHTML : null;
+            // ⭐ فقط متن داخل span عوض می‌شود — ساختار و سایز دست‌نخورده می‌ماند
+            const textSpan = btnEl ? btnEl.querySelector('.cta-text') : null;
+            const originalText = textSpan ? textSpan.textContent : null;
             if (btnEl) {
                 btnEl.disabled = true;
                 btnEl.classList.add('loading');
-                btnEl.innerHTML = `<span class="btn-spinner"></span><span>در حال آماده‌سازی...</span>`;
+                if (textSpan) textSpan.textContent = '⏳ در حال آماده‌سازی...';
             }
 
             function restoreBtn() {
-                if (btnEl && originalHTML !== null) {
+                if (btnEl) {
                     btnEl.disabled = false;
                     btnEl.classList.remove('loading');
-                    btnEl.innerHTML = originalHTML;
+                    if (textSpan && originalText !== null) textSpan.textContent = originalText;
                 }
             }
 
@@ -1460,9 +1457,8 @@
         function showPaymentSuccess(invoiceId) {
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.notificationOccurred('success');
 
-            // ⭐ پاک کردن cache چون user دیگه "اولین خرید" نداره
+            // ⭐ فقط cache مربوط به "اولین خرید" پاک می‌شود چون کاربر دیگه اولین خریدش رو انجام داده
             cacheClear(CACHE_KEY_FIRST);
-            cacheClear(CACHE_KEY_PLANS);
 
             const plansContent = document.getElementById('plans-content');
             plansContent.innerHTML = `
@@ -1784,23 +1780,26 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           INIT — با cache + API
+           INIT — تخفیف همیشه تازه از سرور خوانده می‌شود
            ═══════════════════════════════════════════════════════════ */
         async function init() {
             try {
-                // ⭐ موازی: هم plans config و هم first purchase
                 const [plansConfig, fpData] = await Promise.all([
                     fetchPlansConfig(),
                     userId ? fetchFirstPurchaseCached() : Promise.resolve({ isFirstPurchase: true, telegramId: null })
                 ]);
 
-                // اعمال discount از API
                 if (plansConfig?.discount?.active) {
                     const expired = plansConfig.discount.expires_at && new Date(plansConfig.discount.expires_at) <= new Date();
                     if (!expired) {
                         activeDiscount = plansConfig.discount;
                         console.log('[DISCOUNT] active:', activeDiscount);
+                    } else {
+                        console.log('[DISCOUNT] expired');
+                        activeDiscount = null;
                     }
+                } else {
+                    activeDiscount = null;
                 }
 
                 if (fpData?.ok !== false) {
@@ -1819,7 +1818,6 @@
         }
 
         /* ═══════════════════ START ═══════════════════ */
-        // رندر اولیه سریع (با hardcoded) — سپس init به‌روزرسانی می‌کند
         loadPlans();
         init();
         handleScrollTopVisibility();

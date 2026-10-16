@@ -46,6 +46,7 @@
             overflow-x: hidden;
         }
 
+        /* ⭐ Main container قابل حرکت با transform */
         .main-container {
             background: linear-gradient(135deg, rgba(225, 48, 108, 0.08), rgba(131, 58, 180, 0.08));
             border-radius: 24px;
@@ -55,6 +56,11 @@
             position: relative;
             overflow: hidden;
             margin-bottom: 16px;
+            will-change: transform;
+        }
+
+        .main-container.snapping {
+            transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         .main-container::before {
@@ -79,6 +85,139 @@
         }
 
         .main-container > * { position: relative; z-index: 1; }
+
+        /* ═══════════════════ PULL TO REFRESH ═══════════════════ */
+        .pull-refresh-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 500;
+            opacity: 0;
+            transform: translateY(-70px);
+            will-change: transform, opacity;
+        }
+
+        .pull-refresh-container.visible { opacity: 1; }
+        .pull-refresh-container.snapping { transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.2s ease; }
+
+        .pull-refresh-inner {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--card);
+            border: 2px solid rgba(225, 48, 108, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(225, 48, 108, 0.35);
+            position: relative;
+            transition: transform 0.15s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        /* فلش */
+        .pull-refresh-icon {
+            width: 20px;
+            height: 20px;
+            stroke: var(--primary);
+            stroke-width: 2.5;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: transform 0.25s ease, stroke 0.25s ease;
+            transform: rotate(0deg);
+        }
+
+        .pull-refresh-container.ready .pull-refresh-icon {
+            transform: rotate(180deg);
+            stroke: var(--accent);
+        }
+
+        .pull-refresh-container.ready .pull-refresh-inner {
+            border-color: var(--accent);
+            box-shadow: 0 4px 20px rgba(252, 175, 69, 0.5);
+        }
+
+        /* در حالت loading: فلش مخفی، سامسونگ لودر نمایش داده می‌شود */
+        .pull-refresh-container.loading .pull-refresh-icon { display: none; }
+        .pull-refresh-container.loading .pull-refresh-inner {
+            border-color: var(--accent);
+            box-shadow: 0 4px 20px rgba(252, 175, 69, 0.5);
+        }
+
+        /* ═══════════════════ SAMSUNG STYLE LOADER ═══════════════════ */
+        .samsung-loader {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        .pull-refresh-container.loading .samsung-loader { display: block; }
+
+        .sdot {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation-duration: 1.4s;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out;
+            will-change: transform, opacity;
+        }
+
+        .sdot-1 { top: 0; left: 0; background: #4A90E2; animation-name: samsungDot1; }
+        .sdot-2 { top: 0; right: 0; background: #4ECBA8; animation-name: samsungDot2; }
+        .sdot-3 { bottom: 0; left: 0; background: #4ECBA8; animation-name: samsungDot3; }
+        .sdot-4 { bottom: 0; right: 0; background: #4A90E2; animation-name: samsungDot4; }
+
+        /* هر نقطه از گوشه به مرکز می‌رود، سپس برمی‌گردد */
+        @keyframes samsungDot1 {
+            0%, 25% { transform: translate(0, 0) scale(1); opacity: 1; }
+            45%, 65% { transform: translate(9px, 9px) scale(1.05); opacity: 0.75; }
+            85%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
+        }
+        @keyframes samsungDot2 {
+            0%, 25% { transform: translate(0, 0) scale(1); opacity: 1; }
+            45%, 65% { transform: translate(-9px, 9px) scale(1.05); opacity: 0.75; }
+            85%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
+        }
+        @keyframes samsungDot3 {
+            0%, 25% { transform: translate(0, 0) scale(1); opacity: 1; }
+            45%, 65% { transform: translate(9px, -9px) scale(1.05); opacity: 0.75; }
+            85%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
+        }
+        @keyframes samsungDot4 {
+            0%, 25% { transform: translate(0, 0) scale(1); opacity: 1; }
+            45%, 65% { transform: translate(-9px, -9px) scale(1.05); opacity: 0.75; }
+            85%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
+        }
+
+        .pull-refresh-text {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s ease, color 0.2s ease;
+        }
+
+        .pull-refresh-container.visible .pull-refresh-text { opacity: 1; }
+        .pull-refresh-container.ready .pull-refresh-text { color: var(--accent); }
+        .pull-refresh-container.loading .pull-refresh-text { color: var(--accent); }
 
         /* ═══════════════════ HEADER ═══════════════════ */
         .header { text-align: center; margin-bottom: 20px; position: relative; }
@@ -342,9 +481,7 @@
 
         .feature.discount { color: var(--accent); font-weight: 700; }
 
-        /* ═══════════════════════════════════════════════════════════
-           ⭐ دکمه خرید — دو عنصر مجزا با toggle کلاس
-           ═══════════════════════════════════════════════════════════ */
+        /* ═══════════════════ CTA BUTTON ═══════════════════ */
         .cta-wrapper {
             position: relative;
             width: 100%;
@@ -396,9 +533,7 @@
 
         .cta-item::-moz-focus-inner { border: 0; padding: 0; }
 
-        .cta-normal {
-            display: block;
-        }
+        .cta-normal { display: block; }
 
         .cta-normal:active {
             transform: scale(0.97);
@@ -411,14 +546,10 @@
             background: linear-gradient(135deg, #b5255a, #6b2e94);
         }
 
-        .cta-wrapper.is-loading .cta-normal {
-            display: none;
-        }
+        .cta-wrapper.is-loading .cta-normal { display: none; }
+        .cta-wrapper.is-loading .cta-loading { display: block; }
 
-        .cta-wrapper.is-loading .cta-loading {
-            display: block;
-        }
-
+        /* ═══════════════════ TRUST ═══════════════════ */
         .trust {
             margin-top: 28px;
             background: linear-gradient(135deg, rgba(225, 48, 108, 0.05), rgba(131, 58, 180, 0.05));
@@ -890,96 +1021,6 @@
             filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
         }
 
-        /* ═══════════════════ PULL TO REFRESH ═══════════════════ */
-        .pull-refresh-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
-            z-index: 500;
-            opacity: 0;
-            transform: translateY(-70px);
-            transition: opacity 0.2s ease;
-            will-change: transform, opacity;
-        }
-
-        .pull-refresh-container.visible {
-            opacity: 1;
-        }
-
-        .pull-refresh-inner {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--card);
-            border: 2px solid rgba(225, 48, 108, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 16px rgba(225, 48, 108, 0.35);
-            position: relative;
-            transition: transform 0.15s ease;
-        }
-
-        .pull-refresh-icon {
-            width: 20px;
-            height: 20px;
-            stroke: var(--primary);
-            stroke-width: 2.5;
-            fill: none;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            transition: transform 0.25s ease;
-            transform: rotate(0deg);
-        }
-
-        .pull-refresh-container.ready .pull-refresh-icon {
-            transform: rotate(180deg);
-            stroke: var(--accent);
-        }
-
-        .pull-refresh-container.loading .pull-refresh-icon {
-            animation: pullRefreshSpin 0.8s linear infinite;
-            stroke: var(--accent);
-        }
-
-        .pull-refresh-container.loading .pull-refresh-inner {
-            border-color: var(--accent);
-            box-shadow: 0 4px 20px rgba(252, 175, 69, 0.5);
-        }
-
-        @keyframes pullRefreshSpin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .pull-refresh-text {
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            margin-top: 6px;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--muted);
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-
-        .pull-refresh-container.visible .pull-refresh-text {
-            opacity: 1;
-        }
-
-        .pull-refresh-container.ready .pull-refresh-text {
-            color: var(--accent);
-        }
-
         #initialLoader {
             position: fixed;
             top: 0; left: 0;
@@ -1105,11 +1146,18 @@
 </head>
 
 <body>
+    <!-- ═══════════════════ PULL TO REFRESH ═══════════════════ -->
     <div class="pull-refresh-container" id="pullRefresh">
         <div class="pull-refresh-inner">
             <svg class="pull-refresh-icon" viewBox="0 0 24 24">
                 <path d="M12 5v14M5 12l7 7 7-7"/>
             </svg>
+            <div class="samsung-loader">
+                <span class="sdot sdot-1"></span>
+                <span class="sdot sdot-2"></span>
+                <span class="sdot sdot-3"></span>
+                <span class="sdot sdot-4"></span>
+            </div>
             <div class="pull-refresh-text" id="pullRefreshText">برای بروزرسانی بکشید</div>
         </div>
     </div>
@@ -1916,16 +1964,18 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           PULL TO REFRESH
+           PULL TO REFRESH — با حرکت دادن main-container و لودر سامسونگ
            ═══════════════════════════════════════════════════════════ */
         function initPullToRefresh() {
             const THRESHOLD = 90;
             const MAX_PULL = 130;
             const RESISTANCE = 0.5;
+            const INDICATOR_HEIGHT = 70;
 
             const indicator = document.getElementById('pullRefresh');
             const indicatorText = document.getElementById('pullRefreshText');
-            if (!indicator) return;
+            const mainContainer = document.getElementById('mainContainer');
+            if (!indicator || !mainContainer) return;
 
             let startY = 0;
             let currentPull = 0;
@@ -1933,9 +1983,24 @@
             let isHorizontal = false;
             let triggered = false;
 
+            function setSnapping(on) {
+                if (on) {
+                    indicator.classList.add('snapping');
+                    mainContainer.classList.add('snapping');
+                } else {
+                    indicator.classList.remove('snapping');
+                    mainContainer.classList.remove('snapping');
+                }
+            }
+
             function updateIndicator(pull) {
-                const y = Math.min(MAX_PULL, pull) - 70;
-                indicator.style.transform = `translateY(${y}px)`;
+                const y = Math.min(MAX_PULL, pull);
+
+                // ⭐ main-container به پایین حرکت می‌کند
+                mainContainer.style.transform = `translateY(${y}px)`;
+
+                // ⭐ نشانگر از بالا به داخل می‌آید
+                indicator.style.transform = `translateY(${y - INDICATOR_HEIGHT}px)`;
 
                 if (pull > 5) {
                     indicator.classList.add('visible');
@@ -1952,9 +2017,19 @@
                 }
             }
 
-            function resetIndicator() {
+            function resetIndicator(animate = true) {
                 indicator.classList.remove('visible', 'ready');
-                indicator.style.transform = 'translateY(-70px)';
+
+                if (animate) {
+                    setSnapping(true);
+                    indicator.style.transform = `translateY(-${INDICATOR_HEIGHT}px)`;
+                    mainContainer.style.transform = 'translateY(0px)';
+                    setTimeout(() => setSnapping(false), 400);
+                } else {
+                    indicator.style.transform = `translateY(-${INDICATOR_HEIGHT}px)`;
+                    mainContainer.style.transform = 'translateY(0px)';
+                }
+
                 setTimeout(() => {
                     if (!indicator.classList.contains('loading')) {
                         indicatorText.textContent = 'برای بروزرسانی بکشید';
@@ -1966,7 +2041,9 @@
                 triggered = true;
                 indicator.classList.remove('ready');
                 indicator.classList.add('visible', 'loading');
+                setSnapping(true);
                 indicator.style.transform = 'translateY(0px)';
+                mainContainer.style.transform = `translateY(${MAX_PULL}px)`;
                 indicatorText.textContent = 'در حال بروزرسانی...';
 
                 if (WebApp.HapticFeedback) {
@@ -1975,7 +2052,7 @@
 
                 setTimeout(() => {
                     try { window.location.reload(); } catch (_) {}
-                }, 500);
+                }, 900);
             }
 
             document.addEventListener('touchstart', (e) => {
@@ -1992,6 +2069,8 @@
                 currentPull = 0;
                 isPulling = true;
                 isHorizontal = false;
+
+                setSnapping(false);
             }, { passive: true });
 
             document.addEventListener('touchmove', (e) => {
@@ -2013,7 +2092,7 @@
                     }
                 } else if (diffY < 0) {
                     isPulling = false;
-                    resetIndicator();
+                    resetIndicator(true);
                     currentPull = 0;
                 }
             }, { passive: false });
@@ -2025,7 +2104,7 @@
                 if (currentPull >= THRESHOLD) {
                     triggerRefresh();
                 } else {
-                    resetIndicator();
+                    resetIndicator(true);
                 }
 
                 currentPull = 0;
@@ -2037,7 +2116,7 @@
                 isPulling = false;
                 currentPull = 0;
                 isHorizontal = false;
-                resetIndicator();
+                resetIndicator(true);
             }, { passive: true });
         }
 

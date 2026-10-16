@@ -46,7 +46,6 @@
             overflow-x: hidden;
         }
 
-        /* ⭐ Main container قابل حرکت با transform */
         .main-container {
             background: linear-gradient(135deg, rgba(225, 48, 108, 0.08), rgba(131, 58, 180, 0.08));
             border-radius: 24px;
@@ -120,7 +119,6 @@
             transition: transform 0.15s ease, border-color 0.25s ease, box-shadow 0.25s ease;
         }
 
-        /* فلش */
         .pull-refresh-icon {
             width: 20px;
             height: 20px;
@@ -143,62 +141,58 @@
             box-shadow: 0 4px 20px rgba(252, 175, 69, 0.5);
         }
 
-        /* در حالت loading: فلش مخفی، سامسونگ لودر نمایش داده می‌شود */
-        .pull-refresh-container.loading .pull-refresh-icon { display: none; }
+        /* در حالت loading: دکمه‌ی گرد پنهان و اسپینر ساده نمایش داده می‌شود */
         .pull-refresh-container.loading .pull-refresh-inner {
-            border-color: var(--accent);
-            box-shadow: 0 4px 20px rgba(252, 175, 69, 0.5);
+            background: transparent;
+            border: 0;
+            box-shadow: none;
         }
 
-        /* ═══════════════════ SAMSUNG STYLE LOADER ═══════════════════ */
-        .samsung-loader {
-            position: absolute;
-            width: 28px;
-            height: 28px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+        .pull-refresh-container.loading .pull-refresh-icon {
             display: none;
         }
 
-        .pull-refresh-container.loading .samsung-loader { display: block; }
+        /* ═══════════════════ SIMPLE SPINNER (12 خط) ═══════════════════ */
+        .simple-spinner {
+            position: relative;
+            display: none;
+            width: 32px;
+            height: 32px;
+        }
 
-        .sdot {
+        .pull-refresh-container.loading .simple-spinner {
+            display: block;
+        }
+
+        .simple-spinner div {
             position: absolute;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            animation-duration: 1.4s;
-            animation-iteration-count: infinite;
-            animation-timing-function: ease-in-out;
-            will-change: transform, opacity;
+            top: 0;
+            left: 50%;
+            width: 3px;
+            height: 9px;
+            margin-left: -1.5px;
+            background: #b8b8b8;
+            border-radius: 2px;
+            transform-origin: 50% 16px;
+            animation: spinnerFade 1.2s linear infinite;
         }
 
-        .sdot-1 { top: 0; left: 0; background: #4A90E2; animation-name: samsungDot1; }
-        .sdot-2 { top: 0; right: 0; background: #4ECBA8; animation-name: samsungDot2; }
-        .sdot-3 { bottom: 0; left: 0; background: #4ECBA8; animation-name: samsungDot3; }
-        .sdot-4 { bottom: 0; right: 0; background: #4A90E2; animation-name: samsungDot4; }
+        .simple-spinner div:nth-child(1)  { transform: rotate(0deg);   animation-delay: -1.1s; }
+        .simple-spinner div:nth-child(2)  { transform: rotate(30deg);  animation-delay: -1.0s; }
+        .simple-spinner div:nth-child(3)  { transform: rotate(60deg);  animation-delay: -0.9s; }
+        .simple-spinner div:nth-child(4)  { transform: rotate(90deg);  animation-delay: -0.8s; }
+        .simple-spinner div:nth-child(5)  { transform: rotate(120deg); animation-delay: -0.7s; }
+        .simple-spinner div:nth-child(6)  { transform: rotate(150deg); animation-delay: -0.6s; }
+        .simple-spinner div:nth-child(7)  { transform: rotate(180deg); animation-delay: -0.5s; }
+        .simple-spinner div:nth-child(8)  { transform: rotate(210deg); animation-delay: -0.4s; }
+        .simple-spinner div:nth-child(9)  { transform: rotate(240deg); animation-delay: -0.3s; }
+        .simple-spinner div:nth-child(10) { transform: rotate(270deg); animation-delay: -0.2s; }
+        .simple-spinner div:nth-child(11) { transform: rotate(300deg); animation-delay: -0.1s; }
+        .simple-spinner div:nth-child(12) { transform: rotate(330deg); animation-delay:  0s;   }
 
-        /* هر نقطه از گوشه به مرکز می‌رود، سپس برمی‌گردد */
-        @keyframes samsungDot1 {
-            0%, 25% { transform: translate(0, 0) scale(1); opacity: 1; }
-            45%, 65% { transform: translate(9px, 9px) scale(1.05); opacity: 0.75; }
-            85%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
-        }
-        @keyframes samsungDot2 {
-            0%, 25% { transform: translate(0, 0) scale(1); opacity: 1; }
-            45%, 65% { transform: translate(-9px, 9px) scale(1.05); opacity: 0.75; }
-            85%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
-        }
-        @keyframes samsungDot3 {
-            0%, 25% { transform: translate(0, 0) scale(1); opacity: 1; }
-            45%, 65% { transform: translate(9px, -9px) scale(1.05); opacity: 0.75; }
-            85%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
-        }
-        @keyframes samsungDot4 {
-            0%, 25% { transform: translate(0, 0) scale(1); opacity: 1; }
-            45%, 65% { transform: translate(-9px, -9px) scale(1.05); opacity: 0.75; }
-            85%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
+        @keyframes spinnerFade {
+            0%   { opacity: 1; }
+            100% { opacity: 0.15; }
         }
 
         .pull-refresh-text {
@@ -266,7 +260,6 @@
             display: inline-block;
         }
 
-        /* ═══════════════════ DISCOUNT BANNER ═══════════════════ */
         .discount-banner {
             background: linear-gradient(135deg, #C44569 0%, #833AB4 100%);
             padding: 16px;
@@ -316,7 +309,6 @@
             50% { transform: translateY(-6px) scale(1.1); }
         }
 
-        /* ═══════════════════ TABS ═══════════════════ */
         .tabs {
             display: flex;
             gap: 8px;
@@ -356,7 +348,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ═══════════════════ PLANS STACK ═══════════════════ */
         .plans-stack { display: flex; flex-direction: column; gap: 20px; padding: 8px 0; }
 
         .plan-card {
@@ -481,7 +472,6 @@
 
         .feature.discount { color: var(--accent); font-weight: 700; }
 
-        /* ═══════════════════ CTA BUTTON ═══════════════════ */
         .cta-wrapper {
             position: relative;
             width: 100%;
@@ -534,10 +524,7 @@
         .cta-item::-moz-focus-inner { border: 0; padding: 0; }
 
         .cta-normal { display: block; }
-
-        .cta-normal:active {
-            transform: scale(0.97);
-        }
+        .cta-normal:active { transform: scale(0.97); }
 
         .cta-loading {
             display: none;
@@ -549,7 +536,6 @@
         .cta-wrapper.is-loading .cta-normal { display: none; }
         .cta-wrapper.is-loading .cta-loading { display: block; }
 
-        /* ═══════════════════ TRUST ═══════════════════ */
         .trust {
             margin-top: 28px;
             background: linear-gradient(135deg, rgba(225, 48, 108, 0.05), rgba(131, 58, 180, 0.05));
@@ -579,7 +565,6 @@
             flex-shrink: 0;
         }
 
-        /* ═══════════════════ PAYMENT CARDS ═══════════════════ */
         .payment-card {
             background: var(--card);
             border-radius: 16px;
@@ -743,7 +728,6 @@
             background: linear-gradient(90deg, transparent, rgba(128, 128, 144, 0.5), transparent);
         }
 
-        /* ═══════════════════ EXPIRED OVERLAY ═══════════════════ */
         .expired-overlay-container {
             position: absolute;
             top: -8px;
@@ -905,7 +889,6 @@
             50% { transform: translateX(-50%) translateY(-3px); }
         }
 
-        /* ═══════════════════ TOAST ═══════════════════ */
         .toast {
             position: fixed;
             bottom: 80px;
@@ -1152,11 +1135,11 @@
             <svg class="pull-refresh-icon" viewBox="0 0 24 24">
                 <path d="M12 5v14M5 12l7 7 7-7"/>
             </svg>
-            <div class="samsung-loader">
-                <span class="sdot sdot-1"></span>
-                <span class="sdot sdot-2"></span>
-                <span class="sdot sdot-3"></span>
-                <span class="sdot sdot-4"></span>
+            <div class="simple-spinner">
+                <div></div><div></div><div></div>
+                <div></div><div></div><div></div>
+                <div></div><div></div><div></div>
+                <div></div><div></div><div></div>
             </div>
             <div class="pull-refresh-text" id="pullRefreshText">برای بروزرسانی بکشید</div>
         </div>
@@ -1964,7 +1947,7 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           PULL TO REFRESH — با حرکت دادن main-container و لودر سامسونگ
+           PULL TO REFRESH — با اسپینر ساده ۱۲ خطی
            ═══════════════════════════════════════════════════════════ */
         function initPullToRefresh() {
             const THRESHOLD = 90;
@@ -1996,10 +1979,7 @@
             function updateIndicator(pull) {
                 const y = Math.min(MAX_PULL, pull);
 
-                // ⭐ main-container به پایین حرکت می‌کند
                 mainContainer.style.transform = `translateY(${y}px)`;
-
-                // ⭐ نشانگر از بالا به داخل می‌آید
                 indicator.style.transform = `translateY(${y - INDICATOR_HEIGHT}px)`;
 
                 if (pull > 5) {

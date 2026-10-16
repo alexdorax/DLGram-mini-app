@@ -24,6 +24,7 @@
             --muted: #B3B3C2;
             --danger: #F44336;
             --success: #4CAF50;
+            --btn-height: 50px;
         }
 
         * {
@@ -342,40 +343,62 @@
         .feature.discount { color: var(--accent); font-weight: 700; }
 
         /* ═══════════════════════════════════════════════════════════
-           ⭐⭐ دکمه خرید — سایز ۱۰۰٪ ثابت (غیرقابل تغییر)
+           ⭐⭐ راه‌حل قطعی مشکل دکمه — Wrapper با ارتفاع ثابت
            ────────────────────────────────────────────────────────────
-           استراتژی:
-           1) ارتفاع دکمه دقیقاً 50px قفل شده (height + min + max)
-           2) هیچ متن مستقیمی داخل دکمه نیست
-           3) دو span مجزا با position: absolute روی دکمه قرار دارن
-           4) فقط opacity بینشون سوییچ می‌شه — متن DOM اصلاً تغییر نمی‌کنه
-           5) هیچ عملیات DOM textContent انجام نمی‌شه
+           چون دکمه در یک wrapper با ارتفاع دقیقاً قفل‌شده قرار داره
+           و خودش position: absolute داخلش گرفته، از نظر فیزیکی
+           غیرممکنه که wrapper تغییر سایز بده.
            ═══════════════════════════════════════════════════════════ */
-        .cta {
+        .cta-wrapper {
             position: relative;
-            display: block;
             width: 100%;
-            height: 50px;
-            min-height: 50px;
-            max-height: 50px;
+            height: var(--btn-height);
+            min-height: var(--btn-height);
+            max-height: var(--btn-height);
+            flex: 0 0 var(--btn-height);
+            flex-shrink: 0;
+            flex-grow: 0;
+            margin-top: auto;
+            border-radius: 14px;
+            overflow: hidden;
+            /* ⭐ جلوگیری از هرگونه reflow در parent */
+            contain: layout style paint;
+            isolation: isolate;
+        }
+
+        .cta {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
             padding: 0;
-            border: none;
+            border: 0;
+            outline: 0;
             border-radius: 14px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             box-shadow: 0 4px 16px rgba(225, 48, 108, 0.35);
             cursor: pointer;
             font-family: inherit;
             overflow: hidden;
-            margin-top: auto;
-            flex-shrink: 0;
-            flex-grow: 0;
             transition: transform 0.15s ease, box-shadow 0.3s ease, opacity 0.2s;
-            box-sizing: border-box;
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            text-rendering: optimizeLegibility;
+            -webkit-tap-highlight-color: transparent;
+            /* ⭐ صفر کردن فونت/متن که هیچ چیز نشت نکنه */
+            font-size: 0;
+            line-height: 0;
+            color: transparent;
+            text-indent: -9999px;
+            box-sizing: border-box;
+            margin: 0;
+            display: block;
         }
+
+        .cta::-moz-focus-inner { border: 0; padding: 0; }
 
         .cta::before {
             content: '';
@@ -389,10 +412,7 @@
             pointer-events: none;
         }
 
-        .cta:active {
-            transform: scale(0.97);
-            box-shadow: 0 2px 10px rgba(225, 48, 108, 0.25);
-        }
+        .cta:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(225, 48, 108, 0.25); }
 
         .cta:disabled,
         .cta.loading {
@@ -401,7 +421,7 @@
             transform: none;
         }
 
-        /* هر دو span از جریان layout خارج هستن */
+        /* هر دو span خارج از جریان layout */
         .cta-text {
             position: absolute;
             top: 0;
@@ -424,13 +444,12 @@
             transition: opacity 0.18s ease;
             box-sizing: border-box;
             margin: 0;
+            text-indent: 0;
         }
 
-        /* حالت عادی: span معمولی نمایان، span لودینگ مخفی */
         .cta-text-normal { opacity: 1; }
         .cta-text-loading { opacity: 0; }
 
-        /* حالت loading: برعکس */
         .cta.loading .cta-text-normal { opacity: 0; }
         .cta.loading .cta-text-loading { opacity: 1; }
 
@@ -534,10 +553,11 @@
             100% { transform: translateX(-100%); }
         }
 
-        .payment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .payment-plan { font-size: 16px; font-weight: 700; color: var(--text); }
+        .payment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; }
+        .payment-plan { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.4; }
+        .payment-plan .plan-days { color: var(--accent); font-weight: 800; font-size: 13px; opacity: 0.95; }
 
-        .payment-status { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .payment-status { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; flex-shrink: 0; white-space: nowrap; }
         .status-used { background: rgba(76, 175, 80, 0.2); color: #81c784; }
         .status-unused { background: rgba(252, 175, 69, 0.2); color: var(--accent); }
 
@@ -1089,6 +1109,9 @@
         WebApp.ready();
         WebApp.expand();
 
+        // ⭐ زمان شروع برای محاسبه حداقل زمان لودینگ
+        const APP_START_TIME = Date.now();
+
         document.addEventListener('contextmenu', (e) => e.preventDefault());
         document.addEventListener('keydown', (e) => {
             if (e.key === 'F12') { e.preventDefault(); return false; }
@@ -1137,6 +1160,8 @@
         const FIRST_PURCHASE_DISCOUNT = 10;
 
         const PLAN_DURATIONS = { bronze: 30, silver: 90, gold: 365 };
+        const PLAN_SHORT_NAMES = { bronze: 'برنزی', silver: 'نقره‌ای', gold: 'طلایی' };
+        const PLAN_EMOJIS = { bronze: '🥉', silver: '🥈', gold: '🥇' };
 
         const plans = {
             bronze: {
@@ -1341,7 +1366,7 @@
                        <div class="plan-price">${persianFinal} <span class="unit">تومان</span></div>`
                     : `<div class="plan-price">${persianFinal} <span class="unit">تومان</span></div>`;
 
-                // ⭐⭐ دکمه با دو span مطلق — فقط با opacity سوییچ می‌شن
+                // ⭐⭐⭐ دکمه در Wrapper با ارتفاع قفل‌شده — غیرقابل تغییر سایز
                 cardsHtml += `
                     <div class="plan-card ${highlightClass}">
                         ${popularBadge}
@@ -1360,10 +1385,12 @@
                                 return `<div class="feature ${discountClass}">${text}</div>`;
                             }).join('')}
                         </div>
-                        <button class="cta" onclick="buyPlan('${key}', this)" data-plan="${key}" type="button" aria-label="خرید اشتراک">
-                            <span class="cta-text cta-text-normal">🚀 خرید اشتراک</span>
-                            <span class="cta-text cta-text-loading">⏳ در حال آماده‌سازی...</span>
-                        </button>
+                        <div class="cta-wrapper">
+                            <button class="cta" onclick="buyPlan('${key}', this)" data-plan="${key}" type="button" aria-label="خرید اشتراک">
+                                <span class="cta-text cta-text-normal">🚀 خرید اشتراک</span>
+                                <span class="cta-text cta-text-loading">⏳ در حال آماده‌سازی...</span>
+                            </button>
+                        </div>
                     </div>
                 `;
             }
@@ -1409,21 +1436,22 @@
         }
 
         /* ═══════════════════════════════════════════════════════════
-           BUY PLAN — فقط کلاس loading اضافه/حذف می‌شود
-           هیچ متنی در DOM عوض نمی‌شود
+           BUY PLAN — فقط class عوض می‌شود. هیچ چیز روی DOM دست نمی‌خورد
            ═══════════════════════════════════════════════════════════ */
         async function buyPlan(planKey, btnEl) {
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('medium');
 
             if (btnEl) {
-                btnEl.disabled = true;
                 btnEl.classList.add('loading');
+                // ⭐ disabled را ست نمی‌کنیم تا مرورگر style disabled اعمال نکنه
+                // فقط جلوی کلیک مجدد را با pointer-events می‌گیریم که در CSS loading هست
+                btnEl.style.pointerEvents = 'none';
             }
 
             function restoreBtn() {
                 if (btnEl) {
-                    btnEl.disabled = false;
                     btnEl.classList.remove('loading');
+                    btnEl.style.pointerEvents = '';
                 }
             }
 
@@ -1476,6 +1504,7 @@
             setTimeout(() => { switchTab('payments'); }, 2500);
         }
 
+        /* ═══════════════════ PAYMENTS ═══════════════════ */
         function getPaymentOrder(payment) {
             if (!payment.used) return 2;
             const isExpired = payment.expires_at_iso && isPaymentExpired(payment.expires_at_iso);
@@ -1490,6 +1519,17 @@
                 case 3: return { label: 'منقضی شده', cls: 'expired-label' };
                 default: return { label: '', cls: '' };
             }
+        }
+
+        /* ⭐ نام پلن به‌همراه تعداد روز — مثلاً «🥇 طلایی (365 روز)» */
+        function getPlanDisplayName(planKey) {
+            const planInfo = plans[planKey];
+            const days = PLAN_DURATIONS[planKey];
+            const name = planInfo?.name || planKey;
+            if (days) {
+                return `${name} <span class="plan-days">(${toPersianNumbers(days)} روز)</span>`;
+            }
+            return name;
         }
 
         async function loadPayments() {
@@ -1536,7 +1576,7 @@
                         lastOrder = order;
                     }
 
-                    const plan = plans[payment.plan] || { name: payment.plan };
+                    const planDisplayName = getPlanDisplayName(payment.plan);
                     const status = payment.used ? 'استفاده شده' : 'استفاده نشده';
                     const statusClass = payment.used ? 'status-used' : 'status-unused';
                     const persianAmount = toPersianNumbers((payment.amount / 10).toLocaleString('en-US'));
@@ -1579,11 +1619,12 @@
                         `;
                     }
 
+                    // ⭐ نام پلن حالا با تعداد روز نمایش داده می‌شود
                     html += `
                         <div class="payment-card ${isExpired ? 'expired' : ''}" id="${cardId}">
                             ${progressHtml}
                             <div class="payment-header">
-                                <div class="payment-plan">${plan.name || payment.plan}</div>
+                                <div class="payment-plan">${planDisplayName}</div>
                                 <div class="payment-status ${statusClass}">${status}</div>
                             </div>
                             <div class="payment-details">
@@ -1705,12 +1746,24 @@
             }
         });
 
+        /* ⭐⭐⭐ لودینگ با حداقل زمان نمایش ۱.۵ ثانیه */
+        const MIN_LOADER_DURATION_MS = 1500;
+        let loaderHidden = false;
+
         function hideInitialLoader() {
-            const loader = document.getElementById('initialLoader');
-            if (loader) {
-                loader.classList.add('hidden');
-                setTimeout(() => { loader.style.display = 'none'; }, 500);
-            }
+            if (loaderHidden) return;
+            loaderHidden = true;
+
+            const elapsed = Date.now() - APP_START_TIME;
+            const remaining = Math.max(0, MIN_LOADER_DURATION_MS - elapsed);
+
+            setTimeout(() => {
+                const loader = document.getElementById('initialLoader');
+                if (loader) {
+                    loader.classList.add('hidden');
+                    setTimeout(() => { loader.style.display = 'none'; }, 600);
+                }
+            }, remaining);
         }
 
         function scrollToTop() {

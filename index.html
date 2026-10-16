@@ -144,7 +144,6 @@
             box-shadow: 0 4px 20px rgba(252, 175, 69, 0.5);
         }
 
-        /* در حالت loading: دکمه‌ی گرد پنهان و اسپینر ساده نمایش داده می‌شود */
         .pull-refresh-container.loading .pull-refresh-inner {
             background: transparent;
             border: 0;
@@ -1129,7 +1128,6 @@
 </head>
 
 <body>
-    <!-- ═══════════════════ PULL TO REFRESH ═══════════════════ -->
     <div class="pull-refresh-container" id="pullRefresh">
         <div class="pull-refresh-inner">
             <svg class="pull-refresh-icon" viewBox="0 0 24 24">
@@ -1278,6 +1276,7 @@
         const FIRST_PURCHASE_DISCOUNT = 10;
 
         const PLAN_DURATIONS = { bronze: 30, silver: 90, gold: 365 };
+        const PLAN_NAME_MAP = { bronze: 'برنزی', silver: 'نقره‌ای', gold: 'طلایی' };
 
         const plans = {
             bronze: {
@@ -1332,20 +1331,29 @@
             return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="#ff5252" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13.5" stroke="#ff5252" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1.1" fill="#ff5252"/></svg>`;
         }
 
+        function isPlanInDiscount(planKey) {
+            if (!activeDiscount) return false;
+            if (!Array.isArray(activeDiscount.plans)) return true;
+            if (activeDiscount.plans.length === 0) return true;
+            return activeDiscount.plans.includes(planKey);
+        }
+
         function computeFinalPrice(basePriceStr, planKey) {
             const basePrice = parseInt(String(basePriceStr).replace(/,/g, ''), 10) || 0;
             let totalPercent = 0;
 
             if (activeDiscount && activeDiscount.percent > 0) {
                 const expired = activeDiscount.expires_at && new Date(activeDiscount.expires_at) <= new Date();
-                if (!expired) totalPercent += activeDiscount.percent;
+                if (!expired && isPlanInDiscount(planKey)) {
+                    totalPercent += activeDiscount.percent;
+                }
             }
 
             if (isFirstPurchase && FIRST_PURCHASE_DISCOUNT > 0) {
                 totalPercent += FIRST_PURCHASE_DISCOUNT;
             }
 
-            totalPercent = Math.min(totalPercent, 60);
+            totalPercent = Math.min(totalPercent, 100);
             const final = Math.round(basePrice * (1 - totalPercent / 100));
             return { basePrice, finalPrice: final, totalPercent };
         }
@@ -1408,14 +1416,22 @@
             const globalActive = activeDiscount && activeDiscount.percent > 0 &&
                                 (!activeDiscount.expires_at || new Date(activeDiscount.expires_at) > new Date());
 
+            const selectedPlans = (activeDiscount && Array.isArray(activeDiscount.plans) && activeDiscount.plans.length > 0 && activeDiscount.plans.length < 3)
+                ? activeDiscount.plans.map(p => PLAN_NAME_MAP[p] || p).join(' و ')
+                : null;
+
             if (globalActive && isFirstPurchase) {
                 showBanner = true;
                 title = '🎉 جشنواره تخفیف!';
-                subtitle = `${activeDiscount.label || ''} + ${toPersianNumbers(FIRST_PURCHASE_DISCOUNT)}٪ تخفیف اولین خرید`;
+                subtitle = selectedPlans
+                    ? `${activeDiscount.label || ''} روی پلن ${selectedPlans} + ${toPersianNumbers(FIRST_PURCHASE_DISCOUNT)}٪ تخفیف اولین خرید`
+                    : `${activeDiscount.label || ''} + ${toPersianNumbers(FIRST_PURCHASE_DISCOUNT)}٪ تخفیف اولین خرید`;
             } else if (globalActive) {
                 showBanner = true;
                 title = activeDiscount.label || '🎉 تخفیف ویژه!';
-                subtitle = `${toPersianNumbers(activeDiscount.percent)}٪ تخفیف روی تمام پلن‌ها`;
+                subtitle = selectedPlans
+                    ? `${toPersianNumbers(activeDiscount.percent)}٪ تخفیف روی پلن ${selectedPlans}`
+                    : `${toPersianNumbers(activeDiscount.percent)}٪ تخفیف روی تمام پلن‌ها`;
             } else if (isFirstPurchase) {
                 showBanner = true;
                 title = 'تخفیف ویژه!';
@@ -1946,16 +1962,11 @@
             container.addEventListener('touchcancel', () => { tracking = false; isHorizontal = null; }, { passive: true });
         }
 
-        /* ═══════════════════════════════════════════════════════════
-           PULL TO REFRESH — با رفع دو مشکل:
-           1) حذف فاصله بین نشانگر و کارت در حالت loading
-           2) لغو صحیح وقتی کاربر منصرف می‌شود
-           ═══════════════════════════════════════════════════════════ */
         function initPullToRefresh() {
             const THRESHOLD = 90;
             const MAX_PULL = 130;
             const RESISTANCE = 0.5;
-            const INDICATOR_HEIGHT = 90; // ⭐ هم‌اندازه با CSS container
+            const INDICATOR_HEIGHT = 90;
 
             const indicator = document.getElementById('pullRefresh');
             const indicatorText = document.getElementById('pullRefreshText');
@@ -1981,7 +1992,6 @@
             function updateIndicator(pull) {
                 const y = Math.min(MAX_PULL, pull);
 
-                // ⭐ کارت به پایین و نشانگر دقیقاً چسبیده به بالای کارت
                 mainContainer.style.transform = `translateY(${y}px)`;
                 indicator.style.transform = `translateY(${y - INDICATOR_HEIGHT}px)`;
 
@@ -2022,8 +2032,6 @@
                 indicator.classList.add('visible', 'loading');
                 setSnapping(true);
 
-                // ⭐⭐⭐ حذف فاصله: کارت دقیقاً به اندازه‌ی ارتفاع نشانگر پایین می‌رود
-                //     و نشانگر در بالای صفحه قرار می‌گیرد → صفر فاصله
                 indicator.style.transform = `translateY(0px)`;
                 mainContainer.style.transform = `translateY(${INDICATOR_HEIGHT}px)`;
 
@@ -2064,7 +2072,6 @@
                 const diffY = currentY - startY;
 
                 if (diffY > 0 && window.scrollY <= 0) {
-                    // ⭐⭐⭐ به‌جای early return، همیشه currentPull را دقیق آپدیت کن
                     if (isHorizontal) return;
                     currentPull = diffY * RESISTANCE;
                     updateIndicator(currentPull);
@@ -2073,7 +2080,6 @@
                         e.preventDefault();
                     }
                 } else if (diffY <= 0) {
-                    // ⭐⭐⭐ کاربر انگشت را به سمت بالا (یا مبدأ) برد → لغو کامل
                     if (!isPulling) return;
                     isPulling = false;
                     currentPull = 0;
@@ -2087,7 +2093,6 @@
                 if (!isPulling || triggered) return;
                 isPulling = false;
 
-                // ⭐⭐⭐ شرط دوگانه: هم currentPull کافی باشد هم indicator در حالت ready باشد
                 const genuinelyReady =
                     currentPull >= THRESHOLD &&
                     indicator.classList.contains('ready') &&

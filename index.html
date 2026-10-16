@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
 
     <style>
+        /* ═══════════════════ RESET & VARIABLES ═══════════════════ */
         :root {
             --bg: #0F0F13;
             --card: #1A1A22;
@@ -46,6 +47,84 @@
             overflow-x: hidden;
         }
 
+        /* ═══════════════════ PULL TO REFRESH ═══════════════════ */
+        .pull-refresh-container {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            pointer-events: none;
+            z-index: 500;
+            opacity: 0;
+            transform: translateY(-90px);
+            will-change: transform, opacity;
+        }
+        .pull-refresh-container.visible { opacity: 1; }
+        .pull-refresh-container.snapping { transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.2s ease; }
+
+        .pull-refresh-inner {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--card);
+            border: 2px solid rgba(225, 48, 108, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(225, 48, 108, 0.35);
+            flex-shrink: 0;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+        }
+        .pull-refresh-icon {
+            width: 20px;
+            height: 20px;
+            stroke: var(--primary);
+            stroke-width: 2.5;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: transform 0.25s ease, stroke 0.25s ease;
+            transform: rotate(0deg);
+        }
+        .pull-refresh-container.ready .pull-refresh-icon { transform: rotate(180deg); stroke: var(--accent); }
+        .pull-refresh-container.ready .pull-refresh-inner { border-color: var(--accent); box-shadow: 0 4px 20px rgba(252, 175, 69, 0.5); }
+        .pull-refresh-container.loading .pull-refresh-inner { background: transparent; border: 0; box-shadow: none; }
+        .pull-refresh-container.loading .pull-refresh-icon { display: none; }
+
+        .simple-spinner { position: absolute; top: 50%; left: 50%; width: 32px; height: 32px; margin-top: -16px; margin-left: -16px; display: none; }
+        .pull-refresh-container.loading .simple-spinner { display: block; }
+        .simple-spinner div {
+            position: absolute; top: 0; left: 50%;
+            width: 3px; height: 9px; margin-left: -1.5px;
+            background: #b8b8b8; border-radius: 2px;
+            transform-origin: 50% 16px;
+            animation: spinnerFade 1.2s linear infinite;
+        }
+        .simple-spinner div:nth-child(1)  { transform: rotate(0deg);   animation-delay: -1.1s; }
+        .simple-spinner div:nth-child(2)  { transform: rotate(30deg);  animation-delay: -1.0s; }
+        .simple-spinner div:nth-child(3)  { transform: rotate(60deg);  animation-delay: -0.9s; }
+        .simple-spinner div:nth-child(4)  { transform: rotate(90deg);  animation-delay: -0.8s; }
+        .simple-spinner div:nth-child(5)  { transform: rotate(120deg); animation-delay: -0.7s; }
+        .simple-spinner div:nth-child(6)  { transform: rotate(150deg); animation-delay: -0.6s; }
+        .simple-spinner div:nth-child(7)  { transform: rotate(180deg); animation-delay: -0.5s; }
+        .simple-spinner div:nth-child(8)  { transform: rotate(210deg); animation-delay: -0.4s; }
+        .simple-spinner div:nth-child(9)  { transform: rotate(240deg); animation-delay: -0.3s; }
+        .simple-spinner div:nth-child(10) { transform: rotate(270deg); animation-delay: -0.2s; }
+        .simple-spinner div:nth-child(11) { transform: rotate(300deg); animation-delay: -0.1s; }
+        .simple-spinner div:nth-child(12) { transform: rotate(330deg); animation-delay:  0s;   }
+
+        @keyframes spinnerFade { 0% { opacity: 1; } 100% { opacity: 0.15; } }
+
+        .pull-refresh-text { font-size: 11px; font-weight: 700; color: var(--muted); white-space: nowrap; transition: color 0.2s ease; line-height: 1; }
+        .pull-refresh-container.ready .pull-refresh-text { color: var(--accent); }
+        .pull-refresh-container.loading .pull-refresh-text { color: var(--accent); }
+
+        /* ═══════════════════ MAIN CONTAINER ═══════════════════ */
         .main-container {
             background: linear-gradient(135deg, rgba(225, 48, 108, 0.08), rgba(131, 58, 180, 0.08));
             border-radius: 24px;
@@ -57,11 +136,7 @@
             margin-bottom: 16px;
             will-change: transform;
         }
-
-        .main-container.snapping {
-            transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
+        .main-container.snapping { transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         .main-container::before {
             content: '';
             position: absolute;
@@ -82,140 +157,10 @@
             opacity: 0.05;
             pointer-events: none;
         }
-
         .main-container > * { position: relative; z-index: 1; }
-
-        /* ═══════════════════ PULL TO REFRESH ═══════════════════ */
-        .pull-refresh-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 90px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            pointer-events: none;
-            z-index: 500;
-            opacity: 0;
-            transform: translateY(-90px);
-            will-change: transform, opacity;
-        }
-
-        .pull-refresh-container.visible { opacity: 1; }
-        .pull-refresh-container.snapping { transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.2s ease; }
-
-        .pull-refresh-inner {
-            position: relative;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: var(--card);
-            border: 2px solid rgba(225, 48, 108, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 16px rgba(225, 48, 108, 0.35);
-            flex-shrink: 0;
-            transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-        }
-
-        .pull-refresh-icon {
-            width: 20px;
-            height: 20px;
-            stroke: var(--primary);
-            stroke-width: 2.5;
-            fill: none;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            transition: transform 0.25s ease, stroke 0.25s ease;
-            transform: rotate(0deg);
-        }
-
-        .pull-refresh-container.ready .pull-refresh-icon {
-            transform: rotate(180deg);
-            stroke: var(--accent);
-        }
-
-        .pull-refresh-container.ready .pull-refresh-inner {
-            border-color: var(--accent);
-            box-shadow: 0 4px 20px rgba(252, 175, 69, 0.5);
-        }
-
-        .pull-refresh-container.loading .pull-refresh-inner {
-            background: transparent;
-            border: 0;
-            box-shadow: none;
-        }
-
-        .pull-refresh-container.loading .pull-refresh-icon {
-            display: none;
-        }
-
-        /* ═══════════════════ SIMPLE SPINNER (12 خط) ═══════════════════ */
-        .simple-spinner {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 32px;
-            height: 32px;
-            margin-top: -16px;
-            margin-left: -16px;
-            display: none;
-        }
-
-        .pull-refresh-container.loading .simple-spinner {
-            display: block;
-        }
-
-        .simple-spinner div {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            width: 3px;
-            height: 9px;
-            margin-left: -1.5px;
-            background: #b8b8b8;
-            border-radius: 2px;
-            transform-origin: 50% 16px;
-            animation: spinnerFade 1.2s linear infinite;
-        }
-
-        .simple-spinner div:nth-child(1)  { transform: rotate(0deg);   animation-delay: -1.1s; }
-        .simple-spinner div:nth-child(2)  { transform: rotate(30deg);  animation-delay: -1.0s; }
-        .simple-spinner div:nth-child(3)  { transform: rotate(60deg);  animation-delay: -0.9s; }
-        .simple-spinner div:nth-child(4)  { transform: rotate(90deg);  animation-delay: -0.8s; }
-        .simple-spinner div:nth-child(5)  { transform: rotate(120deg); animation-delay: -0.7s; }
-        .simple-spinner div:nth-child(6)  { transform: rotate(150deg); animation-delay: -0.6s; }
-        .simple-spinner div:nth-child(7)  { transform: rotate(180deg); animation-delay: -0.5s; }
-        .simple-spinner div:nth-child(8)  { transform: rotate(210deg); animation-delay: -0.4s; }
-        .simple-spinner div:nth-child(9)  { transform: rotate(240deg); animation-delay: -0.3s; }
-        .simple-spinner div:nth-child(10) { transform: rotate(270deg); animation-delay: -0.2s; }
-        .simple-spinner div:nth-child(11) { transform: rotate(300deg); animation-delay: -0.1s; }
-        .simple-spinner div:nth-child(12) { transform: rotate(330deg); animation-delay:  0s;   }
-
-        @keyframes spinnerFade {
-            0%   { opacity: 1; }
-            100% { opacity: 0.15; }
-        }
-
-        .pull-refresh-text {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--muted);
-            white-space: nowrap;
-            transition: color 0.2s ease;
-            line-height: 1;
-        }
-
-        .pull-refresh-container.ready .pull-refresh-text { color: var(--accent); }
-        .pull-refresh-container.loading .pull-refresh-text { color: var(--accent); }
 
         /* ═══════════════════ HEADER ═══════════════════ */
         .header { text-align: center; margin-bottom: 20px; position: relative; }
-
         .header h1 {
             position: relative;
             z-index: 1;
@@ -231,21 +176,11 @@
             animation: titleGlow 2s infinite;
             will-change: filter;
         }
-
         @keyframes titleGlow {
             0%, 100% { filter: brightness(1) drop-shadow(0 2px 6px rgba(225, 48, 108, 0.35)); }
             50% { filter: brightness(1.28) drop-shadow(0 4px 18px rgba(225, 48, 108, 0.85)); }
         }
-
-        .header p {
-            position: relative;
-            z-index: 1;
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.75);
-            line-height: 1.5;
-            font-weight: 500;
-        }
-
+        .header p { position: relative; z-index: 1; font-size: 13px; color: rgba(255, 255, 255, 0.75); line-height: 1.5; font-weight: 500; }
         .refund {
             position: relative;
             z-index: 1;
@@ -260,6 +195,7 @@
             display: inline-block;
         }
 
+        /* ═══════════════════ DISCOUNT BANNER ═══════════════════ */
         .discount-banner {
             background: linear-gradient(135deg, #C44569 0%, #833AB4 100%);
             padding: 16px;
@@ -270,7 +206,6 @@
             overflow: hidden;
             box-shadow: 0 8px 24px rgba(131, 58, 180, 0.25);
         }
-
         .discount-banner::before {
             content: '';
             position: absolute;
@@ -279,12 +214,10 @@
             background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
             animation: shine 3s ease-in-out infinite;
         }
-
         @keyframes shine {
             0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
             100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
-
         .discount-banner-content { position: relative; z-index: 1; }
         .discount-title { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 6px; letter-spacing: -0.5px; }
         .discount-subtitle { font-size: 13px; color: #fff; font-weight: 500; line-height: 1.7; padding: 0 4px; }
@@ -303,12 +236,12 @@
             border: 1px solid rgba(255, 215, 0, 0.35);
             font-variant-numeric: tabular-nums;
         }
-
         @keyframes floatGift {
             0%, 100% { transform: translateY(0) scale(1); }
             50% { transform: translateY(-6px) scale(1.1); }
         }
 
+        /* ═══════════════════ TABS ═══════════════════ */
         .tabs {
             display: flex;
             gap: 8px;
@@ -317,7 +250,6 @@
             border-radius: 14px;
             margin-bottom: 24px;
         }
-
         .tab {
             flex: 1;
             border: none;
@@ -332,7 +264,6 @@
             border: 2px solid transparent;
             font-family: inherit;
         }
-
         .tab.active {
             color: var(--text);
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
@@ -340,16 +271,13 @@
                         linear-gradient(135deg, var(--primary), var(--secondary)) border-box;
         }
 
+        /* ═══════════════════ CONTENT ═══════════════════ */
         .content { display: none; }
         .content.active { display: block; animation: fadeIn 0.35s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
+        /* ═══════════════════ PLANS ═══════════════════ */
         .plans-stack { display: flex; flex-direction: column; gap: 20px; padding: 8px 0; }
-
         .plan-card {
             background: var(--card);
             border-radius: 20px;
@@ -364,23 +292,16 @@
             flex-direction: column;
             animation: cardIn 0.5s ease-out backwards;
         }
-
         .plan-card:nth-child(1) { animation-delay: 0.05s; }
         .plan-card:nth-child(2) { animation-delay: 0.15s; }
         .plan-card:nth-child(3) { animation-delay: 0.25s; }
-
-        @keyframes cardIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
+        @keyframes cardIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .plan-card.highlight {
             border: 2px solid transparent;
             background: linear-gradient(var(--card), var(--card)) padding-box,
                         linear-gradient(135deg, var(--primary), var(--secondary)) border-box;
             box-shadow: 0 10px 32px rgba(225, 48, 108, 0.25), 0 4px 16px rgba(0, 0, 0, 0.3);
         }
-
         .plan-card:active { transform: scale(0.985); box-shadow: 0 6px 20px rgba(225, 48, 108, 0.2); }
 
         .badge {
@@ -397,35 +318,20 @@
             border: 1.5px solid rgba(255, 255, 255, 0.15);
             white-space: nowrap;
         }
-
-        .badge.popular {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            animation: badgePulse 2s infinite;
-        }
-
+        .badge.popular { background: linear-gradient(135deg, var(--primary), var(--secondary)); animation: badgePulse 2s infinite; }
         .badge.discount-badge {
             background: linear-gradient(135deg, #C44569, #833AB4);
             right: unset;
             left: 18px;
         }
-
         @keyframes badgePulse {
             0%, 100% { box-shadow: 0 4px 12px rgba(225, 48, 108, 0.5); }
             50% { box-shadow: 0 4px 20px rgba(225, 48, 108, 0.9), 0 0 24px rgba(225, 48, 108, 0.4); }
         }
 
-        .plan-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 16px;
-            padding-top: 6px;
-        }
-
+        .plan-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 16px; padding-top: 6px; }
         .plan-title-group { display: flex; flex-direction: column; gap: 6px; }
         .plan-name { font-size: 20px; font-weight: 900; color: var(--text); letter-spacing: -0.3px; }
-
         .plan-duration {
             display: inline-flex;
             align-items: center;
@@ -438,14 +344,12 @@
             border-radius: 8px;
             width: fit-content;
         }
-
         .plan-price-group { text-align: left; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
         .original-price { text-decoration: line-through; color: #808090; font-size: 14px; font-weight: 600; }
         .plan-price { font-size: 22px; font-weight: 900; color: var(--accent); line-height: 1; white-space: nowrap; }
         .plan-price .unit { font-size: 13px; font-weight: 700; color: var(--accent); opacity: 0.9; }
 
         .features { display: grid; gap: 10px; margin-bottom: 18px; flex: 1; }
-
         .feature {
             display: flex;
             align-items: center;
@@ -454,7 +358,6 @@
             color: rgba(255, 255, 255, 0.85);
             line-height: 1.5;
         }
-
         .feature::before {
             content: '✓';
             flex-shrink: 0;
@@ -469,9 +372,9 @@
             font-weight: bold;
             font-size: 11px;
         }
-
         .feature.discount { color: var(--accent); font-weight: 700; }
 
+        /* ═══════════════════ CTA BUTTON ═══════════════════ */
         .cta-wrapper {
             position: relative;
             width: 100%;
@@ -485,13 +388,9 @@
             overflow: hidden;
             border-radius: 14px;
         }
-
         .cta-item {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             width: 100%;
             height: 100%;
             padding: 0 15px;
@@ -519,22 +418,19 @@
             transition: transform 0.15s ease;
             display: block;
         }
-
         .cta-item::-moz-focus-inner { border: 0; padding: 0; }
-
         .cta-normal { display: block; }
         .cta-normal:active { transform: scale(0.97); }
-
         .cta-loading {
             display: none;
             cursor: wait;
             opacity: 0.9;
             background: linear-gradient(135deg, #b5255a, #6b2e94);
         }
-
         .cta-wrapper.is-loading .cta-normal { display: none; }
         .cta-wrapper.is-loading .cta-loading { display: block; }
 
+        /* ═══════════════════ TRUST ═══════════════════ */
         .trust {
             margin-top: 28px;
             background: linear-gradient(135deg, rgba(225, 48, 108, 0.05), rgba(131, 58, 180, 0.05));
@@ -546,9 +442,7 @@
             font-size: 13px;
             color: var(--text);
         }
-
         .trust div { display: flex; align-items: center; gap: 10px; }
-
         .trust div::before {
             content: '✓';
             color: var(--accent);
@@ -564,6 +458,7 @@
             flex-shrink: 0;
         }
 
+        /* ═══════════════════ PAYMENT CARDS ═══════════════════ */
         .payment-card {
             background: var(--card);
             border-radius: 16px;
@@ -574,7 +469,6 @@
             position: relative;
             overflow: visible;
         }
-
         .subscription-progress {
             position: absolute;
             top: -8px;
@@ -589,22 +483,18 @@
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
         }
-
         .progress-fill {
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
             height: 100%;
             border-radius: 11px;
             transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
         }
-
         .progress-fill.success { background: linear-gradient(135deg, rgba(76, 175, 80, 0.95), rgba(56, 142, 60, 0.95)); }
         .progress-fill.warning { background: linear-gradient(135deg, rgba(255, 193, 7, 0.95), rgba(255, 152, 0, 0.95)); }
         .progress-fill.danger  { background: linear-gradient(135deg, rgba(244, 67, 54, 0.95), rgba(211, 47, 47, 0.95)); }
         .progress-fill.expired { background: linear-gradient(135deg, rgba(97, 97, 97, 0.95), rgba(66, 66, 66, 0.95)); }
-
         .progress-text {
             position: absolute;
             inset: 0;
@@ -619,7 +509,6 @@
             z-index: 2;
             pointer-events: none;
         }
-
         .progress-fill::after {
             content: '';
             position: absolute;
@@ -627,52 +516,16 @@
             background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
             animation: shimmerProgress 2s infinite;
         }
+        @keyframes shimmerProgress { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        @keyframes shimmerProgress {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-
-        .payment-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            gap: 8px;
-        }
-
-        .payment-plan {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text);
-            line-height: 1.4;
-            flex: 1;
-            min-width: 0;
-        }
-
-        .payment-plan .plan-days {
-            color: var(--accent);
-            font-weight: 600;
-            font-size: 11px;
-            opacity: 0.95;
-            margin-right: 4px;
-            display: inline-block;
-            vertical-align: baseline;
-            line-height: 1;
-        }
-
+        .payment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; }
+        .payment-plan { font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.4; flex: 1; min-width: 0; }
+        .payment-plan .plan-days { color: var(--accent); font-weight: 600; font-size: 11px; opacity: 0.95; margin-right: 4px; display: inline-block; vertical-align: baseline; line-height: 1; }
         .payment-status { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; flex-shrink: 0; white-space: nowrap; }
         .status-used { background: rgba(76, 175, 80, 0.2); color: #81c784; }
         .status-unused { background: rgba(252, 175, 69, 0.2); color: var(--accent); }
 
-        .payment-details {
-            display: grid;
-            gap: 8px;
-            font-size: 13px;
-            color: var(--muted);
-            margin-bottom: 12px;
-        }
-
+        .payment-details { display: grid; gap: 8px; font-size: 13px; color: var(--muted); margin-bottom: 12px; }
         .payment-details .payment-row span:last-child { font-size: 15px; font-weight: 600; }
         .payment-row { display: flex; justify-content: space-between; }
         .payment-row.expired-date { color: var(--primary); }
@@ -690,10 +543,8 @@
             border: 2px solid transparent;
             user-select: none;
         }
-
         .payment-code:hover { border-color: var(--primary); background: rgba(225, 48, 108, 0.1); }
         .payment-code:active { transform: scale(0.98); }
-
         .copy-hint { text-align: center; font-size: 11px; color: var(--primary); margin-top: 8px; opacity: 0.8; }
 
         .payment-group-label {
@@ -706,46 +557,27 @@
             font-weight: 700;
             letter-spacing: 0.4px;
         }
-
         .payment-group-label:first-child { margin-top: 4px; }
-
         .payment-group-label .gl-line { flex: 1; height: 1px; max-width: 80px; }
         .payment-group-label .gl-text { flex-shrink: 0; padding: 0 4px; }
-
         .payment-group-label.active-label .gl-text { color: #81c784; }
-        .payment-group-label.active-label .gl-line {
-            background: linear-gradient(90deg, transparent, rgba(129, 199, 132, 0.5), transparent);
-        }
-
+        .payment-group-label.active-label .gl-line { background: linear-gradient(90deg, transparent, rgba(129, 199, 132, 0.5), transparent); }
         .payment-group-label.unused-label .gl-text { color: var(--accent); }
-        .payment-group-label.unused-label .gl-line {
-            background: linear-gradient(90deg, transparent, rgba(252, 175, 69, 0.5), transparent);
-        }
-
+        .payment-group-label.unused-label .gl-line { background: linear-gradient(90deg, transparent, rgba(252, 175, 69, 0.5), transparent); }
         .payment-group-label.expired-label .gl-text { color: #808090; }
-        .payment-group-label.expired-label .gl-line {
-            background: linear-gradient(90deg, transparent, rgba(128, 128, 144, 0.5), transparent);
-        }
+        .payment-group-label.expired-label .gl-line { background: linear-gradient(90deg, transparent, rgba(128, 128, 144, 0.5), transparent); }
 
+        /* ═══════════════════ EXPIRED OVERLAY ═══════════════════ */
         .expired-overlay-container {
             position: absolute;
-            top: -8px;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: -8px; left: 0; right: 0; bottom: 0;
             cursor: pointer;
             z-index: 15;
             opacity: 1;
             transition: opacity 0.4s ease, transform 0.4s ease;
             pointer-events: all;
         }
-
-        .expired-overlay-container.hidden {
-            opacity: 0;
-            transform: scale(0.96);
-            pointer-events: none;
-        }
-
+        .expired-overlay-container.hidden { opacity: 0; transform: scale(0.96); pointer-events: none; }
         .expired-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -763,7 +595,6 @@
             border: 1.5px solid rgba(244, 67, 54, 0.3);
             overflow: hidden;
         }
-
         .expired-overlay::before {
             content: '';
             position: absolute;
@@ -771,7 +602,6 @@
             background: linear-gradient(135deg, rgba(244, 67, 54, 0.06) 0%, transparent 30%, transparent 70%, rgba(131, 58, 180, 0.06) 100%);
             pointer-events: none;
         }
-
         .expired-overlay::after {
             content: '';
             position: absolute;
@@ -784,7 +614,6 @@
             opacity: 0.7;
             pointer-events: none;
         }
-
         .expired-icon-wrap {
             width: 58px;
             height: 58px;
@@ -802,20 +631,11 @@
             padding: 0;
             line-height: 0;
         }
-
         .expired-icon-wrap svg { width: 32px; height: 32px; display: block; }
-
         @keyframes warnPulse {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4), 0 6px 20px rgba(244, 67, 54, 0.25);
-            }
-            50% {
-                transform: scale(1.06);
-                box-shadow: 0 0 0 12px rgba(244, 67, 54, 0), 0 6px 28px rgba(244, 67, 54, 0.55);
-            }
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4), 0 6px 20px rgba(244, 67, 54, 0.25); }
+            50% { transform: scale(1.06); box-shadow: 0 0 0 12px rgba(244, 67, 54, 0), 0 6px 28px rgba(244, 67, 54, 0.55); }
         }
-
         .expired-badge {
             display: inline-flex;
             align-items: center;
@@ -832,7 +652,6 @@
             position: relative;
             z-index: 2;
         }
-
         .expired-badge::before {
             content: '';
             width: 6px;
@@ -842,33 +661,9 @@
             box-shadow: 0 0 8px #ff5252;
             animation: badgeBlink 1.5s ease-in-out infinite;
         }
-
-        @keyframes badgeBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.35; }
-        }
-
-        .expired-text {
-            font-size: 15px;
-            font-weight: 800;
-            color: #fff;
-            margin-bottom: 6px;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-            position: relative;
-            z-index: 2;
-            text-align: center;
-        }
-
-        .expired-subtext {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.65);
-            text-align: center;
-            line-height: 1.6;
-            position: relative;
-            z-index: 2;
-            max-width: 240px;
-        }
-
+        @keyframes badgeBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+        .expired-text { font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 6px; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); position: relative; z-index: 2; text-align: center; }
+        .expired-subtext { font-size: 12px; color: rgba(255, 255, 255, 0.65); text-align: center; line-height: 1.6; position: relative; z-index: 2; max-width: 240px; }
         .expired-tap-hint {
             position: absolute;
             bottom: 14px;
@@ -882,12 +677,9 @@
             z-index: 2;
             animation: hintBounce 2s ease-in-out infinite;
         }
+        @keyframes hintBounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-3px); } }
 
-        @keyframes hintBounce {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-3px); }
-        }
-
+        /* ═══════════════════ TOAST ═══════════════════ */
         .toast {
             position: fixed;
             bottom: 80px;
@@ -906,14 +698,13 @@
             align-items: center;
             gap: 8px;
         }
-
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+        /* ═══════════════════ EMPTY / LOADING / ERROR ═══════════════════ */
         .empty-state { text-align: center; padding: 60px 20px; }
         .empty-icon { font-size: 64px; margin-bottom: 16px; opacity: 0.6; }
         .empty-text { font-size: 16px; color: var(--text); margin-bottom: 8px; font-weight: 600; }
         .empty-subtext { font-size: 13px; color: var(--muted); }
-
         .loading { text-align: center; padding: 40px; color: var(--muted); }
         .spinner {
             border: 3px solid rgba(255, 255, 255, 0.1);
@@ -923,9 +714,7 @@
             animation: spin 1s linear infinite;
             margin: 0 auto 16px;
         }
-
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         .error-message {
             background: rgba(225, 48, 108, 0.15);
             color: var(--primary);
@@ -937,17 +726,15 @@
             border: 1px solid rgba(225, 48, 108, 0.3);
         }
 
+        /* ═══════════════════ FOOTER ═══════════════════ */
         .footer {
             margin-top: 32px;
             padding-top: 24px;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
             text-align: center;
         }
-
         .footer-title { font-size: 12px; color: var(--muted); margin-bottom: 10px; line-height: 1.6; }
-
         .footer-links { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
-
         .footer-link {
             display: inline-flex;
             align-items: center;
@@ -963,10 +750,10 @@
             cursor: pointer;
             font-family: inherit;
         }
-
         .footer-link:active { transform: scale(0.96); background: rgba(225, 48, 108, 0.2); }
         .footer-link svg { width: 16px; height: 16px; flex-shrink: 0; }
 
+        /* ═══════════════════ SCROLL TOP ═══════════════════ */
         #scrollTopBtn {
             position: fixed;
             bottom: 24px;
@@ -990,19 +777,11 @@
             font-family: inherit;
             overflow: hidden;
         }
-
         #scrollTopBtn.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
-
         #scrollTopBtn:active { transform: translateY(0) scale(0.92); box-shadow: 0 2px 8px rgba(225, 48, 108, 0.45); }
+        #scrollTopBtn svg { width: 22px; height: 22px; position: relative; z-index: 1; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3)); }
 
-        #scrollTopBtn svg {
-            width: 22px;
-            height: 22px;
-            position: relative;
-            z-index: 1;
-            filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
-        }
-
+        /* ═══════════════════ INITIAL LOADER ═══════════════════ */
         #initialLoader {
             position: fixed;
             top: 0; left: 0;
@@ -1018,47 +797,8 @@
             transition: opacity 0.6s ease, transform 0.6s ease;
             overflow: hidden;
         }
-
         #initialLoader.hidden { opacity: 0; transform: scale(0.9); pointer-events: none; }
-
-        .loader-logo {
-            width: 80px; height: 80px;
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .loader-logo-inner {
-            width: 100%; height: 100%;
-            background: linear-gradient(135deg, #E1306C 0%, #833AB4 50%, #FCAF45 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            box-shadow: 0 8px 32px rgba(225, 48, 108, 0.6), 0 0 20px rgba(131, 58, 180, 0.4);
-            animation: logoGlow 2s ease-in-out infinite;
-        }
-
-        .loader-logo-inner::before {
-            content: '';
-            position: absolute;
-            width: 72px; height: 72px;
-            background: #0F0F13;
-            border-radius: 50%;
-        }
-
-        .loader-logo-icon { position: relative; z-index: 1; width: 36px; height: 36px; }
-        .loader-logo-icon svg { width: 100%; height: 100%; fill: url(#logoGradient); filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); }
-
-        @keyframes logoGlow { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
-
         .loader-rings { width: 140px; height: 140px; position: relative; margin-bottom: 12px; }
-
         .loader-ring {
             position: absolute;
             width: 100%; height: 100%;
@@ -1066,7 +806,6 @@
             border-radius: 50%;
             animation: rotateRing 2s linear infinite;
         }
-
         .loader-ring:nth-child(1) { border-top-color: #E1306C; border-left-color: rgba(225, 48, 108, 0.3); animation-duration: 1.8s; }
         .loader-ring:nth-child(2) {
             border-right-color: #833AB4;
@@ -1083,13 +822,42 @@
             width: 70%; height: 70%;
             top: 15%; left: 15%;
         }
-
         @keyframes rotateRing {
             0% { transform: rotate(0deg) scale(1); }
             50% { transform: rotate(180deg) scale(1.15); }
             100% { transform: rotate(360deg) scale(1); }
         }
-
+        .loader-logo {
+            width: 80px; height: 80px;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .loader-logo-inner {
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #E1306C 0%, #833AB4 50%, #FCAF45 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(225, 48, 108, 0.6), 0 0 20px rgba(131, 58, 180, 0.4);
+            animation: logoGlow 2s ease-in-out infinite;
+        }
+        .loader-logo-inner::before {
+            content: '';
+            position: absolute;
+            width: 72px; height: 72px;
+            background: #0F0F13;
+            border-radius: 50%;
+        }
+        .loader-logo-icon { position: relative; z-index: 1; width: 36px; height: 36px; }
+        .loader-logo-icon svg { width: 100%; height: 100%; fill: url(#logoGradient); filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); }
+        @keyframes logoGlow { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
         .loader-text {
             margin-top: 80px;
             font-size: 24px;
@@ -1103,31 +871,24 @@
             letter-spacing: -0.5px;
             z-index: 2;
         }
-
         @keyframes gradientMove {
             0%, 100% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
         }
-
         .loader-subtext { margin-top: 10px; font-size: 16px; color: rgba(255, 255, 255, 0.6); z-index: 2; }
-
-        .loader-subtext::after {
-            content: '';
-            animation: dots 1.5s steps(4, end) infinite;
-        }
-
+        .loader-subtext::after { content: ''; animation: dots 1.5s steps(4, end) infinite; }
         @keyframes dots {
             0%, 20% { content: ''; }
             40% { content: '.'; }
             60% { content: '..'; }
             80%, 100% { content: '...'; }
         }
-
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
     </style>
 </head>
 
 <body>
+    <!-- Pull to Refresh -->
     <div class="pull-refresh-container" id="pullRefresh">
         <div class="pull-refresh-inner">
             <svg class="pull-refresh-icon" viewBox="0 0 24 24">
@@ -1143,6 +904,7 @@
         <div class="pull-refresh-text" id="pullRefreshText">برای بروزرسانی بکشید</div>
     </div>
 
+    <!-- Initial Loader -->
     <div id="initialLoader">
         <div class="loader-rings">
             <div class="loader-ring"></div>
@@ -1169,6 +931,7 @@
         <div class="loader-subtext">در حال بارگذاری</div>
     </div>
 
+    <!-- Main Container -->
     <div class="main-container" id="mainContainer">
         <div class="header">
             <h1>خرید اشتراک دی‌ال‌گرام</h1>
@@ -1208,6 +971,7 @@
         </div>
     </div>
 
+    <!-- Scroll Top Button -->
     <button id="scrollTopBtn" aria-label="بازگشت به بالا" onclick="scrollToTop()">
         <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 4l-8 8h5v8h6v-8h5z"/>
@@ -1215,10 +979,19 @@
     </button>
 
     <script>
+        // ═══════════════════════════════════════════════════════════════
+        // تنظیمات پایه
+        // ═══════════════════════════════════════════════════════════════
         const Bale = window.Bale;
         const WebApp = Bale.WebApp;
 
+        // ⚠️ مهم: این دامنه باید در ایران قابل دسترس باشد.
+        // اگر دامنه workers.dev مسدود است، از دامنه اختصاصی استفاده کنید.
+        // مثال: 'https://api.dlgram.ir' یا هر دامنه‌ای که روی Worker تنظیم کرده‌اید.
         const API_BASE = 'https://eshterak-ble-bot.alinouri904.workers.dev';
+
+        // دامنه پشتیبان (اختیاری) — اگر دامنه اصلی پاسخ نداد، از این استفاده می‌شود
+        const API_BASE_FALLBACK = '';
 
         const userData = WebApp.initDataUnsafe.user;
         const userId = userData?.id;
@@ -1238,38 +1011,60 @@
             if (e.ctrlKey && e.key === 's') { e.preventDefault(); return false; }
         });
 
+        // ═══════════════════════════════════════════════════════════════
+        // ابزارهای کمکی
+        // ═══════════════════════════════════════════════════════════════
         function toPersianNumbers(str) {
             const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
             return str.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
         }
 
-        const CACHE_TTL_MS = 5 * 60 * 1000;
-        const CACHE_KEY_FIRST = 'dlgram_first_purchase_v1';
+        function formatPrice(num) {
+            return Number(num).toLocaleString('en-US');
+        }
 
-        function cacheGet(key) {
-            try {
-                const raw = localStorage.getItem(key);
-                if (!raw) return null;
-                const parsed = JSON.parse(raw);
-                if (!parsed || typeof parsed.ts !== 'number') return null;
-                if (Date.now() - parsed.ts > CACHE_TTL_MS) {
-                    localStorage.removeItem(key);
-                    return null;
+        // ═══════════════════════════════════════════════════════════════
+        // درخواست به API با مدیریت خطای شبکه
+        // ═══════════════════════════════════════════════════════════════
+        async function apiFetch(path, options = {}) {
+            const bases = [API_BASE];
+            if (API_BASE_FALLBACK && API_BASE_FALLBACK !== API_BASE) bases.push(API_BASE_FALLBACK);
+
+            let lastError = null;
+
+            for (const base of bases) {
+                try {
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), 8000);
+
+                    const url = `${base}${path}`;
+                    const response = await fetch(url, {
+                        ...options,
+                        signal: controller.signal,
+                        cache: 'no-store'
+                    });
+
+                    clearTimeout(timeout);
+
+                    if (!response.ok) {
+                        const text = await response.text().catch(() => '');
+                        throw new Error(`HTTP ${response.status}${text ? ': ' + text : ''}`);
+                    }
+
+                    return await response.json();
+                } catch (err) {
+                    lastError = err;
+                    console.warn(`[apiFetch] failed for ${base}${path}:`, err.message);
                 }
-                return parsed.data;
-            } catch (_) { return null; }
+            }
+
+            throw lastError || new Error('Network request failed');
         }
 
-        function cacheSet(key, data) {
-            try { localStorage.setItem(key, JSON.stringify({ data, ts: Date.now() })); } catch (_) {}
-        }
-
-        function cacheClear(key) {
-            try { localStorage.removeItem(key); } catch (_) {}
-        }
-
+        // ═══════════════════════════════════════════════════════════════
+        // State
+        // ═══════════════════════════════════════════════════════════════
         let isFirstPurchase = true;
-        let userTelegramId = null;
         let activeDiscount = null;
         let countdownTimer = null;
 
@@ -1310,6 +1105,9 @@
 
         let currentTab = 'plans';
 
+        // ═══════════════════════════════════════════════════════════════
+        // Tab Switching
+        // ═══════════════════════════════════════════════════════════════
         function switchTab(tabName, fromSwipe = false) {
             if (currentTab === tabName && !fromSwipe) return;
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
@@ -1323,6 +1121,9 @@
             if (tabName === 'payments') loadPayments();
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // SVG Helpers
+        // ═══════════════════════════════════════════════════════════════
         function telegramIconSvg() {
             return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#229ED9"/><path fill="#fff" d="M5.5 11.9l10.9-4.2c.5-.2.9.1.8.8l-1.9 8.8c-.1.6-.5.8-1.1.5l-2.9-2.2-1.4 1.4c-.2.2-.3.3-.6.3l.2-3 5.4-4.9c.2-.2 0-.3-.4-.1l-6.7 4.2-2.9-.9c-.6-.2-.6-.6.1-.9z"/></svg>`;
         }
@@ -1331,6 +1132,9 @@
             return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="#ff5252" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13.5" stroke="#ff5252" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1.1" fill="#ff5252"/></svg>`;
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // Discount Logic
+        // ═══════════════════════════════════════════════════════════════
         function isPlanInDiscount(planKey) {
             if (!activeDiscount) return false;
             if (!Array.isArray(activeDiscount.plans)) return true;
@@ -1358,21 +1162,12 @@
             return { basePrice, finalPrice: final, totalPercent };
         }
 
-        function formatPrice(num) {
-            return Number(num).toLocaleString('en-US');
-        }
-
+        // ═══════════════════════════════════════════════════════════════
+        // API Calls
+        // ═══════════════════════════════════════════════════════════════
         async function fetchPlansConfig() {
             try {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 5000);
-                const response = await fetch(`${API_BASE}/api/plans?_t=${Date.now()}`, {
-                    method: 'GET',
-                    signal: controller.signal,
-                    cache: 'no-store'
-                });
-                clearTimeout(timeout);
-                const data = await response.json();
+                const data = await apiFetch(`/api/plans?_t=${Date.now()}`);
                 if (data?.ok) {
                     console.log('[API] plans config fetched:', data.discount);
                     return data;
@@ -1383,18 +1178,12 @@
             return null;
         }
 
-        /* ⭐ حذف cache - همیشه تازه از سرور می‌خوانیم تا برای هر کاربر درست باشد */
         async function fetchFirstPurchaseFresh() {
+            if (!userId) return { ok: true, isFirstPurchase: true, telegramId: null };
             try {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 5000);
-                const response = await fetch(`${API_BASE}/api/check-first-purchase?userId=${userId}&_t=${Date.now()}`, {
-                    method: 'GET',
-                    signal: controller.signal,
-                    cache: 'no-store'
-                });
-                clearTimeout(timeout);
-                const data = await response.json();
+                const data = await apiFetch(
+                    `/api/check-first-purchase?init_data=${encodeURIComponent(WebApp.initData)}&_t=${Date.now()}`
+                );
                 if (data?.ok) {
                     console.log('[API] first purchase fetched:', data.isFirstPurchase);
                     return data;
@@ -1405,6 +1194,9 @@
             return { ok: true, isFirstPurchase: true, telegramId: null };
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // Discount Banner
+        // ═══════════════════════════════════════════════════════════════
         function updateDiscountBanner() {
             const banner = document.getElementById('discountBanner');
             const titleEl = document.getElementById('discountTitle');
@@ -1507,6 +1299,9 @@
             countdownTimer = setInterval(tick, 1000);
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // Load Plans
+        // ═══════════════════════════════════════════════════════════════
         function loadPlans() {
             const plansContent = document.getElementById('plans-content');
             let cardsHtml = '';
@@ -1581,6 +1376,9 @@
             `;
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // External Links
+        // ═══════════════════════════════════════════════════════════════
         function openTelegramBot() {
             if (WebApp.openTelegramLink) WebApp.openTelegramLink('https://t.me/DLGramProBot');
             else if (WebApp.openLink) WebApp.openLink('https://t.me/DLGramProBot');
@@ -1593,6 +1391,9 @@
             else window.open('https://ble.ir/MrAliz', '_blank');
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // Buy Plan
+        // ═══════════════════════════════════════════════════════════════
         async function buyPlan(planKey) {
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('medium');
 
@@ -1615,16 +1416,14 @@
             }
 
             try {
-                const response = await fetch(`${API_BASE}/api/create-invoice`, {
+                const data = await apiFetch('/api/create-invoice', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         plan: planKey,
-                        user_id: userId,
                         init_data: WebApp.initData
                     })
                 });
-                const data = await response.json();
 
                 if (!data.success) throw new Error(data.error || 'خطا در ایجاد فاکتور');
 
@@ -1652,8 +1451,6 @@
         function showPaymentSuccess(invoiceId) {
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.notificationOccurred('success');
 
-            cacheClear(CACHE_KEY_FIRST);
-
             const plansContent = document.getElementById('plans-content');
             plansContent.innerHTML = `
                 <div class="empty-state" style="animation: zoomIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);">
@@ -1670,6 +1467,9 @@
             setTimeout(() => { switchTab('payments'); }, 2500);
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // Payments
+        // ═══════════════════════════════════════════════════════════════
         function getPaymentOrder(payment) {
             if (!payment.used) return 2;
             const isExpired = payment.expires_at_iso && isPaymentExpired(payment.expires_at_iso);
@@ -1699,8 +1499,10 @@
         async function loadPayments() {
             const paymentsContent = document.getElementById('payments-content');
             try {
-                const response = await fetch(`${API_BASE}/api/payments?user_id=${userId}&init_data=${encodeURIComponent(WebApp.initData)}`);
-                const data = await response.json();
+                const data = await apiFetch(
+                    `/api/payments?init_data=${encodeURIComponent(WebApp.initData)}`
+                );
+
                 if (!data.success) throw new Error(data.error || 'خطا در دریافت اطلاعات');
 
                 if (!data.payments || data.payments.length === 0) {
@@ -1831,10 +1633,21 @@
                 paymentsContent.innerHTML = html;
             } catch (error) {
                 console.error('Error loading payments:', error);
-                paymentsContent.innerHTML = `<div class="error-message">خطا در بارگذاری اطلاعات. لطفاً دوباره تلاش کنید.</div>`;
+                paymentsContent.innerHTML = `
+                    <div class="error-message">
+                        خطا در بارگذاری اطلاعات. لطفاً اتصال اینترنت خود را بررسی کنید.
+                        <br><br>
+                        <button onclick="loadPayments()" style="background:var(--primary);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-family:inherit;font-weight:700;cursor:pointer;">
+                            🔄 تلاش دوباره
+                        </button>
+                    </div>
+                `;
             }
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // Helpers
+        // ═══════════════════════════════════════════════════════════════
         function showMessage(message) { WebApp.showAlert(message); }
 
         function showToast(message, duration = 3000) {
@@ -1909,6 +1722,9 @@
             }
         });
 
+        // ═══════════════════════════════════════════════════════════════
+        // Initial Loader
+        // ═══════════════════════════════════════════════════════════════
         const MIN_LOADER_DURATION_MS = 1500;
         let loaderHidden = false;
 
@@ -1928,6 +1744,9 @@
             }, remaining);
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // Scroll Top
+        // ═══════════════════════════════════════════════════════════════
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             if (WebApp.HapticFeedback) WebApp.HapticFeedback.impactOccurred('light');
@@ -1942,6 +1761,9 @@
 
         window.addEventListener('scroll', handleScrollTopVisibility, { passive: true });
 
+        // ═══════════════════════════════════════════════════════════════
+        // Tab Swipe
+        // ═══════════════════════════════════════════════════════════════
         function initTabSwipe() {
             const container = document.getElementById('mainContainer');
             if (!container) return;
@@ -1991,6 +1813,9 @@
             container.addEventListener('touchcancel', () => { tracking = false; isHorizontal = null; }, { passive: true });
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // Pull to Refresh
+        // ═══════════════════════════════════════════════════════════════
         function initPullToRefresh() {
             const THRESHOLD = 90;
             const MAX_PULL = 130;
@@ -2146,6 +1971,9 @@
             }, { passive: true });
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // Init
+        // ═══════════════════════════════════════════════════════════════
         async function init() {
             try {
                 const [plansConfig, fpData] = await Promise.all([
@@ -2168,7 +1996,6 @@
 
                 if (fpData?.ok !== false) {
                     isFirstPurchase = fpData.isFirstPurchase !== false;
-                    userTelegramId = fpData.telegramId || null;
                     console.log('[FIRST_PURCHASE] isFirstPurchase =', isFirstPurchase);
                 }
 
@@ -2182,6 +2009,9 @@
             }
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // Start
+        // ═══════════════════════════════════════════════════════════════
         loadPlans();
         init();
         handleScrollTopVisibility();
